@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://dietiestate25.cu1qeck227j7.us-east-1.rds.amazonaws.com:5432/postgres
+    username: gestore
+    password: 12345678
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
