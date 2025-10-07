@@ -1,0 +1,16 @@
+All'interno dei models ci sono delle convenzioni che vogliamo usare in modo da fare le stesse reference:
+
+1: Il nome della classe in java inizia sempre con una lettera maiuscola e usa il camelCase
+2: Il nome della tabella inizia sempre con una lettera minuscola e usa il camelCase
+3: Il nome della colonna inizia sempre con una lettera minuscola e usa il camelCase
+4: Il nome della variabile inizia sempre con una lettera minuscola e usa il camelCase
+
+5:?? si possono usare @Data  //genera getter e setter
+                    @NoArgsConstructor  //genera costruttore vuoto
+                    @AllArgsConstructor  //genera costruttore con tutti i parametri
+                                       Questi servono per generare automaticamente i metodi getter, setter,
+                                       costruttore vuoto e costruttore con tutti i parametri
+
+6: Il nome della variabile che rappresenta la chiave primaria deve essere idChiave con questa sintassi
+   esempio: private Long idUtente;  //per la tabella utente
+            private Long idProdotto; //per la tabella prodotto
