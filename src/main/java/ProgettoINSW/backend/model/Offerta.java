@@ -1,11 +1,18 @@
 package ProgettoINSW.backend.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "offerta")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Offerta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,43 +44,6 @@ public class Offerta {
 
     @Column(columnDefinition = "TEXT")
     private String note;
-
-    public Offerta() { }
-
-    public Offerta(Immobile immobile, Utente cliente, Agente agente,
-                   BigDecimal prezzoOfferta, String statoOfferta,
-                   OffsetDateTime dataOfferta, String note) {
-        this.immobile = immobile;
-        this.cliente = cliente;
-        this.agente = agente;
-        this.prezzoOfferta = prezzoOfferta;
-        this.statoOfferta = statoOfferta;
-        this.dataOfferta = dataOfferta != null ? dataOfferta : OffsetDateTime.now();
-        this.note = note;
-    }
-    public Long getIdOfferta() { return idOfferta; }
-    public void setIdOfferta(Long idOfferta) { this.idOfferta = idOfferta; }
-
-    public Immobile getImmobile() { return immobile; }
-    public void setImmobile(Immobile immobile) { this.immobile = immobile; }
-
-    public Utente getCliente() { return cliente; }
-    public void setCliente(Utente cliente) { this.cliente = cliente; }
-
-    public Agente getAgente() { return agente; }
-    public void setAgente(Agente agente) { this.agente = agente; }
-
-    public BigDecimal getPrezzoOfferta() { return prezzoOfferta; }
-    public void setPrezzoOfferta(BigDecimal prezzoOfferta) { this.prezzoOfferta = prezzoOfferta; }
-
-    public String getStatoOfferta() { return statoOfferta; }
-    public void setStatoOfferta(String statoOfferta) { this.statoOfferta = statoOfferta; }
-
-    public OffsetDateTime getDataOfferta() { return dataOfferta; }
-    public void setDataOfferta(OffsetDateTime dataOfferta) { this.dataOfferta = dataOfferta; }
-
-    public String getNote() { return note; }
-    public void setNote(String note) { this.note = note; }
 
     @Override
     public String toString() {
