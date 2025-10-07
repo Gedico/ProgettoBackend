@@ -30,11 +30,10 @@ public class Indicatore {
     @Column(name = "distanza", precision = 6, scale = 2)
     private Double distanza;
 
-    //non ho ancora immobile disponibile
-    /*@ManyToOne
+    @ManyToOne
     @JoinColumn(name = "id_inserzione", nullable = false,
             foreignKey = @ForeignKey(name = "fk_indicatore_inserzione"))
-    private Immobile immobile;*/
+    private Immobile immobile;
 
     public enum TipoIndicatore {
         SCUOLA, PARCO, CENTRO, RISTORANTE, ALTRO
