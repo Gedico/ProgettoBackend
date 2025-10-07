@@ -5,7 +5,7 @@ All'interno dei models ci sono delle convenzioni che vogliamo usare in modo da f
 3: Il nome della colonna inizia sempre con una lettera minuscola e usa il camelCase
 4: Il nome della variabile inizia sempre con una lettera minuscola e usa il camelCase
 
-5:?? si possono usare @Data  //genera getter e setter
+5:si possono usare @Data  //genera getter e setter
                       @NoArgsConstructor  //genera costruttore vuoto
                       @AllArgsConstructor  //genera costruttore con tutti i parametri
                                        Questi servono per generare automaticamente i metodi getter, setter,
@@ -14,3 +14,8 @@ All'interno dei models ci sono delle convenzioni che vogliamo usare in modo da f
 6: Il nome della variabile che rappresenta la chiave primaria deve essere idChiave con questa sintassi
    esempio: private Long idUtente;  //per la tabella utente
             private Long idProdotto; //per la tabella prodotto
+
+** in offerta usiamo @ManyToOne(fetch = FetchType.LAZY)
+   perche una offerta appartiene a un solo prodotto ma un prodotto puo avere piu offerte
+   e utilizziamo .LAZY perche non vogliamo caricare tutte le offerte quando carichiamo un prodotto, ma le volgioamo
+   caricare solo quando le chiediamo esplicitamente.
