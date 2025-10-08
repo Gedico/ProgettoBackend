@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -31,6 +33,10 @@ public class Immobile {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_posizione", nullable = false)
     private Posizione posizione;
+
+    // Relazione con FotoImmobile
+    @OneToMany(mappedBy = "immobile", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FotoImmobili> fotoImmobili = new ArrayList<>();
 
     @Column(length = 150, nullable = false)
     @NotBlank

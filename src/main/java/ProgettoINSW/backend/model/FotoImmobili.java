@@ -1,5 +1,6 @@
 package ProgettoINSW.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class FotoImmobili {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_immobile", nullable = false)
+    @JsonBackReference
     private Immobile immobile;
 
     @Column(name = "url_foto", length = 500, nullable = false, unique = true)
