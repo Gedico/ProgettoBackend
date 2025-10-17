@@ -18,7 +18,7 @@ public class Indicatore {
     @Column(name = "tipo", nullable = false, length = 50)
     private TipoIndicatore tipo;
 
-    @Column(name = "distanza", precision = 6, scale = 2)
+    @Column(name = "distanza")
     private Double distanza;
 
     @ManyToOne

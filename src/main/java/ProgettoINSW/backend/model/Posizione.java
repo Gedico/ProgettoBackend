@@ -13,10 +13,10 @@ public class Posizione {
     @Column(name = "id_posizione")
     private Long idPosizione;
 
-    @Column(nullable = false, precision = 9, scale = 6)
+    @Column(nullable = false)
     private BigDecimal latitudine;
 
-    @Column(nullable = false, precision = 9, scale = 6)
+    @Column(nullable = false)
     private BigDecimal longitudine;
 
     @Column(length = 255)

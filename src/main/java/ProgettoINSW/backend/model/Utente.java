@@ -1,6 +1,8 @@
 package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -21,7 +23,7 @@ public class Utente {
     private String indirizzo;
 
     @Column(name="data_di_iscrizione", nullable = false)
-    private Date data_di_iscrizione;
+    private LocalDateTime dataIscrizione;
 
 
 
@@ -51,12 +53,12 @@ public class Utente {
         this.indirizzo = indirizzo;
     }
 
-    public Date getData_di_iscrizione() {
-        return data_di_iscrizione;
+    public LocalDateTime getData_di_iscrizione() {
+        return dataIscrizione;
     }
 
-    public void setData_di_iscrizione(Date data_di_iscrizione) {
-        this.data_di_iscrizione = data_di_iscrizione;
+    public void setDataIscrizione(LocalDateTime dataIscrizione) {
+        this.dataIscrizione = dataIscrizione;
     }
 
 
@@ -70,6 +72,6 @@ public class Utente {
         this.idUtente = idUtente;
         this.account = account;
         this.indirizzo = indirizzo;
-        this.data_di_iscrizione = data_di_iscrizione;
+        this.dataIscrizione = dataIscrizione;
     }
 }
