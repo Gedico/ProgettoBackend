@@ -1,0 +1,149 @@
+============================================================
+        LINEE GUIDA PER LO SVILUPPO BACKEND - DietiEstate25
+============================================================
+
+OBIETTIVO
+---------
+Lo sviluppo del backend seguirà un approccio IBRIDO e FUNZIONALE,
+che combina ordine architetturale e sviluppo guidato dalle API.
+L’obiettivo è mantenere chiarezza, scalabilità e allineamento
+continuo con il frontend (Angular).
+
+
+STRUTTURA GENERALE DEL PROGETTO
+-------------------------------
+Il backend è organizzato in una classica architettura a tre livelli:
+
+    controller/    -> gestione delle richieste HTTP (API)
+    service/       -> logica applicativa
+    repository/    -> accesso al database tramite JPA
+    model/         -> entità e relazioni
+    dto/           -> oggetti di trasferimento dati (request/response)
+    security/      -> gestione JWT e autenticazione
+    exception/     -> gestione centralizzata degli errori
+    util/          -> Gestione degli ogetti
+    config/        -> Configurazioni per security
+
+Ogni funzionalità (es. gestione account, inserzioni, proposte)
+avrà il proprio set completo di componenti nei vari strati.
+
+
+FASE 1 — STRUTTURA BASE DEL PROGETTO
+------------------------------------
+Creare una base solida e coerente:
+  - Tutte le entità principali con relazioni e vincoli
+  - Le repository vuote (extends JpaRepository)
+  - Definizione della struttura dei package (vedi sopra)
+  - Configurazione del file application.yml con connessione al DB AWS
+
+Questa fase serve per costruire lo scheletro tecnico del backend.
+
+
+FASE 2 — DEFINIZIONE DEGLI USE CASE / API
+-----------------------------------------
+In questa fase si elencano tutti i casi d’uso principali (use case)
+e i relativi endpoint REST che dovranno essere implementati.
+
+Per ogni API è indicato:
+    - Endpoint HTTP
+    - Metodo
+    - Descrizione della funzionalità
+    - Necessità di autenticazione (Auth)
+    - Ruolo richiesto (Utente / Agente / Admin)
+
+--------------------------------------------------------------------------------
+ ACCOUNT E AUTENTICAZIONE
+--------------------------------------------------------------------------------
+    /api/account/register         POST    Registra un nuovo utente                   NO     Tutti
+    /api/account/login            POST    Effettua il login e restituisce token JWT  NO     Tutti
+    /api/account/profile          GET     Restituisce i dati del profilo             SI     Tutti
+    /api/account/profile          PUT     Aggiorna i dati del profilo                SI     Tutti
+    /api/account/delete           DELETE  Elimina l’account utente                   SI     Tutti
+
+--------------------------------------------------------------------------------
+ INSERZIONI IMMOBILIARI
+--------------------------------------------------------------------------------
+    /api/inserzioni               POST    Crea una nuova inserzione immobiliare      SI     Agente
+    /api/inserzioni               GET     Ricerca e filtra le inserzioni             NO     Tutti
+    /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti
+    /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente
+    /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente
+    /api/inserzioni/{id}/immagini POST    Aggiunge immagini all’inserzione           SI     Agente
+    /api/inserzioni/{id}/status   PUT     Cambia stato (attiva, sospesa, venduta)    SI     Agente
+
+--------------------------------------------------------------------------------
+ PROPOSTE DI ACQUISTO / CONTATTO
+--------------------------------------------------------------------------------
+    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente
+    /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente
+    /api/proposte/{id}            GET     Mostra i dettagli di una proposta          SI     Agente
+    /api/proposte/{id}            PUT     Aggiorna stato proposta (accettata/rifiutata) SI Agente
+    /api/proposte/{id}            DELETE  Elimina una proposta                       SI     Agente
+
+--------------------------------------------------------------------------------
+ INDICATORI DI PROSSIMITÀ
+--------------------------------------------------------------------------------
+    /api/indicatori               POST    Crea un indicatore di prossimità           SI     Admin
+    /api/indicatori               GET     Restituisce tutti gli indicatori           NO     Tutti
+    /api/indicatori/{id}          GET     Dettagli di un indicatore                  NO     Tutti
+    /api/indicatori/{id}          PUT     Modifica un indicatore                     SI     Admin
+    /api/indicatori/{id}          DELETE  Elimina un indicatore                      SI     Admin
+    /api/inserzioni/{id}/prox     GET     Restituisce indicatori vicini all’immobile NO     Tutti
+
+--------------------------------------------------------------------------------
+ AMMINISTRAZIONE E STATISTICHE
+--------------------------------------------------------------------------------
+    /api/admin/utenti             GET     Elenca tutti gli utenti registrati         SI     Admin
+    /api/admin/inserzioni         GET     Elenca tutte le inserzioni del sistema     SI     Admin
+    /api/admin/statistiche        GET     Ritorna dati aggregati (n. utenti, n. inserzioni, ecc.) SI Admin
+
+
+Questa tabella fungerà da roadmap di sviluppo e da riferimento
+per il frontend.
+
+
+FASE 3 — SVILUPPO PER FUNZIONALITÀ (API-DRIVEN)
+-----------------------------------------------
+Le funzionalità vengono implementate UNA ALLA VOLTA, partendo
+dalle API definite.
+
+Per ogni API:
+  1. Creare o aggiornare il Controller (endpoint REST)
+  2. Implementare il Service con la logica di business
+  3. Aggiungere i metodi necessari nella Repository (solo se servono)
+  4. Verificare l’API con Postman
+  5. Documentare nel file README_API.txt cosa fa e i parametri richiesti
+
+Ordine suggerito di sviluppo:
+  1. Registrazione utente
+  2. Login e JWT
+  3. Creazione e visualizzazione inserzioni
+  4. Proposte immobiliari
+  5. Gestione ruoli e permessi
+
+
+PRINCIPI GUIDA
+--------------
+- MODULARITÀ: ogni API deve funzionare indipendentemente dalle altre.
+- PULIZIA DEL CODICE: la logica va nei Service, non nei Controller.
+- TEST INCREMENTALE: ogni endpoint va testato singolarmente con Postman.
+- ALLINEAMENTO FRONTEND-BACKEND: ogni nuova API deve essere comunicata
+  al team frontend per l’integrazione.
+- GESTIONE ERRORI UNIFICATA: usare @ControllerAdvice per gestire le
+  eccezioni e restituire messaggi di errore coerenti.
+
+
+RIASSUNTO OPERATIVO
+-------------------
+    Step 1  -> Creare entità, repository e struttura base        (Strutturale)
+    Step 2  -> Definire tutte le chiamate API del progetto       (Analitico)
+    Step 3  -> Implementare API una alla volta                   (Funzionale)
+    Step 4  -> Test e documentazione di ogni endpoint            (Qualità)
+    Step 5  -> Integrazione progressiva con Angular              (Iterativo)
+
+
+NOTE FINALI
+-----------
+Questo metodo consente di mantenere ordine e coerenza,
+senza perdere la visione d’insieme dell’applicazione.
+Ogni fase deve produrre un risultato funzionante e testabile.

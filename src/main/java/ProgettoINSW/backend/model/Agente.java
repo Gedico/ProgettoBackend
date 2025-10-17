@@ -1,13 +1,11 @@
 package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+
 
 @Entity
 @Table(name = "agente")
-@Data// CREA GETTER E SETTER
-@NoArgsConstructor// CREA COSTRUTTORE VUOTO
-@AllArgsConstructor//CREA COSTRUTTORE CON TUTTI I PARAMETRI
+
 public class Agente {
 
     @Id
@@ -22,4 +20,45 @@ public class Agente {
 
     @Column(name = "agenzia", length = 255)
     private String agenzia;
+
+
+    //Getter e Setter
+
+
+    public Long getIdAgente() {
+        return idAgente;
+    }
+
+    public void setIdAgente(Long idAgente) {
+        this.idAgente = idAgente;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public String getAgenzia() {
+        return agenzia;
+    }
+
+    public void setAgenzia(String agenzia) {
+        this.agenzia = agenzia;
+    }
+
+
+    //Costruttori
+
+
+    public Agente() {
+    }
+
+    public Agente(Long idAgente, Account account, String agenzia) {
+        this.idAgente = idAgente;
+        this.account = account;
+        this.agenzia = agenzia;
+    }
 }

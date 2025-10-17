@@ -1,18 +1,11 @@
 package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.math.BigDecimal;
 
 
 @Entity
 @Table(name = "posizione")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Posizione {
 
     @Id
@@ -30,5 +23,54 @@ public class Posizione {
     private String descrizione;
 
 
+    //Getter e Setter
+
+
+    public Long getIdPosizione() {
+        return idPosizione;
+    }
+
+    public void setIdPosizione(Long idPosizione) {
+        this.idPosizione = idPosizione;
+    }
+
+    public BigDecimal getLatitudine() {
+        return latitudine;
+    }
+
+    public void setLatitudine(BigDecimal latitudine) {
+        this.latitudine = latitudine;
+    }
+
+    public BigDecimal getLongitudine() {
+        return longitudine;
+    }
+
+    public void setLongitudine(BigDecimal longitudine) {
+        this.longitudine = longitudine;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+
+    //Costruttori
+
+
+    public Posizione() {
+    }
+
+
+    public Posizione(Long idPosizione, BigDecimal latitudine, BigDecimal longitudine, String descrizione) {
+        this.idPosizione = idPosizione;
+        this.latitudine = latitudine;
+        this.longitudine = longitudine;
+        this.descrizione = descrizione;
+    }
 }
 

@@ -1,4 +1,4 @@
 package ProgettoINSW.backend.service;
 
-public class ImmobileService {
+public interface ImmobileService {
 }

@@ -1,0 +1,5 @@
+I package sono dei contenitori delle classi o interfaccie che servono semplicemente per tenere il codice ordinato e permettere
+la sua manutenibilità, oltre a permettere di evitare conflitti di nomi tra classi o interfaccie con lo stesso nome ma in package diversi.
+
+La sintassi del package è sempre con la lettera minuscola, e se si nota la necessità di raggruppare deifile in unico contenitore va creato un nuovo
+package, in conclusione al di fuori dei package ci deve essere solo backend application, oppure qualche classe ma in caso di eccezioni.
