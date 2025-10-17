@@ -1,5 +1,6 @@
 package ProgettoINSW.backend.model;
 
+import ProgettoINSW.backend.model.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -32,9 +33,9 @@ public class Account {
     @Column(unique = true)
     private String numero;
 
-    @NotBlank(message = "Il ruolo è obbligatorio")
-    @Pattern(regexp = "ADMIN|AGENTE|UTENTE", message = "Ruolo non valido")
-    private String ruolo;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private Role ruolo;
 
 
     //Getter e Setter
@@ -87,22 +88,20 @@ public class Account {
         this.numero = numero;
     }
 
-    public String getRuolo() {
+    public Role getRuolo() {
         return ruolo;
     }
-
-    public void setRuolo(String ruolo) {
+    public void setRuolo(Role ruolo) {
         this.ruolo = ruolo;
     }
 
-
-  // Costruttori
+    // Costruttori
 
 
     public Account() {
     }
 
-    public Account(Long id_account, String nome, String cognome, String mail, String password, String numero, String ruolo) {
+    public Account(Long id_account, String nome, String cognome, String mail, String password, String numero, Role ruolo) {
         this.id_account = id_account;
         this.nome = nome;
         this.cognome = cognome;

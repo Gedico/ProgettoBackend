@@ -35,7 +35,7 @@ public class Immobile {
     @Column(length = 1000)
     private String descrizione;
 
-    @Column(precision = 12, scale = 2, nullable = false)
+    @Column( nullable = false)
     @NotNull
     @DecimalMin("0.0")
     private BigDecimal prezzo;

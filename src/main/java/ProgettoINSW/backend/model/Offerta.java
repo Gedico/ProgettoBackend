@@ -24,7 +24,7 @@ public class Offerta {
     @JoinColumn(name = "id_agente")
     private Agente agente;
 
-    @Column(name = "prezzo_offerta", precision = 12, scale = 2, nullable = false)
+    @Column(name = "prezzo_offerta",  nullable = false)
     @DecimalMin("0.0")
     private BigDecimal prezzoOfferta;
 
