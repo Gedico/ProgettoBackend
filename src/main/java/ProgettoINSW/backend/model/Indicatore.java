@@ -1,21 +1,12 @@
 package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import lombok.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Entity
 @Table(name = "agente")
-@Data// CREA GETTER E SETTER
-@NoArgsConstructor// CREA COSTRUTTORE VUOTO
-@AllArgsConstructor//CREA COSTRUTTORE CON TUTTI I PARAMETRI
-
 public class Indicatore {
 
     @Id
@@ -39,4 +30,51 @@ public class Indicatore {
         SCUOLA, PARCO, CENTRO, RISTORANTE, ALTRO
     }
 
+    //Getter e Setter
+
+
+    public Long getIdIndicatore() {
+        return idIndicatore;
+    }
+
+    public void setIdIndicatore(Long idIndicatore) {
+        this.idIndicatore = idIndicatore;
+    }
+
+    public TipoIndicatore getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoIndicatore tipo) {
+        this.tipo = tipo;
+    }
+
+    public Double getDistanza() {
+        return distanza;
+    }
+
+    public void setDistanza(Double distanza) {
+        this.distanza = distanza;
+    }
+
+    public Immobile getImmobile() {
+        return immobile;
+    }
+
+    public void setImmobile(Immobile immobile) {
+        this.immobile = immobile;
+    }
+
+
+    //Costruttori
+
+    public Indicatore() {
+    }
+
+    public Indicatore(Long idIndicatore, TipoIndicatore tipo, Double distanza, Immobile immobile) {
+        this.idIndicatore = idIndicatore;
+        this.tipo = tipo;
+        this.distanza = distanza;
+        this.immobile = immobile;
+    }
 }

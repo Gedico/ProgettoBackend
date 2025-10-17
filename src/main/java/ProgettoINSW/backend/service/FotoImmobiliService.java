@@ -1,4 +1,4 @@
 package ProgettoINSW.backend.service;
 
-public class FotoImmobiliService {
+public interface FotoImmobiliService {
 }

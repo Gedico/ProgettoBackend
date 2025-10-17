@@ -1,4 +1,4 @@
 package ProgettoINSW.backend.service;
 
-public class AgenteService {
+public interface AgenteService {
 }

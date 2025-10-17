@@ -2,16 +2,10 @@ package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 
 @Entity
 @Table(name = "account")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Account {
 
     @Id
@@ -42,4 +36,79 @@ public class Account {
     @Pattern(regexp = "ADMIN|AGENTE|UTENTE", message = "Ruolo non valido")
     private String ruolo;
 
+
+    //Getter e Setter
+
+    public Long getId_account() {
+        return id_account;
+    }
+
+    public void setId_account(Long id_account) {
+        this.id_account = id_account;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getCognome() {
+        return cognome;
+    }
+
+    public void setCognome(String cognome) {
+        this.cognome = cognome;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public String getRuolo() {
+        return ruolo;
+    }
+
+    public void setRuolo(String ruolo) {
+        this.ruolo = ruolo;
+    }
+
+
+  // Costruttori
+
+
+    public Account() {
+    }
+
+    public Account(Long id_account, String nome, String cognome, String mail, String password, String numero, String ruolo) {
+        this.id_account = id_account;
+        this.nome = nome;
+        this.cognome = cognome;
+        this.mail = mail;
+        this.password = password;
+        this.numero = numero;
+        this.ruolo = ruolo;
+    }
 }

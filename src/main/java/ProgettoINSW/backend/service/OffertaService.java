@@ -1,4 +1,4 @@
 package ProgettoINSW.backend.service;
 
-public class OffertaService {
+public interface OffertaService {
 }

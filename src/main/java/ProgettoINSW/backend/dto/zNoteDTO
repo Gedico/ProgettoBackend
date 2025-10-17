@@ -1,0 +1,79 @@
+============================================================
+                  DTO - DATA TRANSFER OBJECT
+============================================================
+
+COS’È UN DTO
+-------------
+Un DTO (Data Transfer Object) è un oggetto utilizzato per
+trasferire dati tra i vari livelli di un’applicazione,
+senza esporre direttamente le entità del database.
+
+In pratica, è una **classe semplice** che contiene solo
+campi e metodi getter/setter, senza logica complessa.
+
+---
+
+PERCHÉ USARLO
+--------------
+1. SEPARAZIONE DEI LIVELLI
+   - Permette di separare il modello dati interno (entity)
+     dalla struttura dei dati richiesta o restituita dal client.
+   - Evita che modifiche alle entity impattino direttamente il frontend.
+
+2. SICUREZZA
+   - Non espone campi sensibili (es. password o dati interni)
+     direttamente alle API.
+
+3. FLESSIBILITÀ
+   - Consente di adattare i dati inviati/ricevuti dal client
+     senza modificare le entità del database.
+   - Possiamo avere DTO diversi per la stessa entity (ad esempio
+     uno per la registrazione e uno per la visualizzazione del profilo).
+
+4. VALIDAZIONE
+   - Possiamo aggiungere annotazioni di validazione direttamente
+     sul DTO (es. @NotBlank, @Email) per verificare i dati
+     prima di salvarli nel database.
+
+5. MANUTENIBILITÀ E ORDINAMENTO DEL CODICE
+   - Raggruppando i DTO in pacchetti dedicati, il progetto
+     rimane ordinato e leggibile.
+   - Favorisce il riuso e la chiarezza su quali dati vengono
+     scambiati con il client.
+
+---
+
+DOVE INSERIRLI NEL PROGETTO
+----------------------------
+- Creare un package dedicato ai DTO:
+    src/main/java/org/example/dto
+
+- Eventualmente, creare sottopackage per dominio o funzionalità:
+    - dto/account         -> per registrazione, login, profilo
+    - dto/inserzione      -> per CRUD inserzioni
+    - dto/proposta        -> per invio e gestione proposte
+    - dto/indicatore      -> per indicatori di prossimità
+
+- Usare i DTO nei Controller e nei Service, mai esporre direttamente
+  le entity alle API REST.
+
+---
+
+ES. DTO REGISTRAZIONE ACCOUNT
+------------------------------
+1. RegisterRequest.java
+   - Contiene i campi richiesti dall’utente per registrarsi
+     (nome, cognome, email, password).
+
+2. RegisterResponse.java
+   - Contiene i dati che il server restituisce dopo la registrazione
+     (messaggio di conferma, id dell’utente).
+
+---
+
+CONCLUSIONE
+------------
+I DTO sono strumenti fondamentali per mantenere pulizia, sicurezza
+e manutenibilità nel backend di un’applicazione. Permettono di
+gestire i dati scambiati tra client e server in maniera chiara,
+coerente e modulare.

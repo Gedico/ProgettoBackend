@@ -3,19 +3,12 @@ package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.OffsetDateTime;
 import java.math.BigDecimal;
 
 
 @Entity
 @Table(name = "immobile")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Immobile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,6 +62,135 @@ public class Immobile {
     private String categoria;
 
 
+    //getter e Setter
+
+
+    public Long getIdImmobile() {
+        return idImmobile;
+    }
+
+    public void setIdImmobile(Long idImmobile) {
+        this.idImmobile = idImmobile;
+    }
+
+    public Agente getAgente() {
+        return agente;
+    }
+
+    public void setAgente(Agente agente) {
+        this.agente = agente;
+    }
+
+    public Posizione getPosizione() {
+        return posizione;
+    }
+
+    public void setPosizione(Posizione posizione) {
+        this.posizione = posizione;
+    }
+
+    public String getTitolo() {
+        return titolo;
+    }
+
+    public void setTitolo(String titolo) {
+        this.titolo = titolo;
+    }
+
+    public OffsetDateTime getDataCreazione() {
+        return dataCreazione;
+    }
+
+    public void setDataCreazione(OffsetDateTime dataCreazione) {
+        this.dataCreazione = dataCreazione;
+    }
+
+    public String getDescrizione() {
+        return descrizione;
+    }
+
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
+    }
+
+    public BigDecimal getPrezzo() {
+        return prezzo;
+    }
+
+    public void setPrezzo(BigDecimal prezzo) {
+        this.prezzo = prezzo;
+    }
+
+    public Integer getDimensioni() {
+        return dimensioni;
+    }
+
+    public void setDimensioni(Integer dimensioni) {
+        this.dimensioni = dimensioni;
+    }
+
+    public Integer getNumeroStanze() {
+        return numeroStanze;
+    }
+
+    public void setNumeroStanze(Integer numeroStanze) {
+        this.numeroStanze = numeroStanze;
+    }
+
+    public Integer getPiano() {
+        return piano;
+    }
+
+    public void setPiano(Integer piano) {
+        this.piano = piano;
+    }
+
+    public Boolean getAscensore() {
+        return ascensore;
+    }
+
+    public void setAscensore(Boolean ascensore) {
+        this.ascensore = ascensore;
+    }
+
+    public String getClasseEnergetica() {
+        return classeEnergetica;
+    }
+
+    public void setClasseEnergetica(String classeEnergetica) {
+        this.classeEnergetica = classeEnergetica;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+
+    //Costruttori
+
+
+    public Immobile() {
+    }
+
+    public Immobile(Long idImmobile, Agente agente, Posizione posizione, String titolo, OffsetDateTime dataCreazione, String descrizione, BigDecimal prezzo, Integer dimensioni, Integer numeroStanze, Integer piano, Boolean ascensore, String classeEnergetica, String categoria) {
+        this.idImmobile = idImmobile;
+        this.agente = agente;
+        this.posizione = posizione;
+        this.titolo = titolo;
+        this.dataCreazione = dataCreazione;
+        this.descrizione = descrizione;
+        this.prezzo = prezzo;
+        this.dimensioni = dimensioni;
+        this.numeroStanze = numeroStanze;
+        this.piano = piano;
+        this.ascensore = ascensore;
+        this.classeEnergetica = classeEnergetica;
+        this.categoria = categoria;
+    }
 
     // Costruttore parziale con campi obbligatori
     public Immobile(Agente agente, Posizione posizione, String titolo,

@@ -2,15 +2,9 @@ package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "FotoImmobili")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class FotoImmobili {
 
     @Id
@@ -27,5 +21,43 @@ public class FotoImmobili {
     private String urlFoto;
 
 
+    //Getter e Setter
 
+
+    public Long getIdFoto() {
+        return idFoto;
+    }
+
+    public void setIdFoto(Long idFoto) {
+        this.idFoto = idFoto;
+    }
+
+    public Immobile getImmobile() {
+        return immobile;
+    }
+
+    public void setImmobile(Immobile immobile) {
+        this.immobile = immobile;
+    }
+
+    public String getUrlFoto() {
+        return urlFoto;
+    }
+
+    public void setUrlFoto(String urlFoto) {
+        this.urlFoto = urlFoto;
+    }
+
+
+    //Costruttori
+
+    public FotoImmobili() {
+    }
+
+
+    public FotoImmobili(Long idFoto, Immobile immobile, String urlFoto) {
+        this.idFoto = idFoto;
+        this.immobile = immobile;
+        this.urlFoto = urlFoto;
+    }
 }
