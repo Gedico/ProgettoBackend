@@ -9,11 +9,11 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-    boolean existsByEmailIgnoreCase(String email);
+
 
     boolean existsByMailIgnoreCase(String mail);
 
-    Account save(Account  account);
+   // Account save(Account  account); //dice che è gia ereditata da jpa
 
 
 

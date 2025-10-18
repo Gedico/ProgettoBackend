@@ -29,7 +29,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public RegisterResponseUtente registraUtente(RegisterRequestUtente request){
 
-        if(accountRepository.existsByEmailIgnoreCase(request.getMail())){
+        if(accountRepository.existsByMailIgnoreCase(request.getMail())){
             throw new RuntimeException("Email già registrata");//Possibile exception personalizzata nelle exception
         }
 

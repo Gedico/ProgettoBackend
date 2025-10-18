@@ -11,7 +11,9 @@ import java.util.List;
 @Repository
 public interface OffertaRepository extends JpaRepository<Offerta, Long> {
 
-    List<Offerta> findByidImmobile(Long idImmobile);
+
+
+    List<Offerta> findByImmobileIdImmobile(Long idImmobile);
 
     List<Offerta> findByClienteIdUtente(Long idUtente);
 
