@@ -7,6 +7,7 @@ public class RegisterRequestUtente {
     private String password;
     private String numero;
     private String indirizzo;
+    private String messaggio;
 
     //Getter e Setter
     public String getNome() {
@@ -56,4 +57,8 @@ public class RegisterRequestUtente {
     public void setIndirizzo(String indirizzo) {
         this.indirizzo = indirizzo;
     }
+
+    public String getMessaggio() { return messaggio; }   // <-- corretto
+    public void setMessaggio(String messaggio) { this.messaggio = messaggio; } // <-- corretto
 }
+

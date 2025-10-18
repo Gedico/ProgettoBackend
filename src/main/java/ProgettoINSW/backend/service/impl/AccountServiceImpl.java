@@ -57,6 +57,9 @@ public class AccountServiceImpl implements AccountService {
         response.setMail(savedAccount.getMail());
         response.setRuolo(savedAccount.getRuolo());
         response.setIndirizzo(utente.getIndirizzo());
+
+        response.setNumero(savedAccount.getNumero());
+        response.setMessaggio(request.getMessaggio());
         
         
         return response;

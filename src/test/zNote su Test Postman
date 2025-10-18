@@ -1,0 +1,51 @@
+1️⃣ RegisterRequestUtente
+
+Problema iniziale: il campo messaggio non esisteva realmente, quindi tentavamo di richiamare il get di un messaggio non settato.
+
+Cambiamento: abbiamo aggiunto il campo messaggio con getter e setter reali, così il service può leggerlo dalla richiesta.
+
+private String messaggio;
+
+public String getMessaggio() { return messaggio; }
+public void setMessaggio(String messaggio) { this.messaggio = messaggio; }
+
+2️⃣ AccountServiceImpl
+
+Problema iniziale:
+
+numero veniva salvato nell’Account, ma non veniva impostato nella response.
+
+messaggio non veniva mai salvato né restituito.
+
+Cambiamento: nella parte in cui crei RegisterResponseUtente, abbiamo aggiunto:
+
+response.setNumero(savedAccount.getNumero());
+response.setMessaggio(request.getMessaggio());
+
+
+Questo assicura che entrambi i campi siano presenti nella response dopo la POST (nella prima prova sul mio locale postman, la registrazione dell'utente
+avveniva ma con il salvataggio dei campi numero e messaggio: null)
+
+3️⃣ RegisterResponseUtente
+
+Problema iniziale: non conteneva i campi numero e messaggio.
+
+Cambiamento: aggiungere i campi e i relativi getter/setter:
+
+private String numero;
+private String messaggio;
+
+public String getNumero() { return numero; }
+public void setNumero(String numero) { this.numero = numero; }
+
+public String getMessaggio() { return messaggio; }
+public void setMessaggio(String messaggio) { this.messaggio = messaggio; }
+
+
+Così la response JSON inviata a Postman include tutti i dati dell’utente.
+
+4️⃣ Test con Postman
+
+Creata una nuova POST con email diversa da quella già registrata.
+Nel body JSON, inviati tutti i campi inclusi numero e messaggio.
+La response adesso mostra correttamente tutti i campi, segno che la registrazione funziona.

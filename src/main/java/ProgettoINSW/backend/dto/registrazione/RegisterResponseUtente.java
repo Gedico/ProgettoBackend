@@ -72,9 +72,7 @@ public class RegisterResponseUtente {
         this.ruolo = ruolo;
     }
 
-    public String getMessaggio() {
-        return messaggio;
-    }
+
 
     public void setMessaggio(String messaggio) {
         this.messaggio = messaggio;
