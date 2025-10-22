@@ -39,4 +39,17 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    // Endpoint per l'eliminazione
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
+        try {
+            accountService.eliminaAccount(id);
+            return ResponseEntity.ok("Account eliminato con successo!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
+
 }

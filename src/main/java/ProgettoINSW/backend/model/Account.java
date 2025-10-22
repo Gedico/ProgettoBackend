@@ -11,7 +11,8 @@ public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_account;
+    @Column(name= "id_account")
+    private Long id;
 
     @NotBlank(message = "Il nome è obbligatorio")
     @Size(max = 20)
@@ -44,12 +45,10 @@ public class Account {
 
     //Getter e Setter
 
-    public Long getId_account() {
-        return id_account;
-    }
+    public Long getId() {return id; }
 
-    public void setId_account(Long id_account) {
-        this.id_account = id_account;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() {
@@ -105,8 +104,8 @@ public class Account {
     public Account() {
     }
 
-    public Account(Long id_account, String nome, String cognome, String email, String password, String numero, Role ruolo) {
-        this.id_account = id_account;
+    public Account(Long id, String nome, String cognome, String email, String password, String numero, Role ruolo) {
+        this.id = id;
         this.nome = nome;
         this.cognome = cognome;
         this.mail = mail;

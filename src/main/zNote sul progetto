@@ -143,7 +143,43 @@ RIASSUNTO OPERATIVO
 
 
 NOTE FINALI
------------
 Questo metodo consente di mantenere ordine e coerenza,
 senza perdere la visione d’insieme dell’applicazione.
 Ogni fase deve produrre un risultato funzionante e testabile.
+-***********************************************************************************************-
+DA LEGGERE:
+
+1) LOGIN
+Il sistema deve permettere all’utente di accedere se le sue credenziali sono corrette.
+
+-DTO (Data Transfer Object):
+LoginRequest → contiene la mail e la password che l’utente inserisce.
+LoginResponse → contiene il messaggio di risposta (“login effettuato con successo”) e altri dati come ruolo e token.
+
+-Service:
+Nel metodo loginUtente() cerchiamo nel database l’account con quella mail (accountRepository.findByMailIgnoreCase()).
+Se non esiste → errore “utente non trovato”.
+Se esiste ma la password è sbagliata → errore “password errata”.
+Se tutto è corretto → ritorniamo una LoginResponse con successo.
+
+-Controller:
+Espone un endpoint /api/auth/login che riceve la richiesta da Postman o dal frontend e risponde con il risultato del login.
+ Quindi, il login verifica i dati dell’utente, confronta mail e password nel database e risponde con un messaggio di conferma o errore.
+
+
+2) ELIMINAZIONE ACCOUNT
+Aggiunta, successivamente, di cancellare un account e il relativo utente a cui si è collegato quest'ultimo.
+
+-Service:
+eliminaAccount(Long idAccount) prima controlla se l’account esiste (findById()).
+Se non esiste → lancia un errore “account non trovato”.
+Se esiste → cerca l’utente collegato e lo elimina (utenteRepository.delete()), poi elimina anche l’account.
+
+-Controller:
+Abbiamo aggiunto un endpoint DELETE /api/auth/delete/{id} che chiama il metodo del service.
+Se l’eliminazione va a buon fine → restituisce “Account eliminato con successo!”.
+
+Correzione importante:
+Ho riscritto nella classe Account i getter/setter e nome del campo id perché Spring usava il nome del metodo per riconoscere il campo primario.
+Senza questa correzione, non poteva trovare l’account nel database, dato che anche in questo caso c'era una incongruenza con i nomi dei campi.
+ti invito a provare

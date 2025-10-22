@@ -14,12 +14,13 @@ public class Utente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUtente;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "id_account", nullable = false, unique = true,
             foreignKey = @ForeignKey(name = "fk_utente_account"))
     private Account account;
 
-   @Column(name = "indirizzo", length = 255)
+
+    @Column(name = "indirizzo", length = 255)
     private String indirizzo;
 
     @Column(name="data_di_iscrizione", nullable = false)
