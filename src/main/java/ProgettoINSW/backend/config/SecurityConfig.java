@@ -18,16 +18,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // ✅ disattiva CSRF per Postman
-                .authorizeHttpRequests(authz -> authz
-                        // ✅ permette tutto ciò che riguarda autenticazione (register/login)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // ❌ tutto il resto richiede autenticazione
-                        .anyRequest().authenticated()
-                );
+                .csrf(csrf -> csrf.disable()) // Disattiva il CSRF (permette DELETE e POST da Postman)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll() // ✅ Tutte le rotte /api/auth sono libere
+                        .anyRequest().permitAll() // tutto il resto libero
+                )
+                .formLogin(form -> form.disable())  // Disattiva login form automatico
+                .httpBasic(httpBasic -> httpBasic.disable()); // Disattiva autenticazione base
 
         return http.build();
     }
 }
+

@@ -7,5 +7,6 @@ import ProgettoINSW.backend.dto.registrazione.RegisterResponseUtente;
 public interface AccountService {
 
     RegisterResponseUtente registraUtente(RegisterRequestUtente utente);
+    void eliminaAccount(Long id);
 
 }

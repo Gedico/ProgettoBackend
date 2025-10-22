@@ -37,6 +37,10 @@ public class Account {
     @Column(nullable = false, length = 10)
     private Role ruolo;
 
+    @OneToOne(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Utente utente;
+
+
 
     //Getter e Setter
 
@@ -101,7 +105,7 @@ public class Account {
     public Account() {
     }
 
-    public Account(Long id_account, String nome, String cognome, String mail, String password, String numero, Role ruolo) {
+    public Account(Long id_account, String nome, String cognome, String email, String password, String numero, Role ruolo) {
         this.id_account = id_account;
         this.nome = nome;
         this.cognome = cognome;

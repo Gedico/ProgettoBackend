@@ -65,4 +65,13 @@ public class AccountServiceImpl implements AccountService {
         return response;
     }
 
+    @Override
+    public void eliminaAccount(Long id) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Account non trovato con ID: " + id));
+
+        accountRepository.delete(account);
+    }
+
+
 }

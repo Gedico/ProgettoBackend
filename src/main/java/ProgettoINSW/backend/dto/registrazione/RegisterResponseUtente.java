@@ -13,7 +13,7 @@ public class RegisterResponseUtente {
     private Role ruolo;
     private String messaggio;
 
-    //Gettere e Setter
+    //Getter e Setter
 
 
     public Long getIdAccount() {
