@@ -2,6 +2,8 @@ package ProgettoINSW.backend.service.impl;
 
 import ProgettoINSW.backend.dto.registrazione.RegisterRequestUtente;
 import ProgettoINSW.backend.dto.registrazione.RegisterResponseUtente;
+import ProgettoINSW.backend.dto.login.LoginRequest;
+import ProgettoINSW.backend.dto.login.LoginResponse;
 import ProgettoINSW.backend.model.Account;
 import ProgettoINSW.backend.model.Utente;
 import ProgettoINSW.backend.model.enums.Role;
@@ -66,12 +68,29 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void eliminaAccount(Long id) {
-        Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account non trovato con ID: " + id));
+    public LoginResponse loginUtente(LoginRequest request) {
 
-        accountRepository.delete(account);
+        LoginResponse response = new LoginResponse();
+
+        // 1️⃣ Trova l’account tramite la mail
+        Account account = accountRepository.findByMailIgnoreCase(request.getMail())
+                .orElse(null);
+
+        if (account == null) {
+            response.setMessaggio("Nessun account trovato con questa mail.");
+            return response;
+        }
+
+        // 2️⃣ Verifica la password criptata
+        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+            response.setMessaggio("Password errata.");
+            return response;
+        }
+
+        // 3️⃣ Login riuscito
+        response.setMessaggio("Login effettuato con successo.");
+        response.setRuolo(account.getRuolo().name());
+        return response;
+
     }
-
-
 }

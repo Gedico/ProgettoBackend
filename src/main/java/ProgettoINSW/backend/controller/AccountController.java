@@ -2,6 +2,8 @@ package ProgettoINSW.backend.controller;
 
 import ProgettoINSW.backend.dto.registrazione.RegisterRequestUtente;
 import ProgettoINSW.backend.dto.registrazione.RegisterResponseUtente;
+import ProgettoINSW.backend.dto.login.LoginRequest;
+import ProgettoINSW.backend.dto.login.LoginResponse;
 import ProgettoINSW.backend.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,15 +26,17 @@ public class AccountController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    // Endpoint per login
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse response = accountService.loginUtente(request);
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> eliminaAccount(@PathVariable Long id) {
-        try {
-            accountService.eliminaAccount(id);
-            return ResponseEntity.ok("Account eliminato con successo (ID: " + id + ")");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Errore: " + e.getMessage());
+        if ("Nessun account trovato con questa mail.".equals(response.getMessaggio()) ||
+                "Password errata.".equals(response.getMessaggio())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
+
+        return ResponseEntity.ok(response);
     }
+
 }
