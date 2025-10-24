@@ -102,10 +102,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new RuntimeException("Account non trovato con ID: " + idAccount));
 
         // Elimina prima l’utente collegato (se esiste)
-        Utente utente = utenteRepository.findByAccount_Id(idAccount).orElse(null);
-        if (utente != null) {
-            utenteRepository.delete(utente);
-        }
+        utenteRepository.findByAccount_Id(idAccount).ifPresent(utenteRepository::delete);
 
         // Poi elimina l’account
         accountRepository.delete(account);
