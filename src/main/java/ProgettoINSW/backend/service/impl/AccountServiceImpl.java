@@ -95,6 +95,27 @@ public class AccountServiceImpl implements AccountService {
         );
     }
 
+    @Override
+    public String logout(String token) {
+        if (token == null || token.isEmpty()) {
+            return "Token non fornito.";
+        }
+
+        // Se inizia con 'Bearer ', lo puliamo
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        // Verifica se il token è valido (così non “logout” token già scaduti)
+        boolean valido = JwtUtil.validateToken(token);
+        if (!valido) {
+            return "Token non valido o già scaduto.";
+        }
+
+        // Logout simbolico: il frontend eliminerà il token
+        return "Logout effettuato con successo. Token non più utilizzabile.";
+    }
+
 
     @Override
     public void eliminaAccount(Long idAccount) {

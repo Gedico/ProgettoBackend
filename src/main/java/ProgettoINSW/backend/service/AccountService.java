@@ -12,4 +12,5 @@ public interface AccountService {
     LoginResponse loginUtente(LoginRequest request);
     void eliminaAccount(Long id_account);
 
+    String logout(String token);
 }
