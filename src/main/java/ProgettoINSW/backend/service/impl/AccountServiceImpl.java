@@ -12,6 +12,7 @@ import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.service.AccountService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ProgettoINSW.backend.util.JwtUtil;
 
 import java.time.LocalDateTime;
 
@@ -70,28 +71,28 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public LoginResponse loginUtente(LoginRequest request) {
 
-        LoginResponse response = new LoginResponse();
-
         // Trova l’account tramite la mail
         Account account = accountRepository.findByMailIgnoreCase(request.getMail())
                 .orElse(null);
 
         if (account == null) {
-            response.setMessaggio("Nessun account trovato con questa mail.");
-            return response;
+            return new LoginResponse("Nessun account trovato con questa mail.", null, null);
         }
 
-        //  Verifica la password criptata
+        // Verifica la password criptata
         if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-            response.setMessaggio("Password errata.");
-            return response;
+            return new LoginResponse("Password errata.", null, null);
         }
 
-        //  Login riuscito
-        response.setMessaggio("Login effettuato con successo.");
-        response.setRuolo(account.getRuolo().name());
-        return response;
+        // Genera token JWT
+        String token = JwtUtil.generateToken(account.getMail(), account.getRuolo().name());
 
+        // Crea e restituisce la risposta
+        return new LoginResponse(
+                "Login effettuato con successo.",
+                account.getRuolo().name(),
+                token
+        );
     }
 
 
