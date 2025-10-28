@@ -39,6 +39,14 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    // Endpoint per logout
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        String message = accountService.logout(token);
+        return ResponseEntity.ok(message);
+    }
+
+
     // Endpoint per l'eliminazione
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
@@ -50,6 +58,12 @@ public class AccountController {
         }
     }
 
+   // Endpoint per profilo (recupero dati)
+   @GetMapping("/profile")
+   public ResponseEntity<RegisterResponseUtente> getProfile(@RequestHeader("Authorization") String token) {
+       RegisterResponseUtente response = accountService.getProfile(token);
+       return ResponseEntity.ok(response);
+   }
 
 
 }

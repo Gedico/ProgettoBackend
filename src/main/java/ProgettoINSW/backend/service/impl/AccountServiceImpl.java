@@ -12,6 +12,7 @@ import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.service.AccountService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ProgettoINSW.backend.util.JwtUtil;
 
 import java.time.LocalDateTime;
 
@@ -70,28 +71,49 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public LoginResponse loginUtente(LoginRequest request) {
 
-        LoginResponse response = new LoginResponse();
-
         // Trova l’account tramite la mail
         Account account = accountRepository.findByMailIgnoreCase(request.getMail())
                 .orElse(null);
 
         if (account == null) {
-            response.setMessaggio("Nessun account trovato con questa mail.");
-            return response;
+            return new LoginResponse("Nessun account trovato con questa mail.", null, null);
         }
 
-        //  Verifica la password criptata
+        // Verifica la password criptata
         if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-            response.setMessaggio("Password errata.");
-            return response;
+            return new LoginResponse("Password errata.", null, null);
         }
 
-        //  Login riuscito
-        response.setMessaggio("Login effettuato con successo.");
-        response.setRuolo(account.getRuolo().name());
-        return response;
+        // Genera token JWT
+        String token = JwtUtil.generateToken(account.getMail(), account.getRuolo().name());
 
+        // Crea e restituisce la risposta
+        return new LoginResponse(
+                "Login effettuato con successo.",
+                account.getRuolo().name(),
+                token
+        );
+    }
+
+    @Override
+    public String logout(String token) {
+        if (token == null || token.isEmpty()) {
+            return "Token non fornito.";
+        }
+
+        // Se inizia con 'Bearer ', lo puliamo
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        // Verifica se il token è valido (così non “logout” token già scaduti)
+        boolean valido = JwtUtil.validateToken(token);
+        if (!valido) {
+            return "Token non valido o già scaduto.";
+        }
+
+        // Logout simbolico: il frontend eliminerà il token
+        return "Logout effettuato con successo. Token non più utilizzabile.";
     }
 
 
@@ -102,15 +124,41 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new RuntimeException("Account non trovato con ID: " + idAccount));
 
         // Elimina prima l’utente collegato (se esiste)
-        Utente utente = utenteRepository.findByAccount_Id(idAccount).orElse(null);
-        if (utente != null) {
-            utenteRepository.delete(utente);
-        }
+        utenteRepository.findByAccount_Id(idAccount).ifPresent(utenteRepository::delete);
 
         // Poi elimina l’account
         accountRepository.delete(account);
     }
 
+    @Override
+    public RegisterResponseUtente getProfile(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new RuntimeException("Token non fornito o non valido.");
+        }
+
+        token = token.substring(7); // Rimuove "Bearer "
+
+        String email = JwtUtil.extractMail(token);
+        Account account = accountRepository.findByMailIgnoreCase(email)
+                .orElseThrow(() -> new RuntimeException("Account non trovato per questa email."));
+
+        Utente utente = utenteRepository.findByAccount_Id(account.getId())
+                .orElse(null);
+
+        RegisterResponseUtente response = new RegisterResponseUtente();
+        response.setIdAccount(account.getId());
+        response.setNome(account.getNome());
+        response.setCognome(account.getCognome());
+        response.setMail(account.getMail());
+        response.setNumero(account.getNumero());
+        response.setRuolo(account.getRuolo());
+        if (utente != null) {
+            response.setIndirizzo(utente.getIndirizzo());
+        }
+
+        response.setMessaggio("Profilo recuperato con successo.");
+
+        return response;
+    }
 
 }
-

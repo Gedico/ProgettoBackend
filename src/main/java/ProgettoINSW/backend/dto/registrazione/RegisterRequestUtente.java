@@ -1,7 +1,5 @@
 package ProgettoINSW.backend.dto.registrazione;
 
-import ProgettoINSW.backend.model.enums.Role;
-
 public class RegisterRequestUtente {
     private String nome;
     private String cognome;
@@ -10,8 +8,6 @@ public class RegisterRequestUtente {
     private String numero;
     private String indirizzo;
     private String messaggio;
-
-    private Role ruolo;
 
     //Getter e Setter
     public String getNome() {

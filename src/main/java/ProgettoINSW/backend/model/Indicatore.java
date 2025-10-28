@@ -3,8 +3,11 @@ package ProgettoINSW.backend.model;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-
+@Setter
+@Getter
 @Entity
 @Table(name = "agente")
 public class Indicatore {
@@ -31,39 +34,6 @@ public class Indicatore {
     }
 
     //Getter e Setter
-
-
-    public Long getIdIndicatore() {
-        return idIndicatore;
-    }
-
-    public void setIdIndicatore(Long idIndicatore) {
-        this.idIndicatore = idIndicatore;
-    }
-
-    public TipoIndicatore getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoIndicatore tipo) {
-        this.tipo = tipo;
-    }
-
-    public Double getDistanza() {
-        return distanza;
-    }
-
-    public void setDistanza(Double distanza) {
-        this.distanza = distanza;
-    }
-
-    public Immobile getImmobile() {
-        return immobile;
-    }
-
-    public void setImmobile(Immobile immobile) {
-        this.immobile = immobile;
-    }
 
 
     //Costruttori

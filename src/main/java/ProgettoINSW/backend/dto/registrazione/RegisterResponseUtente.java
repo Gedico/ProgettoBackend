@@ -1,80 +1,29 @@
 package ProgettoINSW.backend.dto.registrazione;
 
 import ProgettoINSW.backend.model.enums.Role;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 public class RegisterResponseUtente {
 
+    @Getter
     private Long idAccount;
+    @Getter
     private String nome;
+    @Getter
     private String cognome;
+    @Getter
     private String mail;
+    @Getter
     private String numero;
+    @Getter
     private String indirizzo;
+    @Getter
     private Role ruolo;
     private String messaggio;
 
     //Getter e Setter
 
 
-    public Long getIdAccount() {
-        return idAccount;
-    }
-
-    public void setIdAccount(Long idAccount) {
-        this.idAccount = idAccount;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCognome() {
-        return cognome;
-    }
-
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public String getNumero() {
-        return numero;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    public String getIndirizzo() {
-        return indirizzo;
-    }
-
-    public void setIndirizzo(String indirizzo) {
-        this.indirizzo = indirizzo;
-    }
-
-    public Role getRuolo() {
-        return ruolo;
-    }
-
-    public void setRuolo(Role ruolo) {
-        this.ruolo = ruolo;
-    }
-
-
-
-    public void setMessaggio(String messaggio) {
-        this.messaggio = messaggio;
-    }
 }
