@@ -47,7 +47,7 @@ e i relativi endpoint REST che dovranno essere implementati.
 
 Per ogni API è indicato:
     - Endpoint HTTP
-    - Metodo
+    - Metodoaccount
     - Descrizione della funzionalità
     - Necessità di autenticazione (Auth)
     - Ruolo richiesto (Utente / Agente / Admin)
@@ -57,8 +57,10 @@ Per ogni API è indicato:
 --------------------------------------------------------------------------------
     /api/auth/register            POST    Registra un nuovo utente                   NO     Tutti   ✅
     /api/auth/login               POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
-    /api/account/profile          GET     Restituisce i dati del profilo             SI     Tutti
-    /api/account/profile          PUT     Aggiorna i dati del profilo                SI     Tutti
+    /api/auth/logout              POST    Effettua il logout dell’utente             SI     Tutti   nives
+    /api/auth/register/agente     POST    Registra un nuovo agente immobiliare       SI     Admin   gedico
+    /api/account/profile          GET     Restituisce i dati del profilo             SI     Tutti   nives
+    /api/account/profile          PUT     Aggiorna i dati del profilo                SI     Tutti   gedico
     /api/auth/delete              DELETE  Elimina l’account utente                   SI     Tutti   ✅
 
 --------------------------------------------------------------------------------
