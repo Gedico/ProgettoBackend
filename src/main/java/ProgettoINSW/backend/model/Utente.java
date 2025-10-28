@@ -26,7 +26,7 @@ public class Utente {
 
 
     @Getter
-    @Column(name = "indirizzo", length = 255)
+    @Column(name = "indirizzo")
     private String indirizzo;
 
     @Column(name="data_di_iscrizione", nullable = false)

@@ -130,6 +130,35 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.delete(account);
     }
 
+    @Override
+    public RegisterResponseUtente getProfile(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new RuntimeException("Token non fornito o non valido.");
+        }
+
+        token = token.substring(7); // Rimuove "Bearer "
+
+        String email = JwtUtil.extractMail(token);
+        Account account = accountRepository.findByMailIgnoreCase(email)
+                .orElseThrow(() -> new RuntimeException("Account non trovato per questa email."));
+
+        Utente utente = utenteRepository.findByAccount_Id(account.getId())
+                .orElse(null);
+
+        RegisterResponseUtente response = new RegisterResponseUtente();
+        response.setIdAccount(account.getId());
+        response.setNome(account.getNome());
+        response.setCognome(account.getCognome());
+        response.setMail(account.getMail());
+        response.setNumero(account.getNumero());
+        response.setRuolo(account.getRuolo());
+        if (utente != null) {
+            response.setIndirizzo(utente.getIndirizzo());
+        }
+
+        response.setMessaggio("Profilo recuperato con successo.");
+
+        return response;
+    }
 
 }
-

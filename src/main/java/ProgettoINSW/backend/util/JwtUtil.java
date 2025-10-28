@@ -14,7 +14,7 @@ public class JwtUtil {
 
     // 🔐 Chiave segreta fissa — cambiala con una tua personale, lunga almeno 32 caratteri
     private static final String SECRET_KEY = "ProgettoINSW2025SecretKeyForJWT_is_MoltoLungaEForte!";
-    private static final long EXPIRATION_TIME = 86400000; // 24 ore
+    private static final long EXPIRATION_TIME = 86400000; // 24h
 
     private static final Key key = new SecretKeySpec(
             SECRET_KEY.getBytes(StandardCharsets.UTF_8),

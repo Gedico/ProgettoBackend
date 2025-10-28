@@ -58,6 +58,12 @@ public class AccountController {
         }
     }
 
+   // Endpoint per profilo (recupero dati)
+   @GetMapping("/profile")
+   public ResponseEntity<RegisterResponseUtente> getProfile(@RequestHeader("Authorization") String token) {
+       RegisterResponseUtente response = accountService.getProfile(token);
+       return ResponseEntity.ok(response);
+   }
 
 
 }
