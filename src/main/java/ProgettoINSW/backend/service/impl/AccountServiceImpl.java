@@ -77,7 +77,6 @@ public class AccountServiceImpl implements AccountService {
             default -> throw new IllegalArgumentException("Ruolo non supportato: " + ruolo);
         }
 
-        //Creazione risposta
         RegisterResponse response = new RegisterResponse();
         response.setIdAccount(savedAccount.getId());
         response.setNome(savedAccount.getNome());
