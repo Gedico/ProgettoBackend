@@ -22,6 +22,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disattiva il CSRF (permette DELETE e POST da Postman)
                 .authorizeHttpRequests(auth -> auth
+
+                        //.requestMatchers("/api/auth/registerAgente" , "/api/auth/registerAdmin").hasRole("ADMIN") // ✅ Solo ADMIN può registrare Agente e Admin
+
                         .requestMatchers("/api/auth/**").permitAll() // ✅ Tutte le rotte /api/auth sono libere
                         .anyRequest().permitAll() // tutto il resto libero
                 )
