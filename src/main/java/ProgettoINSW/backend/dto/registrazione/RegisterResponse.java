@@ -1,19 +1,22 @@
 package ProgettoINSW.backend.dto.registrazione;
 
+import ProgettoINSW.backend.model.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
-public class RegisterRequestUtente {
-    //Getter e Setter
+@Setter
+public class RegisterResponse {
+
+    private Long idAccount;
     private String nome;
     private String cognome;
     private String mail;
-    private String password;
     private String numero;
-    private String indirizzo;
+    private Role ruolo;
     private String messaggio;
 
-}
+    //Getter e Setter
 
+
+}

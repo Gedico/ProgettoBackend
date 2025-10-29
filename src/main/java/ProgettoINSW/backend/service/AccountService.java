@@ -3,14 +3,15 @@ package ProgettoINSW.backend.service;
 
 import ProgettoINSW.backend.dto.login.LoginRequest;
 import ProgettoINSW.backend.dto.login.LoginResponse;
-import ProgettoINSW.backend.dto.registrazione.RegisterRequestUtente;
-import ProgettoINSW.backend.dto.registrazione.RegisterResponseUtente;
+import ProgettoINSW.backend.dto.registrazione.RegisterRequest;
+import ProgettoINSW.backend.dto.registrazione.RegisterResponse;
+import ProgettoINSW.backend.model.enums.Role;
 
 public interface AccountService {
 
-    RegisterResponseUtente registraUtente(RegisterRequestUtente utente);
+    RegisterResponse registraAccount(RegisterRequest account, Role ruolo);
     LoginResponse loginUtente(LoginRequest request);
     void eliminaAccount(Long id_account);
-    RegisterResponseUtente getProfile(String token);
+
     String logout(String token);
 }

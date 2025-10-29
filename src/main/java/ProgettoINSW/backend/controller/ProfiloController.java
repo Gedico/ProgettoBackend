@@ -37,7 +37,7 @@ public class ProfiloController {
         String token = authHeader.substring(7); // rimuove "Bearer "
         String mail = JwtUtil.extractMail(token);
 
-        UpdateProfiloResponse response = profiloServgit ice.aggiornaProfilo(request, mail);
+        UpdateProfiloResponse response = profiloService.aggiornaProfilo(request, mail);
         return ResponseEntity.ok(response);
     }
 }
