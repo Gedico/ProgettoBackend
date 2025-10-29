@@ -1,12 +1,12 @@
 package ProgettoINSW.backend.dto.registrazione;
 
-public class RegisterRequestUtente {
+public class RegisterRequest {
     private String nome;
     private String cognome;
     private String mail;
     private String password;
     private String numero;
-    private String indirizzo;
+    private String approfondimento;
     private String messaggio;
 
     //Getter e Setter
@@ -14,9 +14,7 @@ public class RegisterRequestUtente {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public void setNome(String nome) {this.nome = nome;}
 
     public String getCognome() {
         return cognome;
@@ -30,9 +28,7 @@ public class RegisterRequestUtente {
         return mail;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
+    public void setMail(String mail) {this.mail = mail;}
 
     public String getPassword() {
         return password;
@@ -50,13 +46,9 @@ public class RegisterRequestUtente {
         this.numero = numero;
     }
 
-    public String getIndirizzo() {
-        return indirizzo;
-    }
+    public String getApprofondimento() { return approfondimento; } // <-- corretto
 
-    public void setIndirizzo(String indirizzo) {
-        this.indirizzo = indirizzo;
-    }
+    public void setApprofondimento(String approfondimento) { this.approfondimento = approfondimento; } // <-- corretto
 
     public String getMessaggio() { return messaggio; }   // <-- corretto
     public void setMessaggio(String messaggio) { this.messaggio = messaggio; } // <-- corretto
