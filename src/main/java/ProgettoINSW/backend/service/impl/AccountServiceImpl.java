@@ -1,13 +1,15 @@
 package ProgettoINSW.backend.service.impl;
 
-import ProgettoINSW.backend.dto.registrazione.RegisterRequestUtente;
-import ProgettoINSW.backend.dto.registrazione.RegisterResponseUtente;
+import ProgettoINSW.backend.dto.registrazione.RegisterRequest;
+import ProgettoINSW.backend.dto.registrazione.RegisterResponse;
 import ProgettoINSW.backend.dto.login.LoginRequest;
 import ProgettoINSW.backend.dto.login.LoginResponse;
 import ProgettoINSW.backend.model.Account;
+import ProgettoINSW.backend.model.Agente;
 import ProgettoINSW.backend.model.Utente;
 import ProgettoINSW.backend.model.enums.Role;
 import ProgettoINSW.backend.repository.AccountRepository;
+import ProgettoINSW.backend.repository.AgenteRepository;
 import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.service.AccountService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,51 +24,72 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final UtenteRepository utenteRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AgenteRepository agenteRepository;
 
-    public AccountServiceImpl(AccountRepository accountRepository, UtenteRepository utenteRepository, PasswordEncoder passwordEncoder) {
+    public AccountServiceImpl(AccountRepository accountRepository, AgenteRepository agenteRepository  , UtenteRepository utenteRepository, PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
         this.utenteRepository = utenteRepository;
+        this.agenteRepository = agenteRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public RegisterResponseUtente registraUtente(RegisterRequestUtente request) {
+    public RegisterResponse registraAccount(RegisterRequest request, Role ruolo) {
 
+        //Controllo unicità email
         if (accountRepository.existsByMailIgnoreCase(request.getMail())) {
-            throw new RuntimeException("Email già registrata");//Possibile exception personalizzata nelle exception
+            throw new RuntimeException("Email già registrata");
+            // creare una exception personalizzata nelle exception/
         }
 
+        // Creazione Account base
         Account account = new Account();
         account.setNome(request.getNome());
         account.setCognome(request.getCognome());
         account.setMail(request.getMail());
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setNumero(request.getNumero());
-        account.setRuolo(Role.UTENTE);
+        account.setRuolo(ruolo);
 
         Account savedAccount = accountRepository.save(account);
 
-        Utente utente = new Utente();
-        utente.setAccount(savedAccount);//Foreign key
-        utente.setIndirizzo(request.getIndirizzo());
-        utente.setDataIscrizione(LocalDateTime.now());
+        //specifiche in base al ruolo
+        switch (ruolo) {
+            case UTENTE -> {
+                Utente utente = new Utente();
+                utente.setAccount(savedAccount);
+                utente.setIndirizzo(request.getApprofondimento()); // 👈 indirizzo
+                utente.setDataIscrizione(LocalDateTime.now());
+                utenteRepository.save(utente);
+            }
 
-        utenteRepository.save(utente);
+            case AGENTE -> {
+                Agente agente = new Agente();
+                agente.setAccount(savedAccount);
+                agente.setAgenzia(request.getApprofondimento()); // 👈 agenzia
+                agenteRepository.save(agente);
+            }
 
-        RegisterResponseUtente response = new RegisterResponseUtente();
+            case ADMIN -> {
+                //Admin non ha tabella
+            }
+
+            default -> throw new IllegalArgumentException("Ruolo non supportato: " + ruolo);
+        }
+
+        //Creazione risposta
+        RegisterResponse response = new RegisterResponse();
         response.setIdAccount(savedAccount.getId());
         response.setNome(savedAccount.getNome());
         response.setCognome(savedAccount.getCognome());
         response.setMail(savedAccount.getMail());
-        response.setRuolo(savedAccount.getRuolo());
-        response.setIndirizzo(utente.getIndirizzo());
-
         response.setNumero(savedAccount.getNumero());
-        response.setMessaggio(request.getMessaggio());
-
+        response.setRuolo(savedAccount.getRuolo());
+        response.setMessaggio(request.getMessaggio() != null ? request.getMessaggio() : "Registrazione completata");
 
         return response;
     }
+
 
     @Override
     public LoginResponse loginUtente(LoginRequest request) {
@@ -130,8 +153,8 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.delete(account);
     }
 
-    @Override
-    public RegisterResponseUtente getProfile(String token) {
+   /* @Override
+    public RegisterResponse getProfile(String token) {
         if (token == null || !token.startsWith("Bearer ")) {
             throw new RuntimeException("Token non fornito o non valido.");
         }
@@ -145,7 +168,7 @@ public class AccountServiceImpl implements AccountService {
         Utente utente = utenteRepository.findByAccount_Id(account.getId())
                 .orElse(null);
 
-        RegisterResponseUtente response = new RegisterResponseUtente();
+        RegisterResponse response = new RegisterResponse();
         response.setIdAccount(account.getId());
         response.setNome(account.getNome());
         response.setCognome(account.getCognome());
@@ -159,6 +182,6 @@ public class AccountServiceImpl implements AccountService {
         response.setMessaggio("Profilo recuperato con successo.");
 
         return response;
-    }
+    }*/  //Credo che qui vada usato un dto diverso da quello usato per la registrazione a questo punto
 
 }

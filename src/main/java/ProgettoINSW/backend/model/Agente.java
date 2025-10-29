@@ -5,11 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-@Setter
-@Getter
 @Entity
 @Table(name = "agente")
-
 public class Agente {
 
     @Id
@@ -27,6 +24,30 @@ public class Agente {
 
 
     //Getter e Setter
+
+    public Long getIdAgente() {
+        return idAgente;
+    }
+
+    public void setIdAgente(Long idAgente) {
+        this.idAgente = idAgente;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public String getAgenzia() {
+        return agenzia;
+    }
+
+    public void setAgenzia(String agenzia) {
+        this.agenzia = agenzia;
+    }
 
 
     //Costruttori

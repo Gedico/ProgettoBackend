@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Setter
-public class RegisterResponseUtente {
+public class RegisterResponse {
 
     @Getter
     private Long idAccount;
@@ -18,9 +18,8 @@ public class RegisterResponseUtente {
     @Getter
     private String numero;
     @Getter
-    private String indirizzo;
-    @Getter
     private Role ruolo;
+    @Getter
     private String messaggio;
 
     //Getter e Setter

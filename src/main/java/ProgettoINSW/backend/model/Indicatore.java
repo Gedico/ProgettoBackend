@@ -6,15 +6,17 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Setter
 @Getter
 @Entity
-@Table(name = "agente")
+@Table(name = "indicatore_prox")
 public class Indicatore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_agente")
+    @Column(name = "id_indicatore")
     private Long idIndicatore;
 
     @Enumerated(EnumType.STRING)
@@ -22,7 +24,7 @@ public class Indicatore {
     private TipoIndicatore tipo;
 
     @Column(name = "distanza")
-    private Double distanza;
+    private BigDecimal distanza;
 
     @ManyToOne
     @JoinColumn(name = "id_inserzione", nullable = false,
@@ -41,7 +43,7 @@ public class Indicatore {
     public Indicatore() {
     }
 
-    public Indicatore(Long idIndicatore, TipoIndicatore tipo, Double distanza, Immobile immobile) {
+    public Indicatore(Long idIndicatore, TipoIndicatore tipo, BigDecimal distanza, Immobile immobile) {
         this.idIndicatore = idIndicatore;
         this.tipo = tipo;
         this.distanza = distanza;
