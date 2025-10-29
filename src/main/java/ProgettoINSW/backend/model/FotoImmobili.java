@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import lombok.Setter;
+
+
+@Setter
 @Entity
 @Table(name = "FotoImmobili")
 public class FotoImmobili {
@@ -24,31 +28,6 @@ public class FotoImmobili {
 
 
     //Getter e Setter
-
-
-    public Long getIdFoto() {
-        return idFoto;
-    }
-
-    public void setIdFoto(Long idFoto) {
-        this.idFoto = idFoto;
-    }
-
-    public Immobile getImmobile() {
-        return immobile;
-    }
-
-    public void setImmobile(Immobile immobile) {
-        this.immobile = immobile;
-    }
-
-    public String getUrlFoto() {
-        return urlFoto;
-    }
-
-    public void setUrlFoto(String urlFoto) {
-        this.urlFoto = urlFoto;
-    }
 
 
     //Costruttori

@@ -1,11 +1,12 @@
 package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "agente")
-
 public class Agente {
 
     @Id
@@ -23,7 +24,6 @@ public class Agente {
 
 
     //Getter e Setter
-
 
     public Long getIdAgente() {
         return idAgente;

@@ -1,9 +1,14 @@
 package ProgettoINSW.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 
 
+@Getter
+@Setter
 @Entity
 @Table(name = "posizione")
 public class Posizione {
@@ -24,39 +29,6 @@ public class Posizione {
 
 
     //Getter e Setter
-
-
-    public Long getIdPosizione() {
-        return idPosizione;
-    }
-
-    public void setIdPosizione(Long idPosizione) {
-        this.idPosizione = idPosizione;
-    }
-
-    public BigDecimal getLatitudine() {
-        return latitudine;
-    }
-
-    public void setLatitudine(BigDecimal latitudine) {
-        this.latitudine = latitudine;
-    }
-
-    public BigDecimal getLongitudine() {
-        return longitudine;
-    }
-
-    public void setLongitudine(BigDecimal longitudine) {
-        this.longitudine = longitudine;
-    }
-
-    public String getDescrizione() {
-        return descrizione;
-    }
-
-    public void setDescrizione(String descrizione) {
-        this.descrizione = descrizione;
-    }
 
 
     //Costruttori

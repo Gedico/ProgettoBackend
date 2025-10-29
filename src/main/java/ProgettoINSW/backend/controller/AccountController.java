@@ -1,9 +1,10 @@
 package ProgettoINSW.backend.controller;
 
-import ProgettoINSW.backend.dto.registrazione.RegisterRequestUtente;
-import ProgettoINSW.backend.dto.registrazione.RegisterResponseUtente;
+import ProgettoINSW.backend.dto.registrazione.RegisterRequest;
+import ProgettoINSW.backend.dto.registrazione.RegisterResponse;
 import ProgettoINSW.backend.dto.login.LoginRequest;
 import ProgettoINSW.backend.dto.login.LoginResponse;
+import ProgettoINSW.backend.model.enums.Role;
 import ProgettoINSW.backend.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,27 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    // Endpoint per registrazione
-    @PostMapping("/register")
-    public ResponseEntity<RegisterResponseUtente> registerUser(@RequestBody RegisterRequestUtente request) {
-        RegisterResponseUtente response = accountService.registraUtente(request);
+    // Endpoint per registrazione utente
+    @PostMapping("/registerUtente")
+    public ResponseEntity<RegisterResponse> registraUtente(@RequestBody RegisterRequest request) {
+        RegisterResponse response = accountService.registraAccount(request,Role.UTENTE);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    // Endpoint per registrazione Agente
+    @PostMapping("/registerAgente")
+    public ResponseEntity<RegisterResponse> registraAgente(@RequestBody RegisterRequest request) {
+        RegisterResponse response = accountService.registraAccount(request,Role.AGENTE);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    // Endpoint per registrazione Admin
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<RegisterResponse> registraAdmin(@RequestBody RegisterRequest request) {
+        RegisterResponse response = accountService.registraAccount(request,Role.ADMIN);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
 
     // Endpoint per login
     @PostMapping("/login")
@@ -39,6 +55,14 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    // Endpoint per logout
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        String message = accountService.logout(token);
+        return ResponseEntity.ok(message);
+    }
+
+
     // Endpoint per l'eliminazione
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
@@ -50,6 +74,12 @@ public class AccountController {
         }
     }
 
+   // Endpoint per profilo (recupero dati)
+   /*@GetMapping("/profile")
+   public ResponseEntity<RegisterResponse> getProfile(@RequestHeader("Authorization") String token) {
+       RegisterResponse response = accountService.getProfile(token);
+       return ResponseEntity.ok(response);
+   }*/
 
 
 }
