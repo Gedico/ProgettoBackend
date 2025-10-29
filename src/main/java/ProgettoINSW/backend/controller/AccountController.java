@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")   /// da capire la rotta per url
+@RequestMapping("/api/auth")   ///
 public class AccountController {
 
     private final AccountService accountService;

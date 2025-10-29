@@ -22,9 +22,9 @@ public class ProfiloController {
     @GetMapping("/me") //fa riferimento al token passato
     public ResponseEntity<ProfiloResponse> getProfilo(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
-        String email = JwtUtil.extractMail(token);
+        String mail = JwtUtil.extractMail(token);
 
-        ProfiloResponse response = profiloService.getProfilo(email);
+        ProfiloResponse response = profiloService.getProfilo(mail);
         return ResponseEntity.ok(response);
     }
 
@@ -35,9 +35,9 @@ public class ProfiloController {
 
         // Estrai il token
         String token = authHeader.substring(7); // rimuove "Bearer "
-        String email = JwtUtil.extractMail(token);
+        String mail = JwtUtil.extractMail(token);
 
-        UpdateProfiloResponse response = profiloService.aggiornaProfilo(request, email);
+        UpdateProfiloResponse response = profiloService.aggiornaProfilo(request, mail);
         return ResponseEntity.ok(response);
     }
 }
