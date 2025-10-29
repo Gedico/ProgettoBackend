@@ -1,0 +1,14 @@
+1. Dobbiamo necessariamente dividere la logica delle implementazioni in due
+controller diversi, questo perchè:
+
+- l'autenticazione dovrebbe riguardare:
+login, logout, registrazione, eliminazione account.
+
+- il profilo invece:
+dato che è già presupposto l'utente loggato, dovrebbe occuparsi di quelle
+che sono le operazioni legate al profilo, come
+aggiornamento dati, visualizzazione dati (nel senso che escono tutti i dati
+associati per quel profilo)
+
+--inoltre, è importante anche perchè dobbiamo cambiare rotta e non possiamo usare
+sempre /auth anche per quello che non riguarda l'autenticazione

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Setter
 @Entity
@@ -47,10 +46,11 @@ public class Utente {
     public Utente() {
     }
 
-    public Utente(Long idUtente, Account account, String indirizzo, Date data_di_iscrizione) {
+    public Utente(Long idUtente, Account account, String indirizzo, LocalDateTime data_di_iscrizione) {
         this.idUtente = idUtente;
         this.account = account;
         this.indirizzo = indirizzo;
-        this.dataIscrizione = dataIscrizione;
+        this.dataIscrizione = data_di_iscrizione;
+
     }
 }

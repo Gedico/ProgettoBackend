@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/auth")   /// da capire la rotta per url
 public class AccountController {
 
     private final AccountService accountService;
@@ -58,12 +58,6 @@ public class AccountController {
         }
     }
 
-   // Endpoint per profilo (recupero dati)
-   @GetMapping("/profile")
-   public ResponseEntity<RegisterResponseUtente> getProfile(@RequestHeader("Authorization") String token) {
-       RegisterResponseUtente response = accountService.getProfile(token);
-       return ResponseEntity.ok(response);
-   }
 
 
 }
