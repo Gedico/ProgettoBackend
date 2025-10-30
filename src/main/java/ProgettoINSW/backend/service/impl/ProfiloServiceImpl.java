@@ -36,7 +36,7 @@ public class ProfiloServiceImpl implements ProfiloService {
     @Override
     public UpdateProfiloResponse aggiornaProfilo(UpdateProfiloRequest request, String mail) {
         Account account = accountRepository.findByMailIgnoreCase(mail)
-                .orElseThrow(() -> new RuntimeException("Account non trovato"));
+                .orElseThrow(() -> new RuntimeException("Account non trovato"));//eccezione personalizzata
 
         if (request.getNome() != null) account.setNome(request.getNome());
         if (request.getCognome() != null) account.setCognome(request.getCognome());

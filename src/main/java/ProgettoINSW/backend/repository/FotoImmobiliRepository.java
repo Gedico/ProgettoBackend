@@ -13,25 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FotoImmobiliRepository {
+public interface FotoImmobiliRepository extends JpaRepository<FotoImmobili, Long>{
 
-    // Recupera tutte le foto di un immobile
-    List<FotoImmobili> findByImmobileId(Long IdImmobile);
 
-    // Trova foto tramite url
-    Optional<FotoImmobili> findByUrlFoto(String urlFoto);
-
-    // Cancella tutte le foto di un immobile
-    @Transactional
-    void deleteByImmobileId(Long idImmobile);
-
-    // Conteggio delle foto di un determinato immobile
-    long countByImmobileId(Long idImmobile);
-
-    // Cerca foto utilizzando una parola chiave
-    List<FotoImmobili> findByUrlFotoContainingIgnoreCase(String keyword);
- /*
- Ad esempio, se le raccogliamo attraverso tag, le possiamo subito trovare
-  */
 
 }

@@ -64,13 +64,15 @@ Per ogni API è indicato:
 --------------------------------------------------------------------------------
  INSERZIONI IMMOBILIARI
 --------------------------------------------------------------------------------
-    /api/inserzioni               POST    Crea una nuova inserzione immobiliare      SI     Agente gedico
+    /api/inserzioni               POST    Crea una nuova inserzione immobiliare      SI     Agente da testare
     /api/inserzioni               GET     Ricerca e filtra le inserzioni             NO     Tutti  nives
     /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti  nives
     /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente gedico
     /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente gedico
     /api/inserzioni/{id}/immagini POST    Aggiunge immagini all’inserzione           SI     Agente gedico
     /api/inserzioni/{id}/status   PUT     Cambia stato (attiva, sospesa, venduta)    SI     Agente nives
+
+    implementare e capire le eccezioni personalizzate                                              gedico
 
 --------------------------------------------------------------------------------
  PROPOSTE DI ACQUISTO / CONTATTO

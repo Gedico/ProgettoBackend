@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")   ///
+@RequestMapping("/api/auth")
 public class AccountController {
 
     private final AccountService accountService;
@@ -51,7 +51,6 @@ public class AccountController {
                 "Password errata.".equals(response.getMessaggio())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-
         return ResponseEntity.ok(response);
     }
 

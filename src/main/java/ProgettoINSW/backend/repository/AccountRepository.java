@@ -12,7 +12,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     boolean existsByMailIgnoreCase(String mail); //serve per la registrazione, per verificare se esiste già l'email
     Optional<Account> findByMailIgnoreCase(String mail); //serve per cercare l'utente e accedere ai dati
 
-   // Account save(Account  account); //dice che è gia ereditata da jpa
+    Optional<Account> findByMail(String mail);
 
 
 
