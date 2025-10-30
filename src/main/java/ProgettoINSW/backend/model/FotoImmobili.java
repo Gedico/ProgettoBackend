@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import lombok.Getter;
 import lombok.Setter;
 
 
 @Setter
+@Getter
 @Entity
 @Table(name = "FotoImmobili")
 public class FotoImmobili {
@@ -25,10 +27,6 @@ public class FotoImmobili {
     @Column(name = "url_foto", length = 500, nullable = false, unique = true)
     @NotBlank
     private String urlFoto;
-
-
-    //Getter e Setter
-
 
     //Costruttori
 

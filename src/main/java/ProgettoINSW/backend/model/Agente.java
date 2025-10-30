@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 
+@Getter
+@Setter
 @Entity
 @Table(name = "agente")
 public class Agente {
@@ -19,39 +21,11 @@ public class Agente {
             foreignKey = @ForeignKey(name = "fk_agente_account"))
     private Account account;
 
-    @Column(name = "agenzia", length = 255)
+    @Column(name = "agenzia")
     private String agenzia;
 
 
-    //Getter e Setter
-
-    public Long getIdAgente() {
-        return idAgente;
-    }
-
-    public void setIdAgente(Long idAgente) {
-        this.idAgente = idAgente;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
-    public String getAgenzia() {
-        return agenzia;
-    }
-
-    public void setAgenzia(String agenzia) {
-        this.agenzia = agenzia;
-    }
-
-
     //Costruttori
-
 
     public Agente() {
     }

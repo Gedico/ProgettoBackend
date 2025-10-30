@@ -18,21 +18,16 @@ public class Posizione {
     @Column(name = "id_posizione")
     private Long idPosizione;
 
-    @Column(nullable = false)
+    @Column(name = "latitudine" ,nullable = false)
     private BigDecimal latitudine;
 
-    @Column(nullable = false)
+    @Column(name = "longitudine" ,nullable = false)
     private BigDecimal longitudine;
 
-    @Column(length = 255)
+    @Column(name = "descrizione" )
     private String descrizione;
 
-
-    //Getter e Setter
-
-
     //Costruttori
-
 
     public Posizione() {
     }

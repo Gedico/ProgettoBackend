@@ -1,4 +1,5 @@
 package ProgettoINSW.backend.model;
+import ProgettoINSW.backend.model.enums.StatoOfferta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -35,22 +36,19 @@ public class Offerta {
     @DecimalMin("0.0")
     private BigDecimal prezzoOfferta;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "stato_offerta", length = 20, nullable = false)
-    @Pattern(regexp = "in_attesa|accettata|rifiutata")
-    private String statoOfferta;
+    private StatoOfferta statoOfferta;
+
 
     @Column(name = "data_offerta", nullable = false)
     private OffsetDateTime dataOfferta = OffsetDateTime.now();
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "note" , columnDefinition = "TEXT")
     private String note;
 
 
-    //Getter e Setter per il momento eliminati
-
-
     //Costruttori
-
 
     public Offerta() {
     }
@@ -62,7 +60,7 @@ public class Offerta {
         this.cliente = cliente;
         this.agente = agente;
         this.prezzoOfferta = prezzoOfferta;
-        this.statoOfferta = statoOfferta;
+        this.statoOfferta = StatoOfferta.valueOf(statoOfferta);
         this.dataOfferta = dataOfferta;
         this.note = note;
     }

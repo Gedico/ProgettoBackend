@@ -23,10 +23,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Disattiva il CSRF (permette DELETE e POST da Postman)
                 .authorizeHttpRequests(auth -> auth
-
-                        //.requestMatchers("/api/auth/registerAgente" , "/api/auth/registerAdmin").hasRole("ADMIN") // ✅ Solo ADMIN può registrare Agente e Admin
-
+                        .requestMatchers("/api/auth/registerAgente","/api/auth/registerAdmin","api/auth/delete/{id}").hasAuthority("ADMIN")
                         .requestMatchers("/api/auth/**").permitAll() // ✅ Tutte le rotte /api/auth sono libere
+                        .requestMatchers("/profilo/**").authenticated() // ✅ Rotte /profilo richiedono autenticazione
                         .anyRequest().permitAll() // tutto il resto libero
                 )
                 .formLogin(AbstractHttpConfigurer::disable)  // Disattiva login form automatico

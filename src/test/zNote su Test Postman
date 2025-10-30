@@ -49,3 +49,7 @@ Così la response JSON inviata a Postman include tutti i dati dell’utente.
 Creata una nuova POST con email diversa da quella già registrata.
 Nel body JSON, inviati tutti i campi inclusi numero e messaggio.
 La response adesso mostra correttamente tutti i campi, segno che la registrazione funziona.
+_______------------------_______
+In account controller, abbiamo specificato la rotta /auth ma dovremmo differenziarla in base alle cose da fare, se si tratta di
+registrazione e di login posso capire che necessita della autorizzazione, ma se dobbiamo recuperare i dati dal
+profilo o modificarli, avrebbe senso avere rotta /account/profile

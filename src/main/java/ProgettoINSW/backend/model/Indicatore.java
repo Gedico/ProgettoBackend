@@ -1,5 +1,6 @@
 package ProgettoINSW.backend.model;
 
+import ProgettoINSW.backend.model.enums.Tipologia;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -21,7 +22,7 @@ public class Indicatore {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 50)
-    private TipoIndicatore tipo;
+    private Tipologia tipo;
 
     @Column(name = "distanza")
     private BigDecimal distanza;
@@ -31,10 +32,6 @@ public class Indicatore {
             foreignKey = @ForeignKey(name = "fk_indicatore_inserzione"))
     private Immobile immobile;
 
-    public enum TipoIndicatore {
-        SCUOLA, PARCO, CENTRO, RISTORANTE, ALTRO
-    }
-
     //Getter e Setter
 
 
@@ -43,7 +40,7 @@ public class Indicatore {
     public Indicatore() {
     }
 
-    public Indicatore(Long idIndicatore, TipoIndicatore tipo, BigDecimal distanza, Immobile immobile) {
+    public Indicatore(Long idIndicatore, Tipologia tipo, BigDecimal distanza, Immobile immobile) {
         this.idIndicatore = idIndicatore;
         this.tipo = tipo;
         this.distanza = distanza;
