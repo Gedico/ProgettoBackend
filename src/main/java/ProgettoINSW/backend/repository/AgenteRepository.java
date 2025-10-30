@@ -10,7 +10,6 @@ import java.util.Optional;
 @Repository
 public interface AgenteRepository extends JpaRepository<Agente, Long>{
 
-    Optional<Agente> findByIdAgente(Long idAgente);
 
 }
 

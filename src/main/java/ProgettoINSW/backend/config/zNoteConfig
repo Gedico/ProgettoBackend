@@ -1,0 +1,4 @@
+Ho limitato l'accesso alle seguenti sorgenti:
+- /api/auth/registraAgente permettendo l'accesso solo ad admin autenticati.
+- /api/auth/registerAdmin permettendo l'accesso solo ad admin autenticati.
+- /profilo/** permettendo l'accesso solo autenticati.

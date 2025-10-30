@@ -12,6 +12,6 @@ public interface AccountService {
     RegisterResponse registraAccount(RegisterRequest account, Role ruolo);
     LoginResponse loginUtente(LoginRequest request);
     void eliminaAccount(Long id_account);
-    //RegisterResponse getProfile(String token);
+
     String logout(String token);
 }

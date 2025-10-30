@@ -22,7 +22,7 @@ Il backend è organizzato in una classica architettura a tre livelli:
     dto/           -> oggetti di trasferimento dati (request/response)
     security/      -> gestione JWT e autenticazione
     exception/     -> gestione centralizzata degli errori
-    util/          -> Gestione degli ogetti
+    util/          -> Gestione degli oggetti
     config/        -> Configurazioni per security
 
 Ogni funzionalità (es. gestione account, inserzioni, proposte)
@@ -47,7 +47,7 @@ e i relativi endpoint REST che dovranno essere implementati.
 
 Per ogni API è indicato:
     - Endpoint HTTP
-    - Metodoaccount
+    - Metodo
     - Descrizione della funzionalità
     - Necessità di autenticazione (Auth)
     - Ruolo richiesto (Utente / Agente / Admin)
@@ -55,24 +55,22 @@ Per ogni API è indicato:
 --------------------------------------------------------------------------------
  ACCOUNT E AUTENTICAZIONE
 --------------------------------------------------------------------------------
-    /api/auth/register            POST    Registra un nuovo utente                   NO     Tutti   ✅
+    /api/auth/register            POST    Registra un nuovo utente, Agente, Admin    NO     Tutti   ✅
     /api/auth/login               POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
-    /api/auth/logout              POST    Effettua il logout dell’utente             SI     Tutti   nives
-    /api/auth/register/agente     POST    Registra un nuovo agente immobiliare       SI     Admin   gedico
-    /api/account/profile          GET     Restituisce i dati del profilo             SI     Tutti   nives
-    /api/account/profile          PUT     Aggiorna i dati del profilo                SI     Tutti   gedico
+    /api/auth/profile             GET     Restituisce i dati del profilo             SI     Tutti   ✅
+    /api/account/profile          PUT     Cambiare password o nome profilo           SI     Tutti   ✅
     /api/auth/delete              DELETE  Elimina l’account utente                   SI     Tutti   ✅
 
 --------------------------------------------------------------------------------
  INSERZIONI IMMOBILIARI
 --------------------------------------------------------------------------------
-    /api/inserzioni               POST    Crea una nuova inserzione immobiliare      SI     Agente
-    /api/inserzioni               GET     Ricerca e filtra le inserzioni             NO     Tutti
-    /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti
-    /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente
-    /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente
-    /api/inserzioni/{id}/immagini POST    Aggiunge immagini all’inserzione           SI     Agente
-    /api/inserzioni/{id}/status   PUT     Cambia stato (attiva, sospesa, venduta)    SI     Agente
+    /api/inserzioni               POST    Crea una nuova inserzione immobiliare      SI     Agente gedico
+    /api/inserzioni               GET     Ricerca e filtra le inserzioni             NO     Tutti  nives
+    /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti  nives
+    /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente gedico
+    /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente gedico
+    /api/inserzioni/{id}/immagini POST    Aggiunge immagini all’inserzione           SI     Agente gedico
+    /api/inserzioni/{id}/status   PUT     Cambia stato (attiva, sospesa, venduta)    SI     Agente nives
 
 --------------------------------------------------------------------------------
  PROPOSTE DI ACQUISTO / CONTATTO
