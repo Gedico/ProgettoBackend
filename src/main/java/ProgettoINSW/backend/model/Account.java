@@ -59,11 +59,6 @@ public class Account {
 
 
 
-    //Getter e Setter
-
-    // Costruttori
-
-
     public Account() {
     }
 

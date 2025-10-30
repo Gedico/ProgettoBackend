@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/auth")   ///
 public class AccountController {
 
     private final AccountService accountService;
@@ -74,12 +74,6 @@ public class AccountController {
         }
     }
 
-   // Endpoint per profilo (recupero dati)
-   /*@GetMapping("/profile")
-   public ResponseEntity<RegisterResponse> getProfile(@RequestHeader("Authorization") String token) {
-       RegisterResponse response = accountService.getProfile(token);
-       return ResponseEntity.ok(response);
-   }*/
 
 
 }
