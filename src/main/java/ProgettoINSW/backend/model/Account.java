@@ -7,57 +7,49 @@ import lombok.Getter;
 import lombok.Setter;
 
 
+@Getter
 @Entity
 @Table(name = "account")
 public class Account {
 
     @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name= "id_account")
     private Long id;
 
     @Setter
-    @Getter
     @NotBlank(message = "Il nome è obbligatorio")
     @Size(max = 20)
+    @Column(name = "nome")
     private String nome;
 
-    @Getter
     @Setter
     @NotBlank(message = "Il cognome è obbligatorio")
     @Size(max = 20)
+    @Column(name = "cognome")
     private String cognome;
 
     @Setter
-    @Getter
     @NotBlank(message = "La mail è obbligatoria")
     @Email(message = "La mail non è valida")
-    @Column(unique = true)
+    @Column(name = "mail",unique = true)
     private String mail;
 
     @Setter
-    @Getter
     @NotBlank(message = "La password è obbligatoria")
+    @Column(name = "password")
     private String password;
 
     @Setter
-    @Getter
     @Size(max = 10)
-    @Column(unique = true)
+    @Column(name = "numero" ,unique = true)
     private String numero;
 
     @Setter
-    @Getter
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(name = "ruolo", nullable = false, length = 10)
     private Role ruolo;
-
-    @OneToOne(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private Utente utente;
-
-
 
     public Account() {
     }
