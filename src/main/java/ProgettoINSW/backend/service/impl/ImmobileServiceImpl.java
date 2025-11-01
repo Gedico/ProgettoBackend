@@ -70,5 +70,11 @@ public class ImmobileServiceImpl implements ImmobileService {
     }
 
 
+    @Override
+    public InserzioneResponse getInserzioneById(Long id) {
+        Immobile immobile = immobileRepository.findById(id).
+                orElseThrow(() -> new EntityNotFoundException("Immobile con ID " + id + " non trovato."));
+        return map.toInserzioneResponse(immobile);
+    }
 
 }

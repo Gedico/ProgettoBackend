@@ -34,9 +34,7 @@ public class ImmobileController {
     }
 
     @GetMapping("/ricerca")
-    public ResponseEntity<List<InserzioneResponse>> ricercaImmobili(@ModelAttribute ImmobileFiltriRequest filtri) {
-
-        List<InserzioneResponse> risultati = immobileService.ricercaImmobili(filtri);
+    public ResponseEntity<List<InserzioneResponse>> ricercaImmobili(@ModelAttribute ImmobileFiltriRequest filtri) {List<InserzioneResponse> risultati = immobileService.ricercaImmobili(filtri);
 
         if (risultati.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -46,6 +44,10 @@ public class ImmobileController {
     }
 
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<InserzioneResponse> getInserzioneById(@PathVariable("id") Long id) {
+        InserzioneResponse response = immobileService.getInserzioneById(id);
+        return ResponseEntity.ok(response);
+    }
 
 }

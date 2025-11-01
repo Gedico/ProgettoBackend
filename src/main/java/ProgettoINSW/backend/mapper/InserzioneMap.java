@@ -60,7 +60,7 @@ public class InserzioneMap {
                 .toList();
     }
 
-    // 🔹 Composizione finale: Entity → DTO : Inserzione completa
+    // 🔹 Composizione finale: Entity → DTO: Inserzione completa
     public InserzioneResponse toInserzioneResponse(Immobile immobile) {
         InserzioneResponse response = new InserzioneResponse();
         response.setImmobile(immobile);
