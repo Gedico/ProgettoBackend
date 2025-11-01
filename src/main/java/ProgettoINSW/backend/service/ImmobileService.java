@@ -12,5 +12,5 @@ public interface ImmobileService {
 
     InserzioneResponse creaInserzione(InserzioneRequest request, String token);
     List<InserzioneResponse> ricercaImmobili(ImmobileFiltriRequest filtri);
-
+    InserzioneResponse getInserzioneById(Long id);
 }
