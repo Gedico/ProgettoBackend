@@ -70,7 +70,8 @@ Per ogni API è indicato:
     /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente gedico
     /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente gedico
     /api/inserzioni/{id}/immagini POST    Aggiunge immagini all’inserzione           SI     Agente gedico
-    /api/inserzioni/{id}/status   PUT     Cambia stato (attiva, sospesa, venduta)    SI     Agente nives
+    /api/offerte?stato=---        GET     Può visualizzare le offerte in base allo stato     Agente  nives
+    /api/offerta/{id}/stato   PUT     Aggiorna stato (in attesa, accettata, rifiutata)    SI Agente nives
 
     implementare e capire le eccezioni personalizzate                                              gedico
 
