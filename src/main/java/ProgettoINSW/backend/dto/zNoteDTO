@@ -2,6 +2,25 @@
                   DTO - DATA TRANSFER OBJECT
 ============================================================
 
+
+ImmobileFiltriRequest -> raccoglie i filtri della query che viene fatta
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 COS’È UN DTO
 -------------
 Un DTO (Data Transfer Object) è un oggetto utilizzato per

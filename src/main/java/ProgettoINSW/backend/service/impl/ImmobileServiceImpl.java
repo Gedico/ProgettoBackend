@@ -1,5 +1,6 @@
 package ProgettoINSW.backend.service.impl;
 
+import ProgettoINSW.backend.dto.immobile.ImmobileFiltriRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.mapper.InserzioneMap;
@@ -13,6 +14,8 @@ import ProgettoINSW.backend.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +51,24 @@ public class ImmobileServiceImpl implements ImmobileService {
         return map.toInserzioneResponse(immobile);
 
     }
+
+    @Override
+    public List<InserzioneResponse> ricercaImmobili(ImmobileFiltriRequest filtri) {
+
+        List<Immobile> risultati = immobileRepository.filtra(
+                filtri.getCitta(),
+                filtri.getCategoria(),
+                filtri.getPrezzoMin(),
+                filtri.getPrezzoMax(),
+                filtri.getDimensioniMin(),
+                filtri.getDimensioniMax()
+        );
+
+        return risultati.stream()
+                .map(map::toInserzioneResponse)
+                .toList();
+    }
+
+
 
 }
