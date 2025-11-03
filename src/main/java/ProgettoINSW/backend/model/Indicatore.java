@@ -32,11 +32,6 @@ public class Indicatore {
             foreignKey = @ForeignKey(name = "fk_indicatore_inserzione"))
     private Immobile immobile;
 
-    //Getter e Setter
-
-
-    //Costruttori
-
     public Indicatore() {
     }
 

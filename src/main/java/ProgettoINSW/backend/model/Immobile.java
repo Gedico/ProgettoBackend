@@ -69,7 +69,7 @@ public class Immobile {
     private String classeEnergetica;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 10, nullable = false)
+    @Column(name = "categoria" , nullable = false)
     private Categoria categoria;
 
 

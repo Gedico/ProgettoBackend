@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "FotoImmobili")
+@Table(name = "Foto_immobili")
 public class FotoImmobili {
 
     @Id
