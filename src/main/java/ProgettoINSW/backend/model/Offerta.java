@@ -38,7 +38,7 @@ public class Offerta {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "stato_offerta", length = 20, nullable = false)
-    private StatoOfferta statoOfferta;
+    private StatoOfferta stato= StatoOfferta.IN_ATTESA;
 
 
     @Column(name = "data_offerta", nullable = false)
@@ -60,7 +60,7 @@ public class Offerta {
         this.cliente = cliente;
         this.agente = agente;
         this.prezzoOfferta = prezzoOfferta;
-        this.statoOfferta = StatoOfferta.valueOf(statoOfferta);
+        this.stato = StatoOfferta.valueOf(statoOfferta);
         this.dataOfferta = dataOfferta;
         this.note = note;
     }
@@ -73,7 +73,7 @@ public class Offerta {
                 ", clienteId=" + (cliente != null ? cliente.getIdUtente() : null) +
                 ", agenteId=" + (agente != null ? agente.getIdAgente() : null) +
                 ", prezzoOfferta=" + prezzoOfferta +
-                ", statoOfferta='" + statoOfferta + '\'' +
+                ", statoOfferta='" + stato + '\'' +
                 ", dataOfferta=" + dataOfferta +
                 ", note='" + note + '\'' +
                 '}';
