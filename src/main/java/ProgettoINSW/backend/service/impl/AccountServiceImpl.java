@@ -12,6 +12,7 @@ import ProgettoINSW.backend.repository.AccountRepository;
 import ProgettoINSW.backend.repository.AgenteRepository;
 import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.service.AccountService;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ProgettoINSW.backend.util.JwtUtil;
@@ -33,6 +34,7 @@ public class AccountServiceImpl implements AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     @Override
     public RegisterResponse registraAccount(RegisterRequest request, Role ruolo) {
 
@@ -138,7 +140,7 @@ public class AccountServiceImpl implements AccountService {
         return "Logout effettuato con successo. Token non più utilizzabile.";
     }
 
-
+    @Transactional
     @Override
     public void eliminaAccount(Long idAccount) {
         // Verifica che l’account esista
