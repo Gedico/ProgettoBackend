@@ -21,15 +21,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disattiva il CSRF (permette DELETE e POST da Postman)
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/registerAgente","/api/auth/registerAdmin","api/auth/delete/{id}").hasAuthority("ADMIN")
-                        .requestMatchers("/api/auth/**").permitAll() // ✅ Tutte le rotte /api/auth sono libere
-                        .requestMatchers("/profilo/**").authenticated() // ✅ Rotte /profilo richiedono autenticazione
-                        .anyRequest().permitAll() // tutto il resto libero
+                        .requestMatchers(
+                                "/api/auth/registerAgente",
+                                "/api/auth/registerAdmin",
+                                "/api/auth/delete/{id}"
+                        ).permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/profilo/**").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .formLogin(AbstractHttpConfigurer::disable)  // Disattiva login form automatico
-                .httpBasic(AbstractHttpConfigurer::disable); // Disattiva autenticazione base
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
