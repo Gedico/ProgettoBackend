@@ -1,11 +1,14 @@
 package ProgettoINSW.backend.controller;
 
+import ProgettoINSW.backend.dto.immobile.ImmobileFiltriRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.service.ImmobileService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/immobili")
@@ -30,6 +33,21 @@ public class ImmobileController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/ricerca")
+    public ResponseEntity<List<InserzioneResponse>> ricercaImmobili(@ModelAttribute ImmobileFiltriRequest filtri) {List<InserzioneResponse> risultati = immobileService.ricercaImmobili(filtri);
 
+        if (risultati.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(risultati);
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<InserzioneResponse> getInserzioneById(@PathVariable("id") Long id) {
+        InserzioneResponse response = immobileService.getInserzioneById(id);
+        return ResponseEntity.ok(response);
+    }
 
 }

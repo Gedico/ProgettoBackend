@@ -73,6 +73,7 @@ public class Immobile {
     private Categoria categoria;
 
 
+
     //Costruttori
 
 
