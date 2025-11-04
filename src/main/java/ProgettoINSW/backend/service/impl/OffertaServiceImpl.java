@@ -6,10 +6,13 @@ import ProgettoINSW.backend.mapper.OffertaMap;
 import ProgettoINSW.backend.model.Account;
 import ProgettoINSW.backend.model.Agente;
 import ProgettoINSW.backend.model.Offerta;
+import ProgettoINSW.backend.model.Immobile;
+import ProgettoINSW.backend.model.enums.StatoImmobile;
 import ProgettoINSW.backend.model.enums.StatoOfferta;
 import ProgettoINSW.backend.repository.AccountRepository;
 import ProgettoINSW.backend.repository.AgenteRepository;
 import ProgettoINSW.backend.repository.OffertaRepository;
+import ProgettoINSW.backend.repository.ImmobileRepository;
 import ProgettoINSW.backend.service.OffertaService;
 import ProgettoINSW.backend.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,6 +28,7 @@ public class OffertaServiceImpl implements OffertaService {
     private final AccountRepository accountRepository;
     private final AgenteRepository agenteRepository;
     private final OffertaMap offertaMap;
+    private final ImmobileRepository immobileRepository;
 
     @Override
     public List<OffertaResponse> getOfferteAgente(String token, StatoOfferta stato) {
@@ -77,6 +81,13 @@ public class OffertaServiceImpl implements OffertaService {
         // 4️⃣ Aggiorna lo stato
         offerta.setStato(request.getNuovoStato());
         offertaRepository.save(offerta);
+
+        // Se l'offerta è ACCETTATA → segna l'immobile come VENDUTO (quando è in vendita)
+        if (request.getNuovoStato() == StatoOfferta.ACCETTATA) {
+            Immobile immobile = offerta.getImmobile();
+            immobile.setStato(StatoImmobile.VENDUTO);
+            immobileRepository.save(immobile);
+        }
 
         // 5️⃣ Mapper → DTO
         return offertaMap.toDto(offerta, "Stato offerta aggiornato con successo");
