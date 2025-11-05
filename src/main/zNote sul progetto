@@ -69,20 +69,22 @@ Per ogni API è indicato:
     /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti   ✅
     /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente  ✅
     /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente  ✅
-    /api/inserzioni/{id}/immagini POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
-    /api/offerte?stato=---        GET     Può visualizzare le offerte in base allo stato     Agente ✅
-    /api/offerta/{id}/stato   PUT     Aggiorna stato (in attesa, accettata, rifiutata)    SI Agente ✅
+    /api/inserzioni/caricaFoto/id POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
+    /api/offerte?stato=---        GET     Può visualizzare le offerte in base allo stato    Agente  ✅
+    /api/offerta/{id}/stato       PUT     Aggiorna stato (att, acce, rif)            SI     Agente  ✅
+    /api/inserzioni/eliminafoto   POST    Elimina immagini all’inserzione            SI     Agente gedico
+    /api/inserzioni/vendita       GET     Modifica lo stato dell'immobile            SI     Agente gedico
 
-    implementare e capire le eccezioni personalizzate                                              gedico
+    implementare e capire le eccezioni personalizzate                                              gedico/nives
 
 --------------------------------------------------------------------------------
  PROPOSTE DI ACQUISTO / CONTATTO
 --------------------------------------------------------------------------------
-    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente
-    /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente
-    /api/proposte/{id}            GET     Mostra i dettagli di una proposta          SI     Agente
-    /api/proposte/{id}            PUT     Aggiorna stato proposta (accettata/rifiutata) SI Agente
-    /api/proposte/{id}            DELETE  Elimina una proposta                       SI     Agente
+    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente nives
+    /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente gedico
+    /api/proposte/{id}            GET     Mostra i dettagli di una proposta          SI     Agente gedico
+    /api/proposte/{id}            PUT     Aggiorna stato proposta (acc/rif)          SI     Agente nives
+    /api/proposte/{id}            DELETE  Elimina una proposta                       SI     Agente nives
 
 --------------------------------------------------------------------------------
  INDICATORI DI PROSSIMITÀ
