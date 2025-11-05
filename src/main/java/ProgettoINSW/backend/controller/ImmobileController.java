@@ -79,7 +79,6 @@ public class ImmobileController {
     }
 
 
-
     @GetMapping("/ricerca")
     public ResponseEntity<List<InserzioneResponse>> ricercaImmobili(@ModelAttribute ImmobileFiltriRequest filtri) {List<InserzioneResponse> risultati = immobileService.ricercaImmobili(filtri);
 
