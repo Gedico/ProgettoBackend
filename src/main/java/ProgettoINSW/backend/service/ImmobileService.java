@@ -24,4 +24,5 @@ public interface ImmobileService {
     void eliminaInserzione(Long id, String token);
 
     void caricaFotoImmobile(Long id, String token,List<FotoRequest> nuoveFoto);
+
 }

@@ -1,6 +1,7 @@
 package ProgettoINSW.backend.repository;
 
 import ProgettoINSW.backend.model.FotoImmobili;
+import ProgettoINSW.backend.model.Immobile;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
