@@ -2,5 +2,5 @@ package ProgettoINSW.backend.model.enums;
 
 public enum Categoria {
     VENDITA,
-    AFFITTO
+    AFFITTO// perfuture implementazioni di affitto
 }
