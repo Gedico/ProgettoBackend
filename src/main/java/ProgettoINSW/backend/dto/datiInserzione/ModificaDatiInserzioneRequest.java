@@ -1,4 +1,4 @@
-package ProgettoINSW.backend.dto.immobile;
+package ProgettoINSW.backend.dto.datiInserzione;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class ModificaImmobileRequest {
+public class ModificaDatiInserzioneRequest {
 
     private String titolo;
     private String descrizione;
@@ -20,6 +20,6 @@ public class ModificaImmobileRequest {
     private String categoria;
 
 
-    public ModificaImmobileRequest(String immobileAggiornatoConSuccesso, boolean b) {
+    public ModificaDatiInserzioneRequest(String inserzioneAggiornataConSuccesso, boolean b) {
     }
 }

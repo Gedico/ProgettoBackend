@@ -1,27 +1,26 @@
 package ProgettoINSW.backend.repository;
 
-import ProgettoINSW.backend.model.enums.StatoOfferta;
+import ProgettoINSW.backend.model.enums.StatoProposta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ProgettoINSW.backend.model.Offerta;
+import ProgettoINSW.backend.model.Proposta;
 
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
-public interface OffertaRepository extends JpaRepository<Offerta, Long> {
+public interface PropostaRepository extends JpaRepository<Proposta, Long> {
 
     @Query("""
-        SELECT o FROM Offerta o
-        WHERE o.immobile.agente.idAgente = :idAgente
+        SELECT o FROM Proposta o
+        WHERE o.inserzione.agente.idAgente = :idAgente
           AND (:stato IS NULL OR o.stato = :stato)
     """)
-    List<Offerta> findByAgenteAndStato(
+    List<Proposta> findByAgenteAndStato(
             @Param("idAgente") Long idAgente,
-            @Param("stato") StatoOfferta stato
+            @Param("stato") StatoProposta stato
     );
 
 

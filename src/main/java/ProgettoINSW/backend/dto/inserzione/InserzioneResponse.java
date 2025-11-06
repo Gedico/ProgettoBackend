@@ -1,6 +1,6 @@
 package ProgettoINSW.backend.dto.inserzione;
 
-import ProgettoINSW.backend.model.Immobile;
+import ProgettoINSW.backend.model.Inserzione;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class InserzioneResponse {
 
-    private Immobile immobile;
+    private Inserzione inserzione;
     private String messaggio;
 
 }

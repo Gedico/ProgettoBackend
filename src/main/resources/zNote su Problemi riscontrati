@@ -54,12 +54,12 @@ boolean existsByEmail(String email);
 ERRORE:
 
 text
-No property 'idImmobile' found for type 'Offerta'; Did you mean 'immobile'
+No property 'idImmobile' found for type 'Offerta'; Did you mean 'inserzione'
 CAUSA:
 
 OffertaRepository aveva: List<Offerta> findByidImmobile(Long idImmobile)
 
-Ma nell'entità Offerta c'era una relazione: private Immobile immobile (oggetto, non ID diretto)
+Ma nell'entità Offerta c'era una relazione: private Immobile inserzione (oggetto, non ID diretto)
 
 SOLUZIONE:
 

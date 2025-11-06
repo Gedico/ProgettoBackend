@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@Table(name = "Foto_immobili")
-public class FotoImmobili {
+@Table(name = "foto")
+public class Foto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +20,9 @@ public class FotoImmobili {
     private Long idFoto;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_immobile", nullable = false)
+    @JoinColumn(name = "id_inserzione", nullable = false)
     @JsonBackReference
-    private Immobile immobile;
+    private Inserzione inserzione;
 
     @Column(name = "url_foto", length = 500, nullable = false, unique = true)
     @NotBlank
@@ -30,13 +30,13 @@ public class FotoImmobili {
 
     //Costruttori
 
-    public FotoImmobili() {
+    public Foto() {
     }
 
 
-    public FotoImmobili(Long idFoto, Immobile immobile, String urlFoto) {
+    public Foto(Long idFoto, Inserzione inserzione, String urlFoto) {
         this.idFoto = idFoto;
-        this.immobile = immobile;
+        this.inserzione = inserzione;
         this.urlFoto = urlFoto;
     }
 }

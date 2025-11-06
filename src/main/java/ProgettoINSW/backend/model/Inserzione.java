@@ -2,7 +2,7 @@ package ProgettoINSW.backend.model;
 
 
 import ProgettoINSW.backend.model.enums.Categoria;
-import ProgettoINSW.backend.model.enums.StatoImmobile;
+import ProgettoINSW.backend.model.enums.StatoInserzione;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -16,13 +16,13 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@Table(name = "immobile")
-public class Immobile {
+@Table(name = "inserzione")
+public class Inserzione {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_immobile")
-    private Long idImmobile;
+    @Column(name = "idInserzione")
+    private Long idInserzione;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,8 +34,8 @@ public class Immobile {
     private Posizione posizione;
 
 
-    @OneToMany(mappedBy = "immobile", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FotoImmobili> fotoImmobili = new ArrayList<>();
+    @OneToMany(mappedBy = "inserzione", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Foto> foto = new ArrayList<>();
 
     @Column(name = "titolo", length = 150, nullable = false)
     @NotBlank
@@ -75,49 +75,18 @@ public class Immobile {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "stato", nullable = false, length = 20)
-    private StatoImmobile stato = StatoImmobile.DISPONIBILE;
-
-
+    private StatoInserzione stato = StatoInserzione.DISPONIBILE;
 
     //Costruttori
 
 
-    public Immobile() {
+    public Inserzione() {
     }
-
-    public Immobile(Long idImmobile, Agente agente, Posizione posizione, String titolo, OffsetDateTime dataCreazione, String descrizione, BigDecimal prezzo, Integer dimensioni, Integer numeroStanze, Integer piano, Boolean ascensore, String classeEnergetica, String categoria) {
-        this.idImmobile = idImmobile;
-        this.agente = agente;
-        this.posizione = posizione;
-        this.titolo = titolo;
-        this.dataCreazione = dataCreazione;
-        this.descrizione = descrizione;
-        this.prezzo = prezzo;
-        this.dimensioni = dimensioni;
-        this.numeroStanze = numeroStanze;
-        this.piano = piano;
-        this.ascensore = ascensore;
-        this.classeEnergetica = classeEnergetica;
-        this.categoria = Categoria.valueOf(categoria);
-    }
-
-    // Costruttore parziale con campi obbligatori
-    public Immobile(Agente agente, Posizione posizione, String titolo,
-                    BigDecimal prezzo, String categoria) {
-        this.agente = agente;
-        this.posizione = posizione;
-        this.titolo = titolo;
-        this.prezzo = prezzo;
-        this.categoria = Categoria.valueOf(categoria);
-        this.dataCreazione = OffsetDateTime.now();
-        this.ascensore = false;
-    }
-
 
     @Override
     public String toString() {
-        return "Immobile{" +
-                "idImmobile=" + idImmobile +
+        return "Inserzione{" +
+                "idInserzione=" + idInserzione +
                 ", idAgente=" + (agente != null ? agente.getIdAgente() : null) +
                 ", idPosizione=" + (posizione != null ? posizione.getIdPosizione() : null) +
                 ", titolo='" + titolo + '\'' +

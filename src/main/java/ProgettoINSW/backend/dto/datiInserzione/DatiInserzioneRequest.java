@@ -1,6 +1,5 @@
-package ProgettoINSW.backend.dto.immobile;
+package ProgettoINSW.backend.dto.datiInserzione;
 
-import ProgettoINSW.backend.dto.posizione.PosizioneRequest;
 import ProgettoINSW.backend.model.enums.Categoria;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class ImmobileRequest {
+public class DatiInserzioneRequest {
 
 private String titolo;
 private String descrizione;

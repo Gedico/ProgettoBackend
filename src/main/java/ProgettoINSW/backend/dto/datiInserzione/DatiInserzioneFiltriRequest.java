@@ -1,4 +1,4 @@
-package ProgettoINSW.backend.dto.immobile;
+package ProgettoINSW.backend.dto.datiInserzione;
 import ProgettoINSW.backend.model.enums.Categoria;
 import lombok.Getter;
 import lombok.Setter;
@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class ImmobileFiltriRequest {
+public class DatiInserzioneFiltriRequest {
     private String citta;
     private Categoria categoria;
     private BigDecimal prezzoMin;
