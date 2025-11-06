@@ -1,6 +1,6 @@
-package ProgettoINSW.backend.dto.offerta;
+package ProgettoINSW.backend.dto.proposta;
 
-import ProgettoINSW.backend.model.enums.StatoOfferta;
+import ProgettoINSW.backend.model.enums.StatoProposta;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,11 +10,11 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-public class OffertaResponse {
-    private Long idOfferta;
-    private String titoloImmobile;
+public class PropostaResponse {
+    private Long idProposta;
+    private String titoloInserzione;
     private BigDecimal importo;
-    private StatoOfferta stato;
+    private StatoProposta stato;
     private OffsetDateTime dataCreazione;
     private String messaggio; //nel caso feedback
 }

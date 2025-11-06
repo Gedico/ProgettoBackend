@@ -1,6 +1,6 @@
 package ProgettoINSW.backend.model.enums;
 
-public enum StatoOfferta {
+public enum StatoProposta {
     IN_ATTESA,
     ACCETTATA,
     RIFIUTATA

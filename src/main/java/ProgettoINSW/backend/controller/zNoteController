@@ -25,13 +25,13 @@ una lista di offerte relative agli immobili gestiti da quell’agente,
 filtrate in base allo stato (o tutte se non si passa alcun parametro).
 Per implementare questa funzionalità abbiamo introdotto un’entità specifica chiamata Offerta, collegata a:
 
-un immobile (ManyToOne) → l’immobile su cui è stata fatta la proposta;
+un inserzione (ManyToOne) → l’inserzione su cui è stata fatta la proposta;
 
-un acquirente (ManyToOne) → l’utente che ha inviato l’offerta.
+un acquirente (ManyToOne) → l’utente che ha inviato l’proposta.
 
 All’interno della classe Offerta abbiamo aggiunto:
 
-un campo importo per rappresentare la cifra offerta;
+un campo importo per rappresentare la cifra proposta;
 
 un campo stato (di tipo StatoOfferta), che può essere:
 
@@ -41,7 +41,7 @@ ACCETTATA
 
 RIFIUTATA
 
-e la dataCreazione per tenere traccia del momento in cui l’offerta è stata fatta.
+e la dataCreazione per tenere traccia del momento in cui l’proposta è stata fatta.
 
 🗂️ Gestione dei dati
 

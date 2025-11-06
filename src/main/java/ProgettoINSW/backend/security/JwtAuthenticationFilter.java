@@ -1,4 +1,4 @@
-package ProgettoINSW.backend.config;
+package ProgettoINSW.backend.security;
 
 import ProgettoINSW.backend.util.JwtUtil;
 import jakarta.servlet.FilterChain;

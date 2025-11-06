@@ -52,53 +52,58 @@ Per ogni API è indicato:
     - Necessità di autenticazione (Auth)
     - Ruolo richiesto (Utente / Agente / Admin)
 
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
  ACCOUNT E AUTENTICAZIONE
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
     /api/auth/register            POST    Registra un nuovo utente, Agente, Admin    NO     Tutti   ✅
     /api/auth/login               POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
     /api/auth/profile             GET     Restituisce i dati del profilo             SI     Tutti   ✅
     /api/account/profile          PUT     Cambiare password o nome profilo           SI     Tutti   ✅
     /api/auth/delete              DELETE  Elimina l’account utente                   SI     Tutti   ✅
 
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
  INSERZIONI IMMOBILIARI
---------------------------------------------------------------------------------
-    /api/inserzioni               POST    Crea una nuova inserzione immobiliare      SI     Agente  ✅
-    /api/inserzioni               GET     Ricerca e filtra le inserzioni             NO     Tutti   ✅
-    /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti   ✅
-    /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente  ✅
-    /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente  ✅
-    /api/inserzioni/caricaFoto/id POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
-    /api/offerte?stato=---        GET     Può visualizzare le offerte in base allo stato    Agente  ✅
-    /api/offerta/{id}/stato       PUT     Aggiorna stato (att, acce, rif)            SI     Agente  ✅
-    /api/inserzioni/eliminafoto   POST    Elimina immagini all’inserzione            SI     Agente gedico
-    /api/inserzioni/vendita       GET     Modifica lo stato dell'immobile            SI     Agente gedico
+----------------------------------------------------------------------------------------------------------
+    /api/inserzioni               GET     Mostra tutte le inserzioni                 NO     Tutti   gedico
+    //crea                        POST    Crea una nuova inserzione immobiliare      SI     Agente  ✅
+    //ricerca                     GET     Ricerca e filtra le inserzioni             NO     Tutti   ✅
+    //{id}                        GET     Mostra dettagli singola inserzione         NO     Tutti   ✅
+    //modifica/{id}               PUT     Modifica un’inserzione esistente           SI     Agente  ✅
+    //elimina/{id}                DELETE  Elimina un’inserzione                      SI     Agente  ✅
+    //caricaFoto/id               POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
+    //eliminafoto                 POST    Elimina immagini all’inserzione            SI     Agente  gedico
+    //modificaStato               PUT     Modifica lo stato dell'inserzione          SI     Agente  gedico
 
-    implementare e capire le eccezioni personalizzate                                              gedico/nives
+    implementare e capire le eccezioni personalizzate                                        gedico/nives
 
---------------------------------------------------------------------------------
+    con {//} indico che il pattern precedente è /api/inserzione
+
+----------------------------------------------------------------------------------------------------------
  PROPOSTE DI ACQUISTO / CONTATTO
---------------------------------------------------------------------------------
-    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente nives
-    /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente gedico
-    /api/proposte/{id}            GET     Mostra i dettagli di una proposta          SI     Agente gedico
-    /api/proposte/{id}            PUT     Aggiorna stato proposta (acc/rif)          SI     Agente nives
-    /api/proposte/{id}            DELETE  Elimina una proposta                       SI     Agente nives
+----------------------------------------------------------------------------------------------------------
+    /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente  gedico
+    //stato                       GET     Visualizza offerte in base allo stato      SI     Agente  ✅
+    //{id}/stato                  PUT     Aggiorna stato (att, acce, rif)            SI     Agente  ✅
+    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente  nives
+    //{id}                        GET     Mostra i dettagli di una proposta          SI     Agente  gedico
+    //aggiorna/{id}               PUT     Aggiorna stato proposta (acc/rif)          SI     Agente  nives
+    //elimina/{id}                DELETE  Elimina una proposta                       SI     Agente  nives
 
---------------------------------------------------------------------------------
+    con {//} indico che il pattern precedente è /api/proposte
+
+----------------------------------------------------------------------------------------------------------
  INDICATORI DI PROSSIMITÀ
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
     /api/indicatori               POST    Crea un indicatore di prossimità           SI     Admin
     /api/indicatori               GET     Restituisce tutti gli indicatori           NO     Tutti
     /api/indicatori/{id}          GET     Dettagli di un indicatore                  NO     Tutti
     /api/indicatori/{id}          PUT     Modifica un indicatore                     SI     Admin
     /api/indicatori/{id}          DELETE  Elimina un indicatore                      SI     Admin
-    /api/inserzioni/{id}/prox     GET     Restituisce indicatori vicini all’immobile NO     Tutti
+    /api/inserzioni/{id}/prox     GET     Restituisce indicatori vicini all’inserzione NO     Tutti
 
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
  AMMINISTRAZIONE E STATISTICHE
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
     /api/admin/utenti             GET     Elenca tutti gli utenti registrati         SI     Admin
     /api/admin/inserzioni         GET     Elenca tutte le inserzioni del sistema     SI     Admin
     /api/admin/statistiche        GET     Ritorna dati aggregati (n. utenti, n. inserzioni, ecc.) SI Admin
@@ -190,7 +195,7 @@ Ho riscritto nella classe Account i getter/setter e nome del campo id perché Sp
 Senza questa correzione, non poteva trovare l’account nel database, dato che anche in questo caso c'era una incongruenza con i nomi dei campi.
 ti invito a provare
 ------------------------
-quando ci sarà crea offerta o invia proposta, deve esserci un controllo che deve vedere se
-lo stato di un immobile a cui si vuole fare proposta è stato gia venduto
+quando ci sarà crea proposta o invia proposta, deve esserci un controllo che deve vedere se
+lo stato di un inserzione a cui si vuole fare proposta è stato gia venduto
 inoltre, bisogna anche bloccare le modifiche a quella determinata inserzione
-si dovrebbe anche aggiungere lo stato di un immobile quando faremo inserzione response
+si dovrebbe anche aggiungere lo stato di un inserzione quando faremo inserzione response

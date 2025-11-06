@@ -1,6 +1,6 @@
 package ProgettoINSW.backend.model.enums;
 
-public enum StatoImmobile {
+public enum StatoInserzione {
     DISPONIBILE,
     VENDUTO
 }

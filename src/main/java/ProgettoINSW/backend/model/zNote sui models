@@ -15,7 +15,7 @@ All'interno dei models ci sono delle convenzioni che vogliamo usare in modo da f
    esempio: private Long idUtente;  //per la tabella utente
             private Long idProdotto; //per la tabella prodotto
 
-** in offerta usiamo @ManyToOne(fetch = FetchType.LAZY)
-   perche una offerta appartiene a un solo prodotto ma un prodotto puo avere piu offerte
+** in proposta usiamo @ManyToOne(fetch = FetchType.LAZY)
+   perche una proposta appartiene a un solo prodotto ma un prodotto puo avere piu offerte
    e utilizziamo .LAZY perche non vogliamo caricare tutte le offerte quando carichiamo un prodotto, ma le volgioamo
    caricare solo quando le chiediamo esplicitamente.

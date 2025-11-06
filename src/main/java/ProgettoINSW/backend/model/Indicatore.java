@@ -30,15 +30,15 @@ public class Indicatore {
     @ManyToOne
     @JoinColumn(name = "id_inserzione", nullable = false,
             foreignKey = @ForeignKey(name = "fk_indicatore_inserzione"))
-    private Immobile immobile;
+    private Inserzione inserzione;
 
     public Indicatore() {
     }
 
-    public Indicatore(Long idIndicatore, Tipologia tipo, BigDecimal distanza, Immobile immobile) {
+    public Indicatore(Long idIndicatore, Tipologia tipo, BigDecimal distanza, Inserzione inserzione) {
         this.idIndicatore = idIndicatore;
         this.tipo = tipo;
         this.distanza = distanza;
-        this.immobile = immobile;
+        this.inserzione = inserzione;
     }
 }

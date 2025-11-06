@@ -1,5 +1,6 @@
-package ProgettoINSW.backend.config;
+package ProgettoINSW.backend.security;
 
+import ProgettoINSW.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
