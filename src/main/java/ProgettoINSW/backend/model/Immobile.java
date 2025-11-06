@@ -2,6 +2,7 @@ package ProgettoINSW.backend.model;
 
 
 import ProgettoINSW.backend.model.enums.Categoria;
+import ProgettoINSW.backend.model.enums.StatoImmobile;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -71,6 +72,10 @@ public class Immobile {
     @Enumerated(EnumType.STRING)
     @Column(name = "categoria" , nullable = false)
     private Categoria categoria;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "stato", nullable = false, length = 20)
+    private StatoImmobile stato = StatoImmobile.DISPONIBILE;
 
 
 
