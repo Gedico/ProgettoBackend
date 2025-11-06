@@ -65,25 +65,26 @@ Per ogni API è indicato:
  INSERZIONI IMMOBILIARI
 --------------------------------------------------------------------------------
     /api/inserzioni               POST    Crea una nuova inserzione immobiliare      SI     Agente  ✅
-    /api/inserzioni               GET     Ricerca e filtra le inserzioni             NO     Tutti  nives
-    /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti  nives
+    /api/inserzioni               GET     Ricerca e filtra le inserzioni             NO     Tutti   ✅
+    /api/inserzioni/{id}          GET     Mostra i dettagli di una singola inserzione NO    Tutti   ✅
     /api/inserzioni/{id}          PUT     Modifica un’inserzione esistente           SI     Agente  ✅
     /api/inserzioni/{id}          DELETE  Elimina un’inserzione                      SI     Agente  ✅
-    /caricaFoto/{id}              POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
-    /eliminaFoto/{id}             DELETE  Elimina immagini all’inserzione            SI     Agente  gedico
-    /api/offerte?stato=---        GET     Può visualizzare le offerte in base allo stato     Agente  nives
-    /api/offerta/{id}/stato   PUT     Aggiorna stato (in attesa, accettata, rifiutata)    SI Agente nives
+    /api/inserzioni/caricaFoto/id POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
+    /api/offerte?stato=---        GET     Può visualizzare le offerte in base allo stato    Agente  ✅
+    /api/offerta/{id}/stato       PUT     Aggiorna stato (att, acce, rif)            SI     Agente  ✅
+    /api/inserzioni/eliminafoto   POST    Elimina immagini all’inserzione            SI     Agente gedico
+    /api/inserzioni/vendita       GET     Modifica lo stato dell'immobile            SI     Agente gedico
 
-    implementare e capire le eccezioni personalizzate                                              gedico
+    implementare e capire le eccezioni personalizzate                                              gedico/nives
 
 --------------------------------------------------------------------------------
  PROPOSTE DI ACQUISTO / CONTATTO
 --------------------------------------------------------------------------------
-    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente
-    /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente
-    /api/proposte/{id}            GET     Mostra i dettagli di una proposta          SI     Agente
-    /api/proposte/{id}            PUT     Aggiorna stato proposta (accettata/rifiutata) SI Agente
-    /api/proposte/{id}            DELETE  Elimina una proposta                       SI     Agente
+    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente nives
+    /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente gedico
+    /api/proposte/{id}            GET     Mostra i dettagli di una proposta          SI     Agente gedico
+    /api/proposte/{id}            PUT     Aggiorna stato proposta (acc/rif)          SI     Agente nives
+    /api/proposte/{id}            DELETE  Elimina una proposta                       SI     Agente nives
 
 --------------------------------------------------------------------------------
  INDICATORI DI PROSSIMITÀ
@@ -188,3 +189,8 @@ Correzione importante:
 Ho riscritto nella classe Account i getter/setter e nome del campo id perché Spring usava il nome del metodo per riconoscere il campo primario.
 Senza questa correzione, non poteva trovare l’account nel database, dato che anche in questo caso c'era una incongruenza con i nomi dei campi.
 ti invito a provare
+------------------------
+quando ci sarà crea offerta o invia proposta, deve esserci un controllo che deve vedere se
+lo stato di un immobile a cui si vuole fare proposta è stato gia venduto
+inoltre, bisogna anche bloccare le modifiche a quella determinata inserzione
+si dovrebbe anche aggiungere lo stato di un immobile quando faremo inserzione response
