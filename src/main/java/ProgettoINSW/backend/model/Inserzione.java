@@ -21,7 +21,7 @@ public class Inserzione {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idInserzione")
+    @Column(name = "id_inserzione")
     private Long idInserzione;
 
 

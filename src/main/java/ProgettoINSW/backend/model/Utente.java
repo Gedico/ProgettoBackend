@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class Utente {
 
     @Id
+    @Column(name = "id_utente")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUtente;
 
@@ -24,7 +25,7 @@ public class Utente {
     @Column(name = "indirizzo")
     private String indirizzo;
 
-    @Column(name="data_di_iscrizione", nullable = false)
+    @Column(name="data_registrazione", nullable = false)
     private LocalDateTime dataIscrizione;
 
 

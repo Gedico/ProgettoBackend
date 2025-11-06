@@ -20,6 +20,6 @@ public class ModificaDatiInserzioneRequest {
     private String categoria;
 
 
-    public ModificaDatiInserzioneRequest(String inserzioneAggiornataConSuccesso, boolean b) {
+    public ModificaDatiInserzioneRequest(String s, boolean b) {
     }
 }

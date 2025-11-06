@@ -33,10 +33,4 @@ public class Foto {
     public Foto() {
     }
 
-
-    public Foto(Long idFoto, Inserzione inserzione, String urlFoto) {
-        this.idFoto = idFoto;
-        this.inserzione = inserzione;
-        this.urlFoto = urlFoto;
-    }
 }
