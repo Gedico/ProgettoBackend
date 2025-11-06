@@ -1,6 +1,5 @@
 package ProgettoINSW.backend.security;
 
-import ProgettoINSW.backend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,11 +28,11 @@ public class SecurityConfig {
 
                         // Endpoint di registrazione e autenticazione
 
-                        .requestMatchers(HttpMethod.GET, "/api/auth/registerAgente").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/auth/registerAdmin").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/registerAgente").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/registerAdmin").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/delete/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/auth/registerUtente").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/registerUtente").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
                         .requestMatchers(HttpMethod.POST,"/api/auth/logout").authenticated()

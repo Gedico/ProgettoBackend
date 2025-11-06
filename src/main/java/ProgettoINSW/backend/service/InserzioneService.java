@@ -1,6 +1,5 @@
 package ProgettoINSW.backend.service;
 
-import ProgettoINSW.backend.dto.foto.FotoRequest;
 import ProgettoINSW.backend.dto.datiInserzione.ModificaDatiInserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
