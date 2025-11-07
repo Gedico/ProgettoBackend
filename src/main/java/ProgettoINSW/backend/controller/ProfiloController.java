@@ -31,8 +31,7 @@ public class ProfiloController {
             @RequestBody UpdateProfiloRequest request,
             @RequestHeader("Authorization") String authHeader) {
 
-        // Estrai il token
-        String token = authHeader.substring(7); // rimuove "Bearer "
+        String token = authHeader.substring(7);
         String mail = JwtUtil.extractMail(token);
 
         UpdateProfiloResponse response = profiloService.aggiornaProfilo(request, mail);

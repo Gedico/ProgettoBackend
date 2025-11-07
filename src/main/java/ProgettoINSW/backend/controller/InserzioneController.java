@@ -1,8 +1,8 @@
 package ProgettoINSW.backend.controller;
 
+import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.foto.FotoRequest;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneFiltriRequest;
-import ProgettoINSW.backend.dto.datiInserzione.ModificaDatiInserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.service.FotoService;
@@ -27,6 +27,36 @@ public class InserzioneController {
         this.fotoService = fotoService;
     }
 
+    //Visualizzazione inserzioni
+/******************************************************************************************************************/
+
+    @GetMapping
+    public ResponseEntity<List<InserzioneResponse>> getAllInserzioni() {
+        List<InserzioneResponse> inserzioni = inserzioneService.getAllInserzioni();
+        return ResponseEntity.ok(inserzioni);
+    }
+
+
+    @GetMapping("/ricerca")
+    public ResponseEntity<List<InserzioneResponse>> ricercaInserzioni(@ModelAttribute DatiInserzioneFiltriRequest filtri) {List<InserzioneResponse> risultati = inserzioneService.ricercaInserzioni(filtri);
+
+        if (risultati.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(risultati);
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<InserzioneResponse> getInserzioneById(@PathVariable("id") Long id) {
+        InserzioneResponse response = inserzioneService.getInserzioneById(id);
+        return ResponseEntity.ok(response);
+    }
+
+
+    //Gestione inserzioni
+/******************************************************************************************************************/
 
     @PostMapping("/crea")
     public ResponseEntity<InserzioneResponse> creaInserzione(@Valid @RequestBody InserzioneRequest request, @RequestHeader("Authorization") String authHeader) {
@@ -40,13 +70,13 @@ public class InserzioneController {
 
 
     @PutMapping("/modifica/{id}")
-    public ResponseEntity<ModificaDatiInserzioneRequest> modificaInserzione(@PathVariable("id") Long id, @Valid @RequestBody ModificaDatiInserzioneRequest request, @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<DatiInserzioneRequest> modificaInserzione(@PathVariable("id") Long id, @Valid @RequestBody DatiInserzioneRequest request, @RequestHeader("Authorization") String authHeader) {
 
         String token = authHeader.replace("Bearer ", "").trim();
 
-        ModificaDatiInserzioneRequest modificaInserzione = inserzioneService.modificaInserzione(id, request, token);
+        DatiInserzioneRequest modificaInserzione = inserzioneService.modificaInserzione(id, request, token);
 
-        return ResponseEntity.ok(modificaInserzione );
+        return ResponseEntity.ok(modificaInserzione);
     }
 
 
@@ -82,21 +112,5 @@ public class InserzioneController {
     }
 
 
-    @GetMapping("/ricerca")
-    public ResponseEntity<List<InserzioneResponse>> ricercaInserzioni(@ModelAttribute DatiInserzioneFiltriRequest filtri) {List<InserzioneResponse> risultati = inserzioneService.ricercaInserzioni(filtri);
-
-        if (risultati.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(risultati);
-    }
-
-
-    @GetMapping("/{id}")
-    public ResponseEntity<InserzioneResponse> getInserzioneById(@PathVariable("id") Long id) {
-        InserzioneResponse response = inserzioneService.getInserzioneById(id);
-        return ResponseEntity.ok(response);
-    }
 
 }
