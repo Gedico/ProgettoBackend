@@ -55,24 +55,29 @@ Per ogni API è indicato:
 ----------------------------------------------------------------------------------------------------------
  ACCOUNT E AUTENTICAZIONE
 ----------------------------------------------------------------------------------------------------------
-    /api/auth/register            POST    Registra un nuovo utente, Agente, Admin    NO     Tutti   ✅
-    /api/auth/login               POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
-    /api/auth/profile             GET     Restituisce i dati del profilo             SI     Tutti   ✅
-    /api/account/profile          PUT     Cambiare password o nome profilo           SI     Tutti   ✅
+    /api/auth/registerAgente      POST    Registra un nuovo Agente                   SI     Admin   ✅
+    /api/auth/registerAdmin       POST    Registra un nuovo Admin                    SI     Admin   ✅
+    /api/auth/registerUtente      POST    Registra un nuovo utente                   NO     Tutti   ✅
     /api/auth/delete              DELETE  Elimina l’account utente                   SI     Tutti   ✅
+    /api/auth/login               POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
+    /api/auth/logout              POST    Effettua il logout dell’utente             SI     Tutti   ✅
+----------------------------------------------------------------------------------------------------------
+    /profilo/me                   GET     Restituisce i dati del profilo             SI     Tutti   ✅
+    /profilo/update               PUT     Cambiare password o nome profilo           SI     Tutti   ✅
 
 ----------------------------------------------------------------------------------------------------------
  INSERZIONI IMMOBILIARI
 ----------------------------------------------------------------------------------------------------------
-    /api/inserzioni               GET     Mostra tutte le inserzioni                 NO     Tutti   gedico
-    //crea                        POST    Crea una nuova inserzione immobiliare      SI     Agente  ✅
+    /api/inserzioni               GET     Mostra tutte le inserzioni                 NO     Tutti   ✅
     //ricerca                     GET     Ricerca e filtra le inserzioni             NO     Tutti   ✅
     //{id}                        GET     Mostra dettagli singola inserzione         NO     Tutti   ✅
+----------------------------------------------------------------------------------------------------------
+    //crea                        POST    Crea una nuova inserzione immobiliare      SI     Agente  ✅
     //modifica/{id}               PUT     Modifica un’inserzione esistente           SI     Agente  ✅
     //elimina/{id}                DELETE  Elimina un’inserzione                      SI     Agente  ✅
-    //caricaFoto/id               POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
-    //eliminafoto                 POST    Elimina immagini all’inserzione            SI     Agente  gedico
-    //modificaStato               PUT     Modifica lo stato dell'inserzione          SI     Agente  gedico
+    //caricaFoto/{id}             POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
+    //eliminafoto/{id}            POST    Elimina immagini all’inserzione            SI     Agente  gedico
+    //modificaStato/{id}          PUT     Modifica lo stato dell'inserzione          SI     Agente  gedico
 
     implementare e capire le eccezioni personalizzate                                        gedico/nives
 

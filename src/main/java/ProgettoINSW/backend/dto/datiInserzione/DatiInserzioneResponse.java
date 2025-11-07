@@ -7,8 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class ModificaDatiInserzioneRequest {
-
+public class DatiInserzioneResponse {
     private String titolo;
     private String descrizione;
     private BigDecimal prezzo;
@@ -18,8 +17,4 @@ public class ModificaDatiInserzioneRequest {
     private Boolean ascensore;
     private String classeEnergetica;
     private String categoria;
-
-
-    public ModificaDatiInserzioneRequest(String s, boolean b) {
-    }
 }

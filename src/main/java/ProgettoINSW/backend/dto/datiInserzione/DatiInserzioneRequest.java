@@ -20,4 +20,6 @@ import java.math.BigDecimal;
     private String classe_energetica;
     private Categoria categoria;
 
+        public DatiInserzioneRequest(String inserzioneAggiornataConSuccesso, boolean b) {
+        }
     }

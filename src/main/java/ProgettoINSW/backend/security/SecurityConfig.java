@@ -30,26 +30,38 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/auth/registerAgente").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/auth/registerAdmin").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/auth/registerUtente").permitAll()
+
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/delete/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/auth/registerUtente").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-
                         .requestMatchers(HttpMethod.POST,"/api/auth/logout").authenticated()
 
                         .requestMatchers("/api/auth/**").permitAll()
 
                         // Endpoint per il profilo
 
-                        .requestMatchers("/profilo/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/profilo/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/profilo/update").authenticated()
+
+                        .requestMatchers( "/profilo/**").authenticated()
 
                         // Endpoint per la gestione degli immobili (solo agenti)
 
-                        .requestMatchers(HttpMethod.POST, "/api/immobili/crea").hasRole("AGENTE")
-                        .requestMatchers(HttpMethod.PUT, "/api/immobili/modifica/**").hasRole("AGENTE")
+                        .requestMatchers(HttpMethod.GET, "/api/inserzioni").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/inserzioni/ricerca").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/inserzioni/{id}").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/api/inserzioni/crea").hasAnyRole("AGENTE","ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/inserzioni/modifica/**").hasAnyRole("AGENTE","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/inserzioni/elimina/**").hasAnyRole("AGENTE","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/inserzioni/caricaFoto").hasAnyRole("AGENTE","ADMIN")
 
 
-                        .requestMatchers(HttpMethod.GET, "/api/immobili/ricerca", "/api/immobili/{id}").permitAll()
+                        // Endpoint per le proposte
+
+                        .requestMatchers(HttpMethod.GET, "/api/proposte/stato").hasAnyRole("AGENTE","ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/proposte/{id}/stato").hasAnyRole("AGENTE","ADMIN")
 
 
                         .anyRequest().permitAll()

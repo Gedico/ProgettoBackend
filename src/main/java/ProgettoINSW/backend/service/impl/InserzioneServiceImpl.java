@@ -1,7 +1,7 @@
 package ProgettoINSW.backend.service.impl;
 
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneFiltriRequest;
-import ProgettoINSW.backend.dto.datiInserzione.ModificaDatiInserzioneRequest;
+import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.mapper.InserzioneMap;
@@ -58,7 +58,7 @@ public class InserzioneServiceImpl implements InserzioneService {
 
     @Transactional
     @Override
-    public ModificaDatiInserzioneRequest modificaInserzione(Long id, ModificaDatiInserzioneRequest request, String token) {
+    public DatiInserzioneRequest modificaInserzione(Long id, DatiInserzioneRequest request, String token) {
 
         if (validazioneUtil.verificaAgenteInserzione(id, token)) {
             throw new RuntimeException("Non puoi modificare un'inserzione che non hai pubblicato");
@@ -71,16 +71,16 @@ public class InserzioneServiceImpl implements InserzioneService {
         if (request.getDescrizione() != null) inserzione.setDescrizione(request.getDescrizione());
         if (request.getPrezzo() != null) inserzione.setPrezzo(request.getPrezzo());
         if (request.getDimensioni() != null) inserzione.setDimensioni(request.getDimensioni());
-        if (request.getNumeroStanze() != null) inserzione.setNumeroStanze(request.getNumeroStanze());
+        if (request.getNumero_stanze() != null) inserzione.setNumeroStanze(request.getNumero_stanze());
         if (request.getPiano() != null) inserzione.setPiano(request.getPiano());
         if (request.getAscensore() != null) inserzione.setAscensore(request.getAscensore());
-        if (request.getClasseEnergetica() != null) inserzione.setClasseEnergetica(request.getClasseEnergetica());
+        if (request.getClasse_energetica() != null) inserzione.setClasseEnergetica(request.getClasse_energetica());
         if (request.getCategoria() != null)
             inserzione.setCategoria(Categoria.valueOf(request.getCategoria().toUpperCase()));
 
         inserzioneRepository.save(inserzione);
 
-        return new ModificaDatiInserzioneRequest("Inserzione aggiornata con successo", true);
+        return new DatiInserzioneRequest("Inserzione aggiornata con successo", true);
     }
 
     @Override
@@ -126,6 +126,15 @@ public class InserzioneServiceImpl implements InserzioneService {
 
         inserzioneRepository.delete(inserzione);
     }
+
+    @Override
+    public List<InserzioneResponse> getAllInserzioni() {
+        List<Inserzione> inserzioni = inserzioneRepository.findAllConRelazioni();
+        return inserzioni.stream()
+                .map(map::toInserzioneResponse)
+                .toList();
+    }
+
 
 
 }

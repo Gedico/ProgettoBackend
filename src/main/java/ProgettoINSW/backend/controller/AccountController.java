@@ -20,21 +20,23 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    // Endpoint per registrazione utente
+
+//Registrazioni
+/******************************************************************************************************************/
+
+
     @PostMapping("/registerUtente")
     public ResponseEntity<RegisterResponse> registraUtente(@RequestBody RegisterRequest request) {
         RegisterResponse response = accountService.registraAccount(request,Role.UTENTE);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Endpoint per registrazione Agente
     @PostMapping("/registerAgente")
     public ResponseEntity<RegisterResponse> registraAgente(@RequestBody RegisterRequest request) {
         RegisterResponse response = accountService.registraAccount(request,Role.AGENTE);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Endpoint per registrazione Admin
     @PostMapping("/registerAdmin")
     public ResponseEntity<RegisterResponse> registraAdmin(@RequestBody RegisterRequest request) {
         RegisterResponse response = accountService.registraAccount(request,Role.ADMIN);
@@ -42,7 +44,9 @@ public class AccountController {
     }
 
 
-    // Endpoint per login
+//Login e Logout
+/******************************************************************************************************************/
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginResponse response = accountService.loginUtente(request);
@@ -54,7 +58,6 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    // Endpoint per logout
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         String message = accountService.logout(token);
@@ -62,7 +65,9 @@ public class AccountController {
     }
 
 
-    // Endpoint per l'eliminazione
+//Eliminazione account
+/******************************************************************************************************************/
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
         try {

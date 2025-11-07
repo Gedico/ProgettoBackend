@@ -30,5 +30,9 @@ public interface InserzioneRepository extends JpaRepository<Inserzione, Long> {
             @Param("dimensioniMax") Double dimensioniMax
     );
 
+    @Query("SELECT DISTINCT i FROM Inserzione i " +
+            "LEFT JOIN FETCH i.posizione " +
+            "LEFT JOIN FETCH i.foto")
+    List<Inserzione> findAllConRelazioni();
 }
 
