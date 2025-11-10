@@ -80,7 +80,7 @@ Per ogni API è indicato:
     //modificaStato/{id}          PUT     Modifica lo stato dell'inserzione          SI     Agente  gedico
 
     implementare e capire le eccezioni personalizzate                                        gedico/nives
-
+git
     con {//} indico che il pattern precedente è /api/inserzione
 
 ----------------------------------------------------------------------------------------------------------
