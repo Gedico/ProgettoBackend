@@ -31,7 +31,17 @@ public class PropostaServiceImpl implements PropostaService {
     private final InserzioneRepository inserzioneRepository;
 
     @Override
-    public List<PropostaResponse> getOfferteAgente(String token, StatoProposta stato) {
+    public List<PropostaResponse> getProposteAgente(String token) {
+        return getProposteAgenteByStato(token, null);
+    }
+
+    @Override
+    public List<PropostaResponse> getProposteAgenteStato(String token, StatoProposta stato) {
+        return getProposteAgenteByStato(token, stato);
+    }
+
+    @Override
+    public PropostaResponse aggiornaStatoProposta(Long id, AggiornaStatoPropostaRequest request, String token) {
 
         String mail = JwtUtil.extractMail(token);
 
@@ -41,8 +51,49 @@ public class PropostaServiceImpl implements PropostaService {
         Agente agente = agenteRepository.findByAccount(account)
                 .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mail));
 
-        List<Proposta> offerte = propostaRepository.findByAgenteAndStato(agente.getIdAgente(), stato);
+        Proposta proposta = propostaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Proposta non trovata con ID: " + id));
 
+        if (!proposta.getInserzione().getAgente().getIdAgente().equals(agente.getIdAgente())) {
+            throw new SecurityException("Non sei autorizzato a modificare questa Proposta.");
+        }
+
+        proposta.setStato(request.getNuovoStato());
+        propostaRepository.save(proposta);
+
+        if (request.getNuovoStato() == StatoProposta.ACCETTATA) {
+            Inserzione inserzione = proposta.getInserzione();
+            inserzione.setStato(StatoInserzione.VENDUTO);
+            inserzioneRepository.save(inserzione);
+        }
+
+        return propostaMap.toDto(proposta, "Stato Proposta aggiornato con successo");
+    }
+
+
+    //Metodi Utili
+/******************************************************************************************************************/
+
+    private List<PropostaResponse> getProposteAgenteByStato(String token, StatoProposta stato) {
+        String mail = JwtUtil.extractMail(token);
+
+        Account account = accountRepository.findByMail(mail)
+                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
+
+        Agente agente = agenteRepository.findByAccount(account)
+                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mail));
+
+        List<Proposta> offerte;
+        if (stato == null) {
+            offerte = propostaRepository.findByAgente(agente.getIdAgente());
+        } else {
+            offerte = propostaRepository.findByAgenteAndStato(agente.getIdAgente(), stato);
+        }
+
+        return mapToResponseList(offerte);
+    }
+
+    private List<PropostaResponse> mapToResponseList(List<Proposta> offerte) {
         return offerte.stream()
                 .map(o -> {
                     PropostaResponse dto = new PropostaResponse();
@@ -54,43 +105,6 @@ public class PropostaServiceImpl implements PropostaService {
                     return dto;
                 })
                 .toList();
-    }
-
-
-    @Override
-    public PropostaResponse aggiornaStatoProposta(Long id, AggiornaStatoPropostaRequest request, String token) {
-
-        String mail = JwtUtil.extractMail(token);
-
-        // 1️⃣ Recupera l'agente autenticato
-        Account account = accountRepository.findByMail(mail)
-                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
-
-        Agente agente = agenteRepository.findByAccount(account)
-                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mail));
-
-        // 2️⃣ Recupera la Proposta
-        Proposta proposta = propostaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Proposta non trovata con ID: " + id));
-
-        // 3️⃣ Verifica che l'agente sia proprietario dell'inserzione associato
-        if (!proposta.getInserzione().getAgente().getIdAgente().equals(agente.getIdAgente())) {
-            throw new SecurityException("Non sei autorizzato a modificare questa Proposta.");
-        }
-
-        // 4️⃣ Aggiorna lo stato
-        proposta.setStato(request.getNuovoStato());
-        propostaRepository.save(proposta);
-
-        // Se la Proposta è ACCETTATA → segna l'inserzione come VENDUTO (quando è in vendita)
-        if (request.getNuovoStato() == StatoProposta.ACCETTATA) {
-            Inserzione inserzione = proposta.getInserzione();
-            inserzione.setStato(StatoInserzione.VENDUTO);
-            inserzioneRepository.save(inserzione);
-        }
-
-        // 5️⃣ Mapper → DTO
-        return propostaMap.toDto(proposta, "Stato Proposta aggiornato con successo");
     }
 
 }

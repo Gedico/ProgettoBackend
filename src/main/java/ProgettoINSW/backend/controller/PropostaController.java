@@ -20,17 +20,31 @@ public class PropostaController {
 
     @GetMapping
     public ResponseEntity<List<PropostaResponse>> getProposteAgente(
+            @RequestHeader("Authorization") String authHeader){
+
+        String token = authHeader.replace("Bearer ", "").trim();
+        List<PropostaResponse> proposte = propostaService.getProposteAgente(token);
+
+        if (proposte.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(proposte);
+    }
+
+    @GetMapping("/stato")
+    public ResponseEntity<List<PropostaResponse>> getProposteAgente(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam(required = false) StatoProposta stato) {
 
         String token = authHeader.replace("Bearer ", "").trim();
-        List<PropostaResponse> offerte = propostaService.getOfferteAgente(token, stato);
+        List<PropostaResponse> proposte = propostaService.getProposteAgenteStato(token, stato);
 
-        if (offerte.isEmpty()) {
+        if (proposte.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(offerte);
+        return ResponseEntity.ok(proposte);
     }
 
     @PutMapping("/{id}/stato")
@@ -45,6 +59,7 @@ public class PropostaController {
 
         return ResponseEntity.ok(response);
     }
+
 
 
 }

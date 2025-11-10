@@ -24,4 +24,5 @@ public interface PropostaRepository extends JpaRepository<Proposta, Long> {
     );
 
 
+    List<Proposta> findByAgente(Long idAgente);
 }
