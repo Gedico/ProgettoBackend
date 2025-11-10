@@ -55,8 +55,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/inserzioni/crea").hasAnyRole("AGENTE","ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/inserzioni/modifica/**").hasAnyRole("AGENTE","ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/inserzioni/elimina/**").hasAnyRole("AGENTE","ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/inserzioni/caricaFoto").hasAnyRole("AGENTE","ADMIN")
-
+                        .requestMatchers(HttpMethod.POST, "/api/inserzioni/caricaFoto/{id}").hasAnyRole("AGENTE","ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/inserzioni/eliminaFoto/{id}").hasAnyRole("AGENTE","ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/inserzioni/modificaStato/{id}").hasAnyRole("AGENTE","ADMIN")
 
                         // Endpoint per le proposte
 

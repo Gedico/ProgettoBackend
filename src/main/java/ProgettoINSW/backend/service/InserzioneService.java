@@ -21,4 +21,6 @@ public interface InserzioneService {
     void eliminaInserzione(Long id, String token);
 
     List<InserzioneResponse> getAllInserzioni();
+
+    void cambiaStato(Long id, String bearer, String nuovoStato);
 }

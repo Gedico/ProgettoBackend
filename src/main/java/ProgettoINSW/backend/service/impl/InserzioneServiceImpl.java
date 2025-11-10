@@ -8,6 +8,7 @@ import ProgettoINSW.backend.mapper.InserzioneMap;
 import ProgettoINSW.backend.model.*;
 import ProgettoINSW.backend.model.enums.Categoria;
 import ProgettoINSW.backend.model.enums.Role;
+import ProgettoINSW.backend.model.enums.StatoInserzione;
 import ProgettoINSW.backend.repository.*;
 import ProgettoINSW.backend.service.InserzioneService;
 import ProgettoINSW.backend.util.JwtUtil;
@@ -135,6 +136,24 @@ public class InserzioneServiceImpl implements InserzioneService {
                 .toList();
     }
 
+    @Override
+    public void cambiaStato(Long id, String token, String nuovoStato) {
+
+        if (validazioneUtil.verificaAgenteInserzione(id, token)) {
+            throw new RuntimeException("Non puoi modificare lo stato di un'inserzione che non hai pubblicato");
+        }
+
+        Inserzione inserzione = inserzioneRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Inserzione non trovata"));
+
+        try {
+            StatoInserzione statoEnum = StatoInserzione.valueOf(nuovoStato.toUpperCase());
+            inserzione.setStato(statoEnum);
+            inserzioneRepository.save(inserzione);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Stato non valido: deve essere DISPONIBILE o VENDUTO");
+        }
+    }
 
 
 }

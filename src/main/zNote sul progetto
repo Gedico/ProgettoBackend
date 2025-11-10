@@ -76,8 +76,8 @@ Per ogni API è indicato:
     //modifica/{id}               PUT     Modifica un’inserzione esistente           SI     Agente  ✅
     //elimina/{id}                DELETE  Elimina un’inserzione                      SI     Agente  ✅
     //caricaFoto/{id}             POST    Aggiunge immagini all’inserzione           SI     Agente  ✅
-    //eliminafoto/{id}            POST    Elimina immagini all’inserzione            SI     Agente  gedico
-    //modificaStato/{id}          PUT     Modifica lo stato dell'inserzione          SI     Agente  gedico
+    //eliminafoto/{id}            POST    Elimina immagini all’inserzione            SI     Agente  ✅
+    //modificaStato/{id}          PUT     Modifica lo stato dell'inserzione          SI     Agente  ✅
 
     implementare e capire le eccezioni personalizzate                                        gedico/nives
 git
@@ -87,7 +87,7 @@ git
  PROPOSTE DI ACQUISTO / CONTATTO
 ----------------------------------------------------------------------------------------------------------
     /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente  gedico
-    //stato                       GET     Visualizza offerte in base allo stato      SI     Agente  ✅
+    //stato                       GET     Visualizza le proposte in base allo stato  SI     Agente  ✅
     //{id}/stato                  PUT     Aggiorna stato (att, acce, rif)            SI     Agente  ✅
     /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente  nives
     //{id}                        GET     Mostra i dettagli di una proposta          SI     Agente  gedico
