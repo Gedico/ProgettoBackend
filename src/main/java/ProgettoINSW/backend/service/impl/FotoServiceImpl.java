@@ -50,5 +50,34 @@ public class FotoServiceImpl implements FotoService {
 
     }
 
+    @Transactional
+    @Override
+    public void eliminaFoto(Long id, String token, List<FotoRequest> daEliminare) {
+
+        if (validazioneUtil.verificaAgenteInserzione(id, token)) {
+            throw new RuntimeException("Non puoi eliminare foto per un'inserzione che non hai pubblicato");
+        }
+
+        if (daEliminare == null || daEliminare.isEmpty()) {
+            throw new RuntimeException("Nessuna foto fornita");
+        }
+
+        Inserzione inserzione = inserzioneRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Inserzione non trovata"));
+
+        List<String> urlDaEliminare = daEliminare.stream()
+                .map(FotoRequest::getUrl)
+                .collect(Collectors.toList());
+
+        List<Foto> fotoPresenti = fotoRepository.findByInserzioneAndUrlFotoIn(inserzione, urlDaEliminare);
+
+        if (fotoPresenti.isEmpty()) {
+            throw new RuntimeException("Nessuna foto trovata da eliminare");
+        }
+
+        fotoRepository.deleteAll(fotoPresenti);
+    }
+
+
 
 }

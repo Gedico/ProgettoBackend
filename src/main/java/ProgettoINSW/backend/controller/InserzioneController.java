@@ -55,6 +55,8 @@ public class InserzioneController {
     }
 
 
+
+
     //Gestione inserzioni
 /******************************************************************************************************************/
 
@@ -67,6 +69,24 @@ public class InserzioneController {
 
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/eliminaFoto/{id}")
+    public ResponseEntity<Map<String, Object>> eliminaFoto(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody List<FotoRequest> daEliminare) {
+
+        String token = authHeader.replace("Bearer ", "").trim();
+        fotoService.eliminaFoto(id, token, daEliminare);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Foto eliminate con successo");
+        response.put("success", true);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
     @PutMapping("/modifica/{id}")
@@ -95,6 +115,23 @@ public class InserzioneController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/modificaStato/{id}")
+    public ResponseEntity<String> cambiaStatoInserzione(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String token,
+            @RequestBody Map<String, String> body) {
+
+        try {
+            String nuovoStato = body.get("stato");
+            inserzioneService.cambiaStato(id, token.replace("Bearer ", ""), nuovoStato);
+            return ResponseEntity.ok("Stato dell'inserzione aggiornato correttamente a: " + nuovoStato);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Errore: " + e.getMessage());
+        }
+    }
+
+
+
     @PostMapping("/caricaFoto/{id}")
     public ResponseEntity<Map<String, Object>> caricaFoto(
             @PathVariable Long id,
@@ -110,7 +147,5 @@ public class InserzioneController {
 
         return ResponseEntity.ok(response);
     }
-
-
 
 }
