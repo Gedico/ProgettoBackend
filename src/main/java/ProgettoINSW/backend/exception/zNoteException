@@ -1,0 +1,3 @@
+hO CREATO UN HANDLER
+questo handler mi prende e gestisce tutte le eccezioni che vengono lanciata e le restituisce al front end come una dto in modo che
+succesivamente io possa utilizzare questa do per implemenatre dei pop-up che segnalano al mio utente l'errore
