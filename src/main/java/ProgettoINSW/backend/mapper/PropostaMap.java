@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PropostaMap {
-    public PropostaResponse toDto(Proposta entity, String messaggio) {
+    public PropostaResponse toPropostaResponse(Proposta entity, String messaggio) {
         PropostaResponse dto = new PropostaResponse();
         dto.setIdProposta(entity.getIdProposta());
         dto.setImporto(entity.getPrezzoProposta());
@@ -17,4 +17,5 @@ public class PropostaMap {
 
         return dto;
     }
+
 }

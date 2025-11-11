@@ -61,5 +61,15 @@ public class PropostaController {
     }
 
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PropostaResponse> dettagliProposta(@PathVariable("id") Long idProposta,
+                                                             @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "").trim();
+
+        PropostaResponse response = propostaService.mostraDettagliProposta(idProposta, token);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }

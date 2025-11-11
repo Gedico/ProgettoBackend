@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ProgettoINSW.backend.model.Proposta;
+import ProgettoINSW.backend.model.Agente;
 
 
 import java.util.List;
@@ -24,5 +25,6 @@ public interface PropostaRepository extends JpaRepository<Proposta, Long> {
     );
 
 
-    List<Proposta> findByAgente(Long idAgente);
+    List<Proposta> findByAgente(Agente agente);
+
 }
