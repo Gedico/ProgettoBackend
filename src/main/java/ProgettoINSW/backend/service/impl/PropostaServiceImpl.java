@@ -18,7 +18,6 @@ import ProgettoINSW.backend.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -67,7 +66,29 @@ public class PropostaServiceImpl implements PropostaService {
             inserzioneRepository.save(inserzione);
         }
 
-        return propostaMap.toDto(proposta, "Stato Proposta aggiornato con successo");
+        return propostaMap.toPropostaResponse(proposta, "Stato Proposta aggiornato con successo");
+    }
+
+    @Override
+    public PropostaResponse mostraDettagliProposta(Long idProposta, String token) {
+
+        Proposta proposta = propostaRepository.findById(idProposta).
+                orElseThrow(() -> new EntityNotFoundException("Inserzione con ID " + idProposta + " non trovato."));
+
+        String mailAgente = JwtUtil.extractMail(token);
+
+        Account account = accountRepository.findByMail(mailAgente)
+                .orElseThrow(() -> new EntityNotFoundException("account con mail:." + mailAgente+" non esiste. "));
+
+        Agente agente = agenteRepository.findByAccount(account)
+                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mailAgente));
+
+        if(!proposta.getAgente().getIdAgente().equals(agente.getIdAgente())){
+            throw  new RuntimeException("Non puoi visualizzare una proposta che non appartiene alle tue ");
+        }
+
+
+        return propostaMap.toPropostaResponse(proposta,null);
     }
 
 
@@ -85,7 +106,7 @@ public class PropostaServiceImpl implements PropostaService {
 
         List<Proposta> offerte;
         if (stato == null) {
-            offerte = propostaRepository.findByAgente(agente.getIdAgente());
+            offerte = propostaRepository.findByAgente(agente);
         } else {
             offerte = propostaRepository.findByAgenteAndStato(agente.getIdAgente(), stato);
         }
