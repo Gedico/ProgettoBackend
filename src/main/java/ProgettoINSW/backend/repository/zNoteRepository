@@ -1,0 +1,24 @@
+il metodo "findAltreProposteByInserzione" serve per trovare tutte le altre proposte legate
+alla stessa inserzione, tranne quella che è stata accettata. perche ci serve:
+
+Immaginiamo di avere :
+
+| ID Proposta | Inserzione    | Stato     |
+| ----------- | ------------- | --------- |
+| 1           | Inserzione 10 | IN_ATTESA |
+| 2           | Inserzione 10 | IN_ATTESA |
+| 3           | Inserzione 10 | IN_ATTESA |
+
+L’agente accetta la proposta 2
+
+La proposta 2 diventa ACCETTATA
+
+L’inserzione 10 diventa VENDUTO
+
+Le altre proposte (1 e 3) devono diventare RIFIUTATA
+
+E noi vogliamo trovare proprio quelle altre proposte (1 e 3).
+ Ecco perché serve questo metodo: per dire a JPA:
+
+“Dammi tutte le proposte che hanno la stessa inserzione, ma che non sono la proposta che ho appena accettato.”
+per rifiutarle automaticamente nel momento in cui una proposta viene accettata

@@ -50,7 +50,8 @@ public class PropostaController {
         return ResponseEntity.ok(proposte);
     }
 
-    @PutMapping("/{id}/stato")
+    @PutMapping("/aggiorna/{id}")
+    @PreAuthorize("hasRole('AGENTE')")
     public ResponseEntity<PropostaResponse> aggiornaStatoProposta(
             @PathVariable("id") Long idProposta,
             @RequestBody AggiornaStatoPropostaRequest request,
