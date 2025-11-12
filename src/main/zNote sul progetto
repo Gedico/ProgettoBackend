@@ -93,7 +93,7 @@ git
     /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente  ✅
     //{id}                        GET     Mostra i dettagli di una proposta          SI     Agente  ✅
     //aggiorna/{id}               PUT     Aggiorna stato proposta (acc/rif)          SI     Agente  ✅
-    //elimina/{id}                DELETE  Elimina una proposta                       SI     Agente  nives
+    //elimina/{id}                DELETE  Elimina una proposta                       SI     utente  ✅
 
     con {//} indico che il pattern precedente è /api/proposte
 
