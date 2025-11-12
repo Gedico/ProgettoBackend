@@ -1,18 +1,14 @@
 package ProgettoINSW.backend.service.impl;
-
 import ProgettoINSW.backend.dto.proposta.AggiornaStatoPropostaRequest;
 import ProgettoINSW.backend.dto.proposta.PropostaResponse;
+import ProgettoINSW.backend.dto.proposta.PropostaRequest;
+import ProgettoINSW.backend.repository.UtenteRepository;
+import java.time.OffsetDateTime;
 import ProgettoINSW.backend.mapper.PropostaMap;
-import ProgettoINSW.backend.model.Account;
-import ProgettoINSW.backend.model.Agente;
-import ProgettoINSW.backend.model.Proposta;
-import ProgettoINSW.backend.model.Inserzione;
+import ProgettoINSW.backend.model.*;
 import ProgettoINSW.backend.model.enums.StatoInserzione;
 import ProgettoINSW.backend.model.enums.StatoProposta;
-import ProgettoINSW.backend.repository.AccountRepository;
-import ProgettoINSW.backend.repository.AgenteRepository;
-import ProgettoINSW.backend.repository.PropostaRepository;
-import ProgettoINSW.backend.repository.InserzioneRepository;
+import ProgettoINSW.backend.repository.*;
 import ProgettoINSW.backend.service.PropostaService;
 import ProgettoINSW.backend.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,6 +24,7 @@ public class PropostaServiceImpl implements PropostaService {
     private final AgenteRepository agenteRepository;
     private final PropostaMap propostaMap;
     private final InserzioneRepository inserzioneRepository;
+    private final UtenteRepository utenteRepository;
 
     @Override
     public List<PropostaResponse> getProposteAgente(String token) {
@@ -90,6 +87,51 @@ public class PropostaServiceImpl implements PropostaService {
 
         return propostaMap.toPropostaResponse(proposta,null);
     }
+
+    @Override
+    public PropostaResponse inviaProposta(PropostaRequest request, String token) {
+
+        // Recupero mail utente autenticato
+        String mail = JwtUtil.extractMail(token);
+
+        Account account = accountRepository.findByMail(mail)
+                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
+
+        Utente utente = utenteRepository.findByAccount_Id(account.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato per l'account: " + mail));
+
+        // Recupero inserzione
+        Inserzione inserzione = inserzioneRepository.findById(request.getIdInserzione())
+                .orElseThrow(() -> new EntityNotFoundException("Inserzione non trovata con ID: " + request.getIdInserzione()));
+
+        // Controllo disponibilità
+        if (inserzione.getStato() != StatoInserzione.DISPONIBILE) {
+            throw new RuntimeException("Non è possibile fare proposte su un'inserzione non disponibile.");
+        }
+
+        // (Facoltativo) controllo se l'utente ha già inviato una proposta per la stessa inserzione
+        boolean esisteGia = propostaRepository.existsByClienteAndInserzione(utente, inserzione);
+        if (esisteGia) {
+            throw new RuntimeException("Hai già inviato una proposta per questa inserzione.");
+        }
+
+        // Creazione proposta
+        Proposta proposta = new Proposta();
+        proposta.setInserzione(inserzione);
+        proposta.setCliente(utente);
+        proposta.setAgente(inserzione.getAgente());
+        proposta.setPrezzoProposta(request.getPrezzoProposta());
+        proposta.setNote(request.getNote());
+        proposta.setStato(StatoProposta.IN_ATTESA);
+        proposta.setDataProposta(OffsetDateTime.now());
+
+        // Salvataggio nel DB
+        propostaRepository.save(proposta);
+
+        // Uso del tuo mapper per creare la risposta
+        return propostaMap.toPropostaResponse(proposta, "Proposta inviata con successo.");
+    }
+
 
 
     //Metodi Utili

@@ -1,6 +1,7 @@
 package ProgettoINSW.backend.service;
 
 import ProgettoINSW.backend.dto.proposta.AggiornaStatoPropostaRequest;
+import ProgettoINSW.backend.dto.proposta.PropostaRequest;
 import ProgettoINSW.backend.dto.proposta.PropostaResponse;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 
@@ -11,6 +12,6 @@ public interface PropostaService {
     List<PropostaResponse> getProposteAgente(String token);
     List<PropostaResponse> getProposteAgenteStato(String token, StatoProposta stato);
     PropostaResponse aggiornaStatoProposta(Long id, AggiornaStatoPropostaRequest request, String token);
-
+    PropostaResponse inviaProposta(PropostaRequest request, String token);
     PropostaResponse mostraDettagliProposta(Long idProposta, String token);
 }

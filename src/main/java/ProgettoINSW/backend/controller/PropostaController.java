@@ -1,10 +1,13 @@
 package ProgettoINSW.backend.controller;
 
 import ProgettoINSW.backend.dto.proposta.AggiornaStatoPropostaRequest;
+import ProgettoINSW.backend.dto.proposta.PropostaRequest;
 import ProgettoINSW.backend.dto.proposta.PropostaResponse;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 import ProgettoINSW.backend.service.PropostaService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -70,6 +73,17 @@ public class PropostaController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping
+    @PreAuthorize("hasRole('UTENTE')")
+    public ResponseEntity<PropostaResponse> inviaProposta(
+            @RequestBody @Valid PropostaRequest request,
+            @RequestHeader("Authorization") String token) {
+        String jwt = token.replace("Bearer ", "");
+        PropostaResponse response = propostaService.inviaProposta(request, jwt);
+        return ResponseEntity.ok(response);
+    }
+
 
 
 }
