@@ -86,5 +86,18 @@ public class PropostaController {
     }
 
 
+    @DeleteMapping("/elimina/{id}")
+    @PreAuthorize("hasRole('UTENTE')")
+    public ResponseEntity<String> eliminaProposta(
+            @PathVariable("id") Long idProposta,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "").trim();
+
+        propostaService.eliminaProposta(idProposta, token);
+
+        return ResponseEntity.ok("Proposta eliminata con successo.");
+    }
+
 
 }

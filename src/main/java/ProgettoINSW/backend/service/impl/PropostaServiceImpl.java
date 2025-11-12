@@ -147,6 +147,37 @@ public class PropostaServiceImpl implements PropostaService {
     }
 
 
+    @Override
+    public void eliminaProposta(Long idProposta, String token) {
+
+        // 1️⃣ Recupera la mail dal token
+        String mail = JwtUtil.extractMail(token);
+
+        // 2️⃣ Trova account e utente associato
+        Account account = accountRepository.findByMail(mail)
+                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
+
+        Utente utente = utenteRepository.findByAccount_Id(account.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato per l'account: " + mail));
+
+        // 3️⃣ Recupera la proposta da eliminare
+        Proposta proposta = propostaRepository.findById(idProposta)
+                .orElseThrow(() -> new EntityNotFoundException("Proposta non trovata con ID: " + idProposta));
+
+        // 4️⃣ Verifica che la proposta appartenga all’utente autenticato
+        if (!proposta.getCliente().getIdUtente().equals(utente.getIdUtente())) {
+            throw new SecurityException("Non sei autorizzato a eliminare questa proposta.");
+        }
+
+        // 5️⃣ Può eliminarla solo se è ancora in attesa
+        if (proposta.getStato() != StatoProposta.IN_ATTESA) {
+            throw new IllegalStateException("Non è possibile eliminare una proposta già accettata o rifiutata.");
+        }
+
+        // 6️⃣ Eliminazione dal database
+        propostaRepository.delete(proposta);
+    }
+
 
     //Metodi Utili
 /******************************************************************************************************************/

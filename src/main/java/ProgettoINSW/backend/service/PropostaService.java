@@ -13,5 +13,6 @@ public interface PropostaService {
     List<PropostaResponse> getProposteAgenteStato(String token, StatoProposta stato);
     PropostaResponse aggiornaStatoProposta(Long id, AggiornaStatoPropostaRequest request, String token);
     PropostaResponse inviaProposta(PropostaRequest request, String token);
+    void eliminaProposta(Long idProposta, String token);
     PropostaResponse mostraDettagliProposta(Long idProposta, String token);
 }
