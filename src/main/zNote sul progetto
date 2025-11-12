@@ -91,7 +91,7 @@ git
     /api/proposte                 GET     Elenca tutte le proposte ricevute          SI     Agente  ✅
     //stato                       GET     Visualizza le proposte in base allo stato  SI     Agente  ✅
     //{id}/stato                  PUT     Aggiorna stato (att, acce, rif)            SI     Agente  ✅
-    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente  nives
+    /api/proposte                 POST    Invia una proposta per un’inserzione       SI     Utente  ✅
     //{id}                        GET     Mostra i dettagli di una proposta          SI     Agente  ✅
     //aggiorna/{id}               PUT     Aggiorna stato proposta (acc/rif)          SI     Agente  nives
     //elimina/{id}                DELETE  Elimina una proposta                       SI     Agente  nives

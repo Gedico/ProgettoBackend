@@ -1,5 +1,7 @@
 package ProgettoINSW.backend.repository;
 
+import ProgettoINSW.backend.model.Inserzione;
+import ProgettoINSW.backend.model.Utente;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,5 +28,7 @@ public interface PropostaRepository extends JpaRepository<Proposta, Long> {
 
 
     List<Proposta> findByAgente(Agente agente);
+
+    boolean existsByClienteAndInserzione(Utente cliente, Inserzione inserzione);
 
 }
