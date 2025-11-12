@@ -54,16 +54,30 @@ public class PropostaServiceImpl implements PropostaService {
             throw new SecurityException("Non sei autorizzato a modificare questa Proposta.");
         }
 
-        proposta.setStato(request.getNuovoStato());
+        StatoProposta nuovoStato = request.getNuovoStato();
+        proposta.setStato(nuovoStato);
         propostaRepository.save(proposta);
 
-        if (request.getNuovoStato() == StatoProposta.ACCETTATA) {
+        if (nuovoStato == StatoProposta.ACCETTATA) {
             Inserzione inserzione = proposta.getInserzione();
+
             inserzione.setStato(StatoInserzione.VENDUTO);
             inserzioneRepository.save(inserzione);
+
+            List<Proposta> altreProposte = propostaRepository.findAltreProposteByInserzione(inserzione, proposta.getIdProposta());
+            for (Proposta altra : altreProposte) {
+                if (altra.getStato() == StatoProposta.IN_ATTESA) {
+                    altra.setStato(StatoProposta.RIFIUTATA);
+                    propostaRepository.save(altra);
+                }
+            }
         }
 
-        return propostaMap.toPropostaResponse(proposta, "Stato Proposta aggiornato con successo");
+        // Se la proposta è RIFIUTATA → non si cambia lo stato dell'inserzione (rimane DISPONIBILE)
+        // Non serve fare nulla in questo caso
+
+        return propostaMap.toPropostaResponse(proposta, "Stato proposta aggiornato con successo");
+
     }
 
     @Override
