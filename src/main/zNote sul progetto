@@ -59,6 +59,9 @@ Per ogni API è indicato:
     /api/auth/registerAdmin       POST    Registra un nuovo Admin                    SI     Admin   ✅
     /api/auth/registerUtente      POST    Registra un nuovo utente                   NO     Tutti   ✅
     /api/auth/login               POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
+    /api/auth/loginGoogle         POST    Effettua il login e restituisce token JWT  NO     Tutti
+    /api/auth/loginGithub         POST    Effettua il login e restituisce token JWT  NO     Tutti
+    /api/auth/loginFacebook       POST    Effettua il login e restituisce token JWT  NO     Tutti
     /api/auth/logout              POST    Effettua il logout dell’utente             SI     Tutti   ✅
     /api/auth/recuperaPassword    POST    Invia email per recupero password          NO     Tutti   dopo frontnd
 ----------------------------------------------------------------------------------------------------------
@@ -104,7 +107,7 @@ git
     /api/indicatori/{id}          GET     Dettagli di un indicatore                  NO     Tutti
     /api/indicatori/{id}          PUT     Modifica un indicatore                     SI     Admin
     /api/indicatori/{id}          DELETE  Elimina un indicatore                      SI     Admin
-    /api/inserzioni/{id}/prox     GET     Restituisce indicatori vicini all’inserzione NO     Tutti
+    /api/inserzioni/{id}/prox     GET     Restituisce indicatori vicini              NO     Tutti
 
 ----------------------------------------------------------------------------------------------------------
  AMMINISTRAZIONE E STATISTICHE
