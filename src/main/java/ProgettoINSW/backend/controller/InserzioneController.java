@@ -56,7 +56,6 @@ public class InserzioneController {
 
 
 
-
     //Gestione inserzioni
 /******************************************************************************************************************/
 
@@ -85,8 +84,6 @@ public class InserzioneController {
 
         return ResponseEntity.ok(response);
     }
-
-
 
 
     @PutMapping("/modifica/{id}")
@@ -129,8 +126,6 @@ public class InserzioneController {
             return ResponseEntity.badRequest().body("Errore: " + e.getMessage());
         }
     }
-
-
 
     @PostMapping("/caricaFoto/{id}")
     public ResponseEntity<Map<String, Object>> caricaFoto(
