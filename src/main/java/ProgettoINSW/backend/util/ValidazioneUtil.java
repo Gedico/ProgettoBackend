@@ -18,7 +18,7 @@ public class ValidazioneUtil {
         this.inserzioneRepository = inserzioneRepository;
     }
 
-    /**
+    /*
      * ✅ Verifica se l'utente autenticato è l'agente proprietario dell'inserzione
      *     oppure un amministratore autorizzato a modificarla.
      *
