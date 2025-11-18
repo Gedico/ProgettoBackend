@@ -60,7 +60,7 @@ Per ogni API è indicato:
     /api/auth/registerUtente      POST    Registra un nuovo utente                   NO     Tutti   ✅
     /api/auth/delete              DELETE  Elimina l’account utente                   SI     Tutti   ✅
     /api/auth/login               POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
-    /api/auth/loginGoogle         POST    Effettua il login e restituisce token JWT  NO     Tutti
+    /api/auth/loginGoogle         POST    Effettua il login e restituisce token JWT  NO     Tutti   ✅
     /api/auth/loginGithub         POST    Effettua il login e restituisce token JWT  NO     Tutti
     /api/auth/loginFacebook       POST    Effettua il login e restituisce token JWT  NO     Tutti
     /api/auth/logout              POST    Effettua il logout dell’utente             SI     Tutti   ✅
