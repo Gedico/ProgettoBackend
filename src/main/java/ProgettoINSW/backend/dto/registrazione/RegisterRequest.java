@@ -12,7 +12,6 @@ public class RegisterRequest {
     private String mail;
     private String password;
     private String numero;
-    private String indirizzo;
     private String approfondimento;
     private String messaggio;
 
