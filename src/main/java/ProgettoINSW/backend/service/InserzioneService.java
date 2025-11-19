@@ -1,6 +1,7 @@
 package ProgettoINSW.backend.service;
 
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
+import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import org.springframework.stereotype.Service;
@@ -23,4 +24,6 @@ public interface InserzioneService {
     List<InserzioneResponse> getAllInserzioni();
 
     void cambiaStato(Long id, String bearer, String nuovoStato);
+
+    List<InserzioneCardResponse> getInserzioniRecenti();
 }

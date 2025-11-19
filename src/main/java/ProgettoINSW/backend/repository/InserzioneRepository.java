@@ -2,6 +2,7 @@ package ProgettoINSW.backend.repository;
 
 import ProgettoINSW.backend.model.Inserzione;
 import ProgettoINSW.backend.model.enums.Categoria;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,5 +35,13 @@ public interface InserzioneRepository extends JpaRepository<Inserzione, Long> {
             "LEFT JOIN FETCH i.posizione " +
             "LEFT JOIN FETCH i.foto")
     List<Inserzione> findAllConRelazioni();
+
+    @Query("""
+       SELECT i FROM Inserzione i
+       LEFT JOIN FETCH i.foto
+       ORDER BY i.dataCreazione DESC
+       """)
+    List<Inserzione> findUltime4ConFoto(Pageable pageable);
+
 }
 
