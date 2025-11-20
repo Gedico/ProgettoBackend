@@ -67,6 +67,10 @@ public class SecurityConfig {
 
                         .successHandler(this::handleOAuthSuccess)
                 )
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/oauth2/authorization/github")
+                        .defaultSuccessUrl("http://localhost:4200/login-success", true)
+                )
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
