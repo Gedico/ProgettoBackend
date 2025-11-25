@@ -6,9 +6,8 @@ import ProgettoINSW.backend.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
-@RequestMapping("/profilo")
+@RequestMapping("/api/profilo")
 public class ProfiloController {
 
     private final ProfiloService profiloService;
@@ -17,16 +16,17 @@ public class ProfiloController {
         this.profiloService = profiloService;
     }
 
-    @GetMapping("/me") //fa riferimento al token passato
-    public ResponseEntity<ProfiloResponse> getProfilo(@RequestHeader("Authorization") String authHeader) {
+    @GetMapping
+    public ResponseEntity<ProfiloResponse> getProfilo(
+            @RequestHeader("Authorization") String authHeader) {
+
         String token = authHeader.substring(7);
         String mail = JwtUtil.extractMail(token);
 
-        ProfiloResponse response = profiloService.getProfilo(mail);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(profiloService.getProfilo(mail));
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public ResponseEntity<UpdateProfiloResponse> aggiornaProfilo(
             @RequestBody UpdateProfiloRequest request,
             @RequestHeader("Authorization") String authHeader) {
@@ -34,8 +34,6 @@ public class ProfiloController {
         String token = authHeader.substring(7);
         String mail = JwtUtil.extractMail(token);
 
-        UpdateProfiloResponse response = profiloService.aggiornaProfilo(request, mail);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(profiloService.aggiornaProfilo(request, mail));
     }
 }
-
