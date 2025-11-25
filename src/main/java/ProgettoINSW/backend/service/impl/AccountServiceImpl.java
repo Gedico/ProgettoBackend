@@ -13,9 +13,11 @@ import ProgettoINSW.backend.repository.AgenteRepository;
 import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.service.AccountService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ProgettoINSW.backend.util.JwtUtil;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 
@@ -36,7 +38,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public RegisterResponse registraAccount(RegisterRequest request, Role ruolo) {
+    public RegisterResponse registraAccount(@Valid @RequestBody RegisterRequest request, Role ruolo) {
 
         //Controllo unicità email
         if (accountRepository.existsByMailIgnoreCase(request.getMail())) {
