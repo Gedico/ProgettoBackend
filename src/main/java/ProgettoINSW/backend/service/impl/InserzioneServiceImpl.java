@@ -2,6 +2,7 @@ package ProgettoINSW.backend.service.impl;
 
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneFiltriRequest;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
+import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.mapper.InserzioneMap;
@@ -16,6 +17,8 @@ import ProgettoINSW.backend.util.ValidazioneUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -109,6 +112,36 @@ public class InserzioneServiceImpl implements InserzioneService {
     }
 
     @Override
+    public List<InserzioneCardResponse> getInserzioniRecenti() {
+
+        Pageable limit = PageRequest.of(0, 4);
+
+        List<Inserzione> lista = inserzioneRepository.findUltime4ConFoto(limit);
+
+        return lista.stream()
+                .map(inserzione -> {
+                    InserzioneCardResponse dto = new InserzioneCardResponse();
+
+                    dto.setIdInserzione(inserzione.getIdInserzione());
+                    dto.setTitolo(inserzione.getTitolo());
+                    dto.setPrezzo(inserzione.getPrezzo());
+                    dto.setDimensioni(inserzione.getDimensioni());
+                    dto.setNumero_stanze(inserzione.getNumeroStanze());
+
+                    // Prima foto
+                    if (inserzione.getFoto() != null && !inserzione.getFoto().isEmpty()) {
+                        dto.setFotoPrincipale(inserzione.getFoto().get(0).getUrlFoto());
+                    }
+
+                    return dto;
+                })
+                .toList();
+
+
+    }
+
+
+    @Override
     public void eliminaInserzione(Long id, String token) {
         String mailAgente = JwtUtil.extractMail(token);
 
@@ -154,6 +187,8 @@ public class InserzioneServiceImpl implements InserzioneService {
             throw new RuntimeException("Stato non valido: deve essere DISPONIBILE o VENDUTO");
         }
     }
+
+
 
 
 }
