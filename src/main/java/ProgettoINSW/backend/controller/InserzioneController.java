@@ -3,6 +3,7 @@ package ProgettoINSW.backend.controller;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.foto.FotoRequest;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneFiltriRequest;
+import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.service.FotoService;
@@ -36,6 +37,12 @@ public class InserzioneController {
         return ResponseEntity.ok(inserzioni);
     }
 
+
+    @GetMapping("/recenti")
+    public ResponseEntity<List<InserzioneCardResponse>> getInserzioniRecenti() {
+        List<InserzioneCardResponse> inserzioniRecenti = inserzioneService.getInserzioniRecenti();
+        return ResponseEntity.ok(inserzioniRecenti);
+    }
 
     @GetMapping("/ricerca")
     public ResponseEntity<List<InserzioneResponse>> ricercaInserzioni(@ModelAttribute DatiInserzioneFiltriRequest filtri) {List<InserzioneResponse> risultati = inserzioneService.ricercaInserzioni(filtri);
