@@ -47,60 +47,27 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-
-                        // ====== ENDPOINT AUTH LOCALI ======
                         .requestMatchers(HttpMethod.POST, "/api/auth/registerUtente").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/registerAgente").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/auth/registerAdmin").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.DELETE, "/api/auth/delete/**").hasRole("ADMIN")
-
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/logout").authenticated()
-
-                        // Lasciamo /api/auth/** aperto per ora (come avevi già)
                         .requestMatchers("/api/auth/**").permitAll()
-
-                        // ====== PROFILO ======
-                        .requestMatchers(HttpMethod.GET, "/profilo/me").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/profilo/update").authenticated()
-                        .requestMatchers("/profilo/**").authenticated()
-
-                        // ====== INSERZIONI ======
-                        .requestMatchers(HttpMethod.GET, "/api/inserzioni").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/inserzioni/ricerca").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/inserzioni/{id}").permitAll()
-
-                        .requestMatchers(HttpMethod.POST, "/api/inserzioni/crea").hasAnyRole("AGENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/inserzioni/modifica/**").hasAnyRole("AGENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/inserzioni/elimina/**").hasAnyRole("AGENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/inserzioni/caricaFoto/{id}").hasAnyRole("AGENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/inserzioni/eliminaFoto/{id}").hasAnyRole("AGENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/inserzioni/modificaStato/{id}").hasAnyRole("AGENTE", "ADMIN")
-
-                        // ====== PROPOSTE ======
-                        .requestMatchers(HttpMethod.GET, "/api/proposte/stato").hasAnyRole("AGENTE", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/proposte/{id}/stato").hasAnyRole("AGENTE", "ADMIN")
-
-                        // ====== OAUTH2 (GOOGLE, ecc.) ======
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-
-                        // Il resto per ora lo lasciamo aperto
                         .anyRequest().permitAll()
                 )
 
-                // ====== CONFIGURAZIONE OAUTH2 ======
                 .oauth2Login(oauth -> oauth
-                        // non usiamo una vera loginPage perché Angular gestisce il redirect,
-                        // ma Spring vuole comunque una stringa
-                        .loginPage("/api/auth/oauth2/login")
+                        .loginPage("/api/auth/oauth2/login")     // pagina unica per avviare OAuth
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(new DefaultOAuth2UserService())
                         )
-                        .successHandler(this::oAuth2SuccessHandler)
+                        .successHandler(this::handleOAuthSuccess)  // handler che gestisce Google / GitHub / Facebook
                 )
 
-                // ====== FILTRO JWT (come prima) ======
+
+
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
@@ -108,63 +75,117 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /*
-     * Handler chiamato DOPO un login OAuth2 riuscito (es. Google).
-     * Qui:
-     *  - leggiamo i dati dell'utente dal provider
-     *  - cerchiamo/creiamo Account
-     *  - generiamo il JWT con JwtUtil
-     *  - reindirizziamo Angular con ?token=...
-     */
-    private void oAuth2SuccessHandler(HttpServletRequest request,
-                                      HttpServletResponse response,
-                                      Authentication authentication) throws IOException {
+    // ================================
+    //       HANDLER GENERALE
+    // ================================
+    private void handleOAuthSuccess(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    Authentication authentication) throws IOException {
 
-        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        Map<String, Object> attributes = oAuth2User.getAttributes();
+        String provider = getProviderFromRequest(request);
 
-        // Per Google: email, given_name, family_name, sub (id univoco)
-        String email = (String) attributes.get("email");
-        String givenName = (String) attributes.getOrDefault("given_name", "");
-        String familyName = (String) attributes.getOrDefault("family_name", "");
+        switch (provider) {
+            case "google" -> handleGoogleSuccess(response, authentication);
+            case "github" -> handleGitHubSuccess(response, authentication);
+            case "facebook" -> handleFacebookSuccess(response, authentication);
+            default -> response.sendError(400, "Provider OAuth non supportato: " + provider);
+        }
+    }
 
-        if (email == null || email.isBlank()) {
-            // caso limite: senza email non possiamo creare un account
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email non fornita dal provider OAuth2");
-            return;
+    private String getProviderFromRequest(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        if (uri.contains("google")) return "google";
+        if (uri.contains("github")) return "github";
+        if (uri.contains("facebook")) return "facebook";
+
+        return "unknown";
+    }
+
+    // ============================================
+    //                GOOGLE
+    // ============================================
+    private void handleGoogleSuccess(HttpServletResponse response,
+                                     Authentication authentication) throws IOException {
+
+        OAuth2User user = (OAuth2User) authentication.getPrincipal();
+        Map<String, Object> a = user.getAttributes();
+
+        String email = (String) a.get("email");
+        String nome = (String) a.getOrDefault("given_name", "Utente");
+        String cognome = (String) a.getOrDefault("family_name", "Google");
+
+        processOAuthUser(email, nome, cognome, response);
+    }
+
+    // ============================================
+    //                GITHUB
+    // ============================================
+    private void handleGitHubSuccess(HttpServletResponse response,
+                                     Authentication authentication) throws IOException {
+
+        OAuth2User user = (OAuth2User) authentication.getPrincipal();
+        Map<String, Object> a = user.getAttributes();
+
+        String email = (String) a.get("email");
+        if (email == null) {
+            // GitHub NON SEMPRE fornisce email → fallback con username
+            email = a.get("login") + "@github.fake";
         }
 
-        Optional<Account> existingOpt = accountRepository.findByMailIgnoreCase(email);
+        String nome = (String) a.getOrDefault("name", "GitHubUser");
+        String cognome = "GitHub";
 
+        processOAuthUser(email, nome, cognome, response);
+    }
+
+    // ============================================
+    //                FACEBOOK
+    // ============================================
+    private void handleFacebookSuccess(HttpServletResponse response,
+                                       Authentication authentication) throws IOException {
+
+        OAuth2User user = (OAuth2User) authentication.getPrincipal();
+        Map<String, Object> a = user.getAttributes();
+
+        String email = (String) a.get("email");
+        if (email == null) email = UUID.randomUUID() + "@facebook.fake";
+
+        String nome = (String) a.getOrDefault("first_name", "FacebookUser");
+        String cognome = (String) a.getOrDefault("last_name", "");
+
+        processOAuthUser(email, nome, cognome, response);
+    }
+
+    // ============================================
+    //       CREAZIONE ACCOUNT + REDIRECT
+    // ============================================
+    private void processOAuthUser(String email,
+                                  String nome,
+                                  String cognome,
+                                  HttpServletResponse response) throws IOException {
+
+        Optional<Account> existing = accountRepository.findByMailIgnoreCase(email);
         Account account;
-        if (existingOpt.isPresent()) {
-            account = existingOpt.get();
-        } else {
-            // 👉 REGISTRAZIONE AUTOMATICA UTENTE SOCIAL
-            account = new Account();
-            account.setNome(givenName.isBlank() ? "Utente" : givenName);
-            account.setCognome(familyName.isBlank() ? "Social" : familyName);
-            account.setMail(email);
 
-            // 👇 password obbligatoria nel DB → generiamo una fittizia (non usata)
+        if (existing.isPresent()) {
+            account = existing.get();
+        } else {
+            account = new Account();
+            account.setMail(email);
+            account.setNome(nome);
+            account.setCognome(cognome);
+
             String randomPassword = UUID.randomUUID().toString();
             account.setPassword(passwordEncoder().encode(randomPassword));
-
-            account.setNumero(null); // Google non fornisce numero
-            account.setRuolo(Role.UTENTE); // ruolo di default per registrazione via social
+            account.setRuolo(Role.UTENTE);
 
             accountRepository.save(account);
         }
 
-        // 👉 Genera JWT usando la tua util (mail + ruolo)
-        String token = JwtUtil.generateToken(
-                account.getMail(),
-                account.getRuolo().name()
-        );
+        String token = JwtUtil.generateToken(account.getMail(), account.getRuolo().name());
 
-        // 👉 Redirect verso Angular con il token nella querystring
-        String redirectUrl = "http://localhost:4200/oauth-callback?token=" + token;
-        response.sendRedirect(redirectUrl);
+        response.sendRedirect("http://localhost:4200/oauth-callback?token=" + token);
     }
 }
 
