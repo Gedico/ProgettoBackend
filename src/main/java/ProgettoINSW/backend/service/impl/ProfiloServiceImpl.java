@@ -10,6 +10,8 @@ import ProgettoINSW.backend.service.UtenteService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class ProfiloServiceImpl implements ProfiloService {
 
@@ -26,8 +28,12 @@ public class ProfiloServiceImpl implements ProfiloService {
 
     @Override
     public ProfiloResponse getProfilo(String mail) {
+
         Account account = accountRepository.findByMailIgnoreCase(mail)
                 .orElseThrow(() -> new RuntimeException("Account non trovato"));
+
+        Utente utente = utenteRepository.findByAccount_Id(account.getId())
+                .orElse(null);
 
         ProfiloResponse response = new ProfiloResponse();
         response.setNome(account.getNome());
@@ -36,18 +42,11 @@ public class ProfiloServiceImpl implements ProfiloService {
         response.setNumero(account.getNumero());
         response.setRuolo(account.getRuolo());
 
-        // Tentativo di lettura dell'indirizzo
-        Utente utente = utenteRepository.findByAccount_Id(account.getId())
-                .orElse(null);
-
-        if (utente != null) {
-            response.setIndirizzo(utente.getIndirizzo());
-        } else {
-            response.setIndirizzo(null);
-        }
+        response.setIndirizzo(utente != null ? utente.getIndirizzo() : null);
 
         return response;
     }
+
 
     @Override
     public UpdateProfiloResponse aggiornaProfilo(UpdateProfiloRequest request, String mail) {
@@ -65,16 +64,25 @@ public class ProfiloServiceImpl implements ProfiloService {
 
         accountRepository.save(account);
 
-        // aggiornamento indirizzo in utente (se esiste)
+        // --- FIX: crea utente se non esiste ---
         Utente utente = utenteRepository.findByAccount_Id(account.getId()).orElse(null);
 
-        if (utente != null && request.getIndirizzo() != null) {
-            utente.setIndirizzo(request.getIndirizzo());
-            utenteRepository.save(utente);
+        if (utente == null) {
+            utente = new Utente();
+            utente.setAccount(account);
+            utente.setDataIscrizione(LocalDateTime.now());
         }
+
+        if (request.getIndirizzo() != null) {
+            utente.setIndirizzo(request.getIndirizzo());
+        }
+
+        utenteRepository.save(utente);
+        // --- FINE FIX ---
 
         return new UpdateProfiloResponse("Profilo aggiornato con successo", true);
     }
+
 
 
 }
