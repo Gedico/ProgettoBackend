@@ -133,7 +133,16 @@ public class SecurityConfig {
             email = a.get("login") + "@github.fake";
         }
 
-        String nome = (String) a.getOrDefault("name", "GitHubUser");
+        String nome = (String) a.get("name");
+
+        if (nome == null || nome.isBlank()) {
+            nome = (String) a.get("login"); // username GitHub
+        }
+
+        if (nome == null || nome.isBlank()) {
+            nome = "GitHubUser";
+        }
+
         String cognome = "GitHub";
 
         processOAuthUser(email, nome, cognome, response);
