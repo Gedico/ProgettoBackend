@@ -80,7 +80,7 @@ public class PropostaController {
         );
     }
 
-    // 🔹 5) Invia una nuova proposta
+    // 🔹 5) Invia una nuova proposta per una inserzione
     @PostMapping
     @PreAuthorize("hasRole('UTENTE')")
     public ResponseEntity<PropostaResponse> inviaProposta(
