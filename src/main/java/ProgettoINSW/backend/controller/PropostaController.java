@@ -6,6 +6,7 @@ import ProgettoINSW.backend.dto.proposta.PropostaResponse;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 import ProgettoINSW.backend.service.PropostaService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,90 +15,94 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/proposte")
+@RequiredArgsConstructor
 public class PropostaController {
+
     private final PropostaService propostaService;
 
-    public PropostaController(PropostaService propostaService) {
-        this.propostaService = propostaService;
+    // 🔹 UTILITY: rimuove il prefisso Bearer
+    private String cleanToken(String header) {
+        return header.replace("Bearer ", "").trim();
     }
 
+    // 🔹 1) Proposte dell'agente autenticato
     @GetMapping
+    @PreAuthorize("hasRole('AGENTE')")
     public ResponseEntity<List<PropostaResponse>> getProposteAgente(
-            @RequestHeader("Authorization") String authHeader){
+            @RequestHeader("Authorization") String authHeader) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = cleanToken(authHeader);
         List<PropostaResponse> proposte = propostaService.getProposteAgente(token);
 
-        if (proposte.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(proposte);
+        return proposte.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(proposte);
     }
 
-    @GetMapping("/stato")
-    public ResponseEntity<List<PropostaResponse>> getProposteAgente(
+    // 🔹 2) Proposte dell'agente filtrate per stato
+    @GetMapping("/filtra")
+    @PreAuthorize("hasRole('AGENTE')")
+    public ResponseEntity<List<PropostaResponse>> getProposteAgenteByStato(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam(required = false) StatoProposta stato) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = cleanToken(authHeader);
         List<PropostaResponse> proposte = propostaService.getProposteAgenteStato(token, stato);
 
-        if (proposte.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(proposte);
+        return proposte.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(proposte);
     }
 
-    @PutMapping("/aggiorna/{id}")
+    // 🔹 3) Aggiorna lo stato (ACCETTA / RIFIUTA)
+    @PutMapping("/{id}/stato")
     @PreAuthorize("hasRole('AGENTE')")
     public ResponseEntity<PropostaResponse> aggiornaStatoProposta(
-            @PathVariable("id") Long idProposta,
+            @PathVariable Long id,
             @RequestBody AggiornaStatoPropostaRequest request,
             @RequestHeader("Authorization") String authHeader) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
-
-        PropostaResponse response = propostaService.aggiornaStatoProposta(idProposta, request, token);
-
-        return ResponseEntity.ok(response);
+        String token = cleanToken(authHeader);
+        return ResponseEntity.ok(
+                propostaService.aggiornaStatoProposta(id, request, token)
+        );
     }
 
-
+    // 🔹 4) Dettagli proposta
     @GetMapping("/{id}")
-    public ResponseEntity<PropostaResponse> dettagliProposta(@PathVariable("id") Long idProposta,
-                                                             @RequestHeader("Authorization") String authHeader){
-        String token = authHeader.replace("Bearer ", "").trim();
+    public ResponseEntity<PropostaResponse> dettagliProposta(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
 
-        PropostaResponse response = propostaService.mostraDettagliProposta(idProposta, token);
-
-        return ResponseEntity.ok(response);
+        String token = cleanToken(authHeader);
+        return ResponseEntity.ok(
+                propostaService.mostraDettagliProposta(id, token)
+        );
     }
 
+    // 🔹 5) Invia una nuova proposta
     @PostMapping
     @PreAuthorize("hasRole('UTENTE')")
     public ResponseEntity<PropostaResponse> inviaProposta(
             @RequestBody @Valid PropostaRequest request,
-            @RequestHeader("Authorization") String token) {
-        String jwt = token.replace("Bearer ", "");
-        PropostaResponse response = propostaService.inviaProposta(request, jwt);
-        return ResponseEntity.ok(response);
-    }
-
-
-    @DeleteMapping("/elimina/{id}")
-    @PreAuthorize("hasRole('UTENTE')")
-    public ResponseEntity<String> eliminaProposta(
-            @PathVariable("id") Long idProposta,
             @RequestHeader("Authorization") String authHeader) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = cleanToken(authHeader);
+        return ResponseEntity.ok(
+                propostaService.inviaProposta(request, token)
+        );
+    }
 
-        propostaService.eliminaProposta(idProposta, token);
+    // 🔹 6) Elimina una proposta (solo UTENTE e solo se IN_ATTESA)
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('UTENTE')")
+    public ResponseEntity<String> eliminaProposta(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = cleanToken(authHeader);
+        propostaService.eliminaProposta(id, token);
 
         return ResponseEntity.ok("Proposta eliminata con successo.");
     }
-
-
 }
