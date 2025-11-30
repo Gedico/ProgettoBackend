@@ -34,4 +34,7 @@ public interface PropostaRepository extends JpaRepository<Proposta, Long> {
     @Query("SELECT p FROM Proposta p WHERE p.inserzione = :inserzione AND p.idProposta <> :idProposta")
     List<Proposta> findAltreProposteByInserzione(@Param("inserzione") Inserzione inserzione,
                                                  @Param("idProposta") Long idProposta);
+
+    List<Proposta> findByCliente_IdUtente(Long idUtente);
+
 }
