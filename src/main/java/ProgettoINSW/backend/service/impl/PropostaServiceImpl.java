@@ -215,4 +215,28 @@ public class PropostaServiceImpl implements PropostaService {
                 .toList();
     }
 
+    @Override
+    public List<PropostaResponse> getProposteUtente(String token) {
+
+        // 1) recupera mail dal JWT
+        String mail = JwtUtil.extractMail(token);
+
+        // 2) recupera account dalla mail
+        Account account = accountRepository.findByMail(mail)
+                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per mail: " + mail));
+
+        // 3) recupera utente legato all'account
+        Utente utente = utenteRepository.findByAccount_Id(account.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato per account: " + account.getId()));
+
+        // 4) recupera tutte le proposte fatte da quell’utente
+        List<Proposta> proposte = propostaRepository.findByCliente_IdUtente(utente.getIdUtente());
+
+        // 5) mappa in response
+        return proposte.stream()
+                .map(p -> propostaMap.toPropostaResponse(p, null))
+                .toList();
+    }
+
+
 }

@@ -15,4 +15,6 @@ public interface PropostaService {
     PropostaResponse inviaProposta(PropostaRequest request, String token);
     void eliminaProposta(Long idProposta, String token);
     PropostaResponse mostraDettagliProposta(Long idProposta, String token);
+
+    List<PropostaResponse> getProposteUtente(String token);
 }

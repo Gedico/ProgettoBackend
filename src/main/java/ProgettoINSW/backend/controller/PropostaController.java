@@ -105,4 +105,21 @@ public class PropostaController {
 
         return ResponseEntity.ok("Proposta eliminata con successo.");
     }
+
+    // 🔹 7) Proposte inviate dall'utente autenticato
+    @GetMapping("/mie")
+    @PreAuthorize("hasRole('UTENTE')")
+    public ResponseEntity<List<PropostaResponse>> getProposteUtente(
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = cleanToken(authHeader);
+
+        List<PropostaResponse> proposte = propostaService.getProposteUtente(token);
+
+        return proposte.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(proposte);
+    }
+
+
 }
