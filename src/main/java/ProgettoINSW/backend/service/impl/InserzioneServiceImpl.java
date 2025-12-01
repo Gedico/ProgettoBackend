@@ -12,6 +12,7 @@ import ProgettoINSW.backend.model.enums.Role;
 import ProgettoINSW.backend.model.enums.StatoInserzione;
 import ProgettoINSW.backend.repository.*;
 import ProgettoINSW.backend.service.InserzioneService;
+import ProgettoINSW.backend.specification.InserzioneSpecification;
 import ProgettoINSW.backend.util.JwtUtil;
 import ProgettoINSW.backend.util.ValidazioneUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -90,19 +91,15 @@ public class InserzioneServiceImpl implements InserzioneService {
     @Override
     public List<InserzioneResponse> ricercaInserzioni(DatiInserzioneFiltriRequest filtri) {
 
-        List<Inserzione> risultati = inserzioneRepository.filtra(
-                filtri.getCitta(),
-                filtri.getCategoria(),
-                filtri.getPrezzoMin(),
-                filtri.getPrezzoMax(),
-                filtri.getDimensioniMin(),
-                filtri.getDimensioniMax()
-        );
+        var specification = InserzioneSpecification.filtra(filtri);
+
+        List<Inserzione> risultati = inserzioneRepository.findAll(specification);
 
         return risultati.stream()
                 .map(map::toInserzioneResponse)
                 .toList();
     }
+
 
     @Override
     public InserzioneResponse getInserzioneById(Long id) {

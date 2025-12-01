@@ -4,6 +4,7 @@ import ProgettoINSW.backend.model.Inserzione;
 import ProgettoINSW.backend.model.enums.Categoria;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;      // << AGGIUNGERE QUESTO
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
-public interface InserzioneRepository extends JpaRepository<Inserzione, Long> {
+public interface InserzioneRepository
+        extends JpaRepository<Inserzione, Long>, JpaSpecificationExecutor<Inserzione> {
 
     @Query("""
         SELECT i FROM Inserzione i
@@ -44,4 +46,3 @@ public interface InserzioneRepository extends JpaRepository<Inserzione, Long> {
     List<Inserzione> findUltime4ConFoto(Pageable pageable);
 
 }
-
