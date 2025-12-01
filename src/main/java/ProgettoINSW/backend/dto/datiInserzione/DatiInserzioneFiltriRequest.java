@@ -13,4 +13,5 @@ public class DatiInserzioneFiltriRequest {
     private BigDecimal prezzoMax;
     private Double dimensioniMin;
     private Double dimensioniMax;
+    private String query;
 }
