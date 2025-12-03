@@ -26,7 +26,7 @@ public class PasswordResetToken {
     public PasswordResetToken(String token, Account account) {
         this.token = token;
         this.account = account;
-        this.expiryDate = LocalDateTime.now().plusMinutes(30); // token valido 30 min
+        this.expiryDate = LocalDateTime.now().plusMinutes(10); // token valido 10 min
     }
 
     public PasswordResetToken() {}
