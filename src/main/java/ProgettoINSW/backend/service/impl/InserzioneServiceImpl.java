@@ -21,6 +21,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -34,11 +38,15 @@ public class InserzioneServiceImpl implements InserzioneService {
     private final AgenteRepository agenteRepository;
     private final AccountRepository accountRepository;
     private final ValidazioneUtil validazioneUtil;
+    private final CloudStorageServiceImpl cloudStorageService;
 
     @Transactional
     @Override
-    public InserzioneResponse creaInserzione(InserzioneRequest request, String token) {
+    public InserzioneResponse creaInserzione(InserzioneRequest request,
+                                             MultipartFile[] immagini,
+                                             String token) throws IOException {
 
+        // 1. Recupero utente / agente
         String mail = JwtUtil.extractMail(token);
 
         Account account = accountRepository.findByMail(mail)
@@ -47,19 +55,41 @@ public class InserzioneServiceImpl implements InserzioneService {
         Agente agente = agenteRepository.findByAccount(account)
                 .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mail));
 
-        Posizione posizione = map.toPosizione(request.getPosizione());//riempio dto posizione mediante mapper
+        // 2. Salvataggio posizione
+        Posizione posizione = map.toPosizione(request.getPosizione());
         posizioneRepository.save(posizione);
 
-        Inserzione inserzione = map.toDatiInserzione(request.getDatiInserzioneRequest());//riempio dto inserzione mediante mapper
+        // 3. Salvataggio inserzione
+        Inserzione inserzione = map.toDatiInserzione(request.getDatiInserzioneRequest());
         inserzione.setPosizione(posizione);
         inserzione.setAgente(agente);
         inserzioneRepository.save(inserzione);
 
-        fotoRepository.saveAll(map.toFotoList(request.getFoto(), inserzione));
+        // 4. Upload immagini su Google Cloud + salvataggio URL su DB
+        List<Foto> fotoSalvate = new ArrayList<>();
 
+        if (immagini != null) {
+            for (MultipartFile file : immagini) {
+
+                // 4.1 upload su GCS
+                String url = cloudStorageService.uploadFile(file);
+                // il metodo restituisce l'URL pubblico
+
+                // 4.2 Creo entità Foto da salvare
+                Foto foto = new Foto();
+                foto.setUrlFoto(url);
+                foto.setInserzione(inserzione);
+                fotoSalvate.add(foto);
+            }
+        }
+
+        // 4.3 salva tutte le foto associate
+        fotoRepository.saveAll(fotoSalvate);
+
+        // 5. Ritorna la response completa
         return map.toInserzioneResponse(inserzione);
-
     }
+
 
     @Transactional
     @Override
