@@ -11,7 +11,10 @@ import ProgettoINSW.backend.service.InserzioneService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,15 +69,15 @@ public class InserzioneController {
     //Gestione inserzioni
 /******************************************************************************************************************/
 
-    @PostMapping("/crea")
-    public ResponseEntity<InserzioneResponse> creaInserzione(@Valid @RequestBody InserzioneRequest request, @RequestHeader("Authorization") String authHeader) {
+        @PostMapping(value = "/crea", consumes = "multipart/form-data")
+            public InserzioneResponse creaInserzione(
+            @RequestPart("dati") InserzioneRequest request,
+           @RequestPart("immagini") MultipartFile[] immagini,
+          @RequestHeader("Authorization") String token
+        ) throws IOException {
+          return inserzioneService.creaInserzione(request, immagini, token);
+        }
 
-        String token = authHeader.replace("Bearer ", "").trim();
-
-        InserzioneResponse response = inserzioneService.creaInserzione(request, token);
-
-        return ResponseEntity.ok(response);
-    }
 
     @DeleteMapping("/eliminaFoto/{id}")
     public ResponseEntity<Map<String, Object>> eliminaFoto(
