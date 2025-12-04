@@ -17,4 +17,6 @@ public interface PropostaService {
     PropostaResponse mostraDettagliProposta(Long idProposta, String token);
 
     List<PropostaResponse> getProposteUtente(String token);
+
+    List<PropostaResponse> getProposteAgenteRegistro(String token);
 }
