@@ -7,7 +7,6 @@ import ProgettoINSW.backend.repository.AccountRepository;
 import ProgettoINSW.backend.repository.PasswordResetTokenRepository;
 import ProgettoINSW.backend.security.PasswordResetToken;
 import ProgettoINSW.backend.service.EmailService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,28 +45,32 @@ public class PasswordResetController {
     public ResponseEntity<?> requestPasswordReset(@RequestBody PasswordResetRequest request) {
 
         Optional<Account> accountOpt = accountRepository.findByMail(request.getEmail());
+
+        // 1. Se l'email non esiste → rispondi comunque 200
         if (accountOpt.isEmpty()) {
-            // in produzione potresti comunque rispondere 200 per non far capire se l'email esiste
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Nessun account trovato con questa email");
+            return ResponseEntity.ok(
+                    Map.of("message", "Se l'email è corretta, riceverai un link per il reset.")
+            );
         }
 
         Account account = accountOpt.get();
 
-        // Genera token random sicuro
+        // 2. Genera token
         String token = UUID.randomUUID().toString();
 
-        // Crea e salva token con scadenza
         PasswordResetToken resetToken = new PasswordResetToken(token, account);
         passwordResetTokenRepository.save(resetToken);
 
+        // 3. Salva e invia email
         String link = "http://localhost:4200/reset-password?token=" + token;
         emailService.sendPasswordResetEmail(account.getMail(), link);
 
-
-        // In futuro: qui invierai la mail vera
-        return ResponseEntity.ok("Se l'email è corretta, è stato inviato un link per il reset.");
+        // 4. Risposta uniforme e sempre 200 OK
+        return ResponseEntity.ok(
+                Map.of("message", "Se l'email è corretta, riceverai un link per il reset.")
+        );
     }
+
 
 
     @PostMapping("/reset")
@@ -75,31 +79,38 @@ public class PasswordResetController {
         Optional<PasswordResetToken> tokenOpt =
                 passwordResetTokenRepository.findByToken(request.getToken());
 
+        // Caso 1 → token mancante o non valido
         if (tokenOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Token non valido");
+            return ResponseEntity.ok(
+                    Map.of("status", "invalid_token", "message", "Token non valido o non esistente.")
+            );
         }
 
         PasswordResetToken resetToken = tokenOpt.get();
 
-        // Controllo scadenza
+        // Caso 2 → token scaduto
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Token scaduto");
+            return ResponseEntity.ok(
+                    Map.of("status", "expired", "message", "Token scaduto.")
+            );
         }
 
         Account account = resetToken.getAccount();
 
-        // Aggiorno password con BCrypt
+        // Aggiorno password
         String encodedPassword = passwordEncoder.encode(request.getNewPassword());
         account.setPassword(encodedPassword);
         accountRepository.save(account);
 
-        // Token non più riutilizzabile
+        // Elimino il token
         passwordResetTokenRepository.delete(resetToken);
 
-        return ResponseEntity.ok("Password aggiornata con successo");
+        // Caso 3 → successo
+        return ResponseEntity.ok(
+                Map.of("status", "success", "message", "Password aggiornata con successo")
+        );
     }
+
 
 
 
