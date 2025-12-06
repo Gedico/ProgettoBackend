@@ -29,6 +29,12 @@ public class GlobalExceptionHandler {
         return buildError("BAD_REQUEST", ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex) {
+        return buildError("BUSINESS_ERROR", ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
         String errors = ex.getBindingResult().getFieldErrors()

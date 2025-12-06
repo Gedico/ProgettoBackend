@@ -1,11 +1,15 @@
 package ProgettoINSW.backend.dto.registrazione;
 
 import ProgettoINSW.backend.model.enums.Role;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RegisterResponse {
 
     private Long idAccount;
@@ -15,8 +19,6 @@ public class RegisterResponse {
     private String numero;
     private Role ruolo;
     private String messaggio;
-
-    //Getter e Setter
-
+    private boolean success;
 
 }
