@@ -1,72 +1,30 @@
-1. Dobbiamo necessariamente dividere la logica delle implementazioni in due
-controller diversi, questo perchè:
-
-- l'autenticazione dovrebbe riguardare:
-login, logout, registrazione, eliminazione account.
-
-- il profilo invece:
-dato che è già presupposto l'utente loggato, dovrebbe occuparsi di quelle
-che sono le operazioni legate al profilo, come
-aggiornamento dati, visualizzazione dati (nel senso che escono tutti i dati
-associati per quel profilo)
-
---inoltre, è importante anche perchè dobbiamo cambiare rotta e non possiamo usare
-sempre /auth anche per quello che non riguarda l'autenticazione
-
----------------------------------
-Agente che può cercare in base allo stato delle offerte fatte dall'utente
-👉 Accesso:
-
-solo agenti autenticati (tramite token JWT).
-
-👉 Risultato:
-
-una lista di offerte relative agli immobili gestiti da quell’agente,
-filtrate in base allo stato (o tutte se non si passa alcun parametro).
-Per implementare questa funzionalità abbiamo introdotto un’entità specifica chiamata Offerta, collegata a:
-
-un inserzione (ManyToOne) → l’inserzione su cui è stata fatta la proposta;
-
-un acquirente (ManyToOne) → l’utente che ha inviato l’proposta.
-
-All’interno della classe Offerta abbiamo aggiunto:
-
-un campo importo per rappresentare la cifra proposta;
-
-un campo stato (di tipo StatoOfferta), che può essere:
-
-IN_ATTESA
-
-ACCETTATA
-
-RIFIUTATA
-
-e la dataCreazione per tenere traccia del momento in cui l’proposta è stata fatta.
-
-🗂️ Gestione dei dati
-
-Per gestire i dati delle offerte abbiamo creato:
-
-un repository (OffertaRepository) che consente di filtrare le offerte in base all’agente e allo stato;
-
-un service (OffertaServiceImpl) che:
-
-legge il token JWT per identificare l’agente loggato,
-
-recupera tutte le offerte relative agli immobili di quell’agente,
-
-e le converte in un formato leggibile dal frontend tramite un DTO (OffertaResponse);
-
-infine, un controller (OffertaController) che espone l’endpoint REST /api/offerte.
-
-🌐 Endpoint principale
-GET /api/offerte?stato=IN_ATTESA
 
 
-Questo endpoint:
+=============================================ACCOUNT CONTROLLER===============================================================
 
-può essere chiamato solo da un agente autenticato (tramite token Bearer);
+L’AccountController gestisce tutte le operazioni di autenticazione e gestione degli account tramite endpoint REST sotto /api/auth.
+Le registrazioni sono suddivise in tre endpoint distinti (registerUtente, registerAgente, registerAdmin), ognuno dei quali invia una richiesta al servizio applicando il ruolo corretto. La logica comune è centralizzata nel metodo privato registra, che si occupa di inoltrare i dati al service e restituire una risposta HTTP 201.
 
-accetta un parametro opzionale stato;
+Il login avviene tramite l’endpoint /login, che delega l’autenticazione al servizio. L’operazione è considerata riuscita solo se la risposta contiene un token JWT; in caso contrario viene restituito un errore HTTP 401.
+Il logout riceve il token tramite header e lo invalida tramite il service.
 
-restituisce la lista delle offerte ricevute, filtrate per stato (o tutte, se il parametro non è specificato).
+Per l’eliminazione di un account è disponibile l’endpoint DELETE /delete/{id}. La cancellazione viene eseguita dal service; se l’ID non esiste viene sollevata un’eccezione intercettata dal GlobalExceptionHandler. In caso di successo l’endpoint restituisce HTTP 204 No Content.
+
+Il controller è minimale: non contiene logica di validazione o gestione degli errori, che sono centralizzate nel livello service e nell’exception handler.
+
+
+============================================INSERZIONE CONTROLLER===========================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
