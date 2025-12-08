@@ -1,4 +1,10 @@
 package ProgettoINSW.backend.repository;
 
-public interface IndicatoreRepository {
+import ProgettoINSW.backend.model.IndicatoreProx;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+
+public interface IndicatoreRepository extends JpaRepository<IndicatoreProx, Long> {
+
+
 }
