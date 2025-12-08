@@ -67,14 +67,14 @@ public class InserzioneController {
     //Gestione inserzioni
 /******************************************************************************************************************/
 
-     @PostMapping(value = "/crea", consumes = "multipart/form-data")
-     public ResponseEntity<InserzioneResponse> creaInserzione(
-         @RequestPart("dati") @Valid InserzioneRequest request,
-         @RequestPart("immagini") MultipartFile[] immagini,
-         @RequestHeader("Authorization") String authHeader
-         ) throws IOException {
+    @PostMapping(value = "/crea",consumes = { "multipart/form-data", "application/json" })
+            public ResponseEntity<InserzioneResponse> creaInserzione(
+            @RequestPart(value = "dati", required = false) InserzioneRequest request,
+            @RequestPart(value = "immagini", required = false) MultipartFile[] immagini,
+            @RequestHeader("Authorization") String authHeader
+    ) throws IOException {
 
-         String token = extractToken(authHeader);
+        String token = extractToken(authHeader);
          InserzioneResponse response = inserzioneService.creaInserzione(request, immagini, token);
 
          return ResponseEntity.ok(response);
@@ -152,6 +152,7 @@ private String extractToken(String header) {
 
     return header.substring(7).trim();
 }
+
 
 
 }

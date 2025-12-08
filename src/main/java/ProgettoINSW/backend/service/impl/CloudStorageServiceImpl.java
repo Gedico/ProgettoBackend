@@ -37,5 +37,13 @@ public class CloudStorageServiceImpl implements CloudStorageService {
     public String getPublicUrl(String filename) {
         return "https://storage.googleapis.com/" + bucketName + "/inserzioni/" + filename;
     }
+
+
+    public void deleteFile(String url) {
+        // logica per rimuovere l'oggetto dal bucket GCS
+    }
+
+
+
 }
 

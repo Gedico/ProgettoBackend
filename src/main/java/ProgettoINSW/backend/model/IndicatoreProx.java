@@ -1,6 +1,6 @@
 package ProgettoINSW.backend.model;
 
-import ProgettoINSW.backend.model.enums.Tipologia;
+import ProgettoINSW.backend.model.enums.TipoIndicatore;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @Entity
 @Table(name = "indicatore_prox")
-public class Indicatore {
+public class IndicatoreProx {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class Indicatore {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 50)
-    private Tipologia tipo;
+    private TipoIndicatore tipo;
 
     @Column(name = "distanza")
     private BigDecimal distanza;
@@ -32,10 +32,10 @@ public class Indicatore {
             foreignKey = @ForeignKey(name = "fk_indicatore_inserzione"))
     private Inserzione inserzione;
 
-    public Indicatore() {
+    public IndicatoreProx() {
     }
 
-    public Indicatore(Long idIndicatore, Tipologia tipo, BigDecimal distanza, Inserzione inserzione) {
+    public IndicatoreProx(Long idIndicatore, TipoIndicatore tipo, BigDecimal distanza, Inserzione inserzione) {
         this.idIndicatore = idIndicatore;
         this.tipo = tipo;
         this.distanza = distanza;

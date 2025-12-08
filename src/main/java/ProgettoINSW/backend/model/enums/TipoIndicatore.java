@@ -1,8 +1,8 @@
 package ProgettoINSW.backend.model.enums;
 
-public enum Tipologia {
+public enum TipoIndicatore {
 
-    SCUOLA ,
+    SCUOLA,
     OSPEDALE,
     SUPERMERCATO,
     PARCO,
