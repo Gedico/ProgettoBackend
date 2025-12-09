@@ -6,15 +6,19 @@ import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneFiltriRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
+import ProgettoINSW.backend.dto.response.SimpleResponse;
+import ProgettoINSW.backend.dto.stato.StatoRequest;
+import ProgettoINSW.backend.exception.BusinessException;
 import ProgettoINSW.backend.service.FotoService;
 import ProgettoINSW.backend.service.InserzioneService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/inserzioni")
@@ -45,11 +49,8 @@ public class InserzioneController {
     }
 
     @GetMapping("/ricerca")
-    public ResponseEntity<List<InserzioneResponse>> ricercaInserzioni(@ModelAttribute DatiInserzioneFiltriRequest filtri) {List<InserzioneResponse> risultati = inserzioneService.ricercaInserzioni(filtri);
-
-        if (risultati.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
+    public ResponseEntity<List<InserzioneResponse>> ricercaInserzioni(@ModelAttribute DatiInserzioneFiltriRequest filtri) {
+        List<InserzioneResponse> risultati = inserzioneService.ricercaInserzioni(filtri);
 
         return ResponseEntity.ok(risultati);
     }
@@ -66,37 +67,38 @@ public class InserzioneController {
     //Gestione inserzioni
 /******************************************************************************************************************/
 
-    @PostMapping("/crea")
-    public ResponseEntity<InserzioneResponse> creaInserzione(@Valid @RequestBody InserzioneRequest request, @RequestHeader("Authorization") String authHeader) {
+    @PostMapping(value = "/crea",consumes = { "multipart/form-data", "application/json" })
+            public ResponseEntity<InserzioneResponse> creaInserzione(
+            @RequestPart(value = "dati", required = false) InserzioneRequest request,
+            @RequestPart(value = "immagini", required = false) MultipartFile[] immagini,
+            @RequestHeader("Authorization") String authHeader
+    ) throws IOException {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = extractToken(authHeader);
+         InserzioneResponse response = inserzioneService.creaInserzione(request, immagini, token);
 
-        InserzioneResponse response = inserzioneService.creaInserzione(request, token);
+         return ResponseEntity.ok(response);
+     }
 
-        return ResponseEntity.ok(response);
-    }
+
 
     @DeleteMapping("/eliminaFoto/{id}")
-    public ResponseEntity<Map<String, Object>> eliminaFoto(
+    public ResponseEntity<SimpleResponse> eliminaFoto(
             @PathVariable Long id,
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody List<FotoRequest> daEliminare) {
+            @RequestBody @Valid List<FotoRequest> daEliminare) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = extractToken(authHeader);
         fotoService.eliminaFoto(id, token, daEliminare);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Foto eliminate con successo");
-        response.put("success", true);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new SimpleResponse(true, "Foto eliminate con successo"));
     }
 
 
     @PutMapping("/modifica/{id}")
     public ResponseEntity<DatiInserzioneRequest> modificaInserzione(@PathVariable("id") Long id, @Valid @RequestBody DatiInserzioneRequest request, @RequestHeader("Authorization") String authHeader) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = extractToken(authHeader);
 
         DatiInserzioneRequest modificaInserzione = inserzioneService.modificaInserzione(id, request, token);
 
@@ -105,49 +107,52 @@ public class InserzioneController {
 
 
     @DeleteMapping("/elimina/{id}")
-    public ResponseEntity<Map<String, Object>> eliminaInserzione(
+    public ResponseEntity<SimpleResponse> eliminaInserzione(
             @PathVariable Long id,
             @RequestHeader("Authorization") String authHeader) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = extractToken(authHeader);
         inserzioneService.eliminaInserzione(id, token);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Inserzione eliminata con successo");
-        response.put("success", true);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new SimpleResponse(true, "Inserzione eliminata con successo"));
     }
 
     @PutMapping("/modificaStato/{id}")
-    public ResponseEntity<String> cambiaStatoInserzione(
-            @PathVariable Long id,
-            @RequestHeader("Authorization") String token,
-            @RequestBody Map<String, String> body) {
-
-        try {
-            String nuovoStato = body.get("stato");
-            inserzioneService.cambiaStato(id, token.replace("Bearer ", ""), nuovoStato);
-            return ResponseEntity.ok("Stato dell'inserzione aggiornato correttamente a: " + nuovoStato);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body("Errore: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/caricaFoto/{id}")
-    public ResponseEntity<Map<String, Object>> caricaFoto(
+    public ResponseEntity<SimpleResponse> cambiaStatoInserzione(
             @PathVariable Long id,
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody List<FotoRequest> nuoveFoto) {
+            @RequestBody @Valid StatoRequest body) {
 
-        String token = authHeader.replace("Bearer ", "").trim();
+        String token = extractToken(authHeader);
+        String nuovoStato = body.getStato();
+
+        inserzioneService.cambiaStato(id, token, nuovoStato);
+
+        return ResponseEntity.ok(new SimpleResponse(true, "Stato aggiornato correttamente a: " + nuovoStato));
+    }
+
+
+    @PostMapping("/caricaFoto/{id}")
+    public ResponseEntity<SimpleResponse> caricaFoto(@PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody @Valid List<FotoRequest> nuoveFoto) {
+
+        String token = extractToken(authHeader);
         fotoService.caricaFoto(id, token, nuoveFoto);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Foto caricate con successo");
-        response.put("success", true);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new SimpleResponse(true, "Foto caricate con successo"));
     }
+
+
+/******FUNZIONI AUSILIARIE*******************************************************************************************************************************/
+
+private String extractToken(String header) {
+    if (header == null || !header.startsWith("Bearer "))
+        throw new BusinessException("Token non fornito");
+
+    return header.substring(7).trim();
+}
+
+
 
 }
