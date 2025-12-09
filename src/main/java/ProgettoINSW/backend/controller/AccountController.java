@@ -84,7 +84,6 @@ public class AccountController {
 
 
 
-
 /**********FUNZIONI AUSILIARIE*************************************************************************************************************/
 
     private ResponseEntity<RegisterResponse> registra(RegisterRequest request, Role role) {
