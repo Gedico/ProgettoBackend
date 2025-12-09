@@ -13,6 +13,5 @@ public class InserzioneRequest {
 
     private DatiInserzioneRequest datiInserzioneRequest;
     private PosizioneRequest posizione;
-    private List<FotoRequest> foto;
 
 }

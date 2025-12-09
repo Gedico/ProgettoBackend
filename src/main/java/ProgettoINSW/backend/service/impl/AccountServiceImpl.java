@@ -1,9 +1,11 @@
 package ProgettoINSW.backend.service.impl;
 
+import ProgettoINSW.backend.dto.logout.LogoutResponse;
 import ProgettoINSW.backend.dto.registrazione.RegisterRequest;
 import ProgettoINSW.backend.dto.registrazione.RegisterResponse;
 import ProgettoINSW.backend.dto.login.LoginRequest;
 import ProgettoINSW.backend.dto.login.LoginResponse;
+import ProgettoINSW.backend.exception.BusinessException;
 import ProgettoINSW.backend.model.Account;
 import ProgettoINSW.backend.model.Agente;
 import ProgettoINSW.backend.model.Utente;
@@ -13,11 +15,9 @@ import ProgettoINSW.backend.repository.AgenteRepository;
 import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.service.AccountService;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ProgettoINSW.backend.util.JwtUtil;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 
@@ -36,17 +36,84 @@ public class AccountServiceImpl implements AccountService {
         this.passwordEncoder = passwordEncoder;
     }
 
+
+/******REGISTRAZIONI************************************************************************************************************/
+
     @Transactional
     @Override
-    public RegisterResponse registraAccount(@Valid @RequestBody RegisterRequest request, Role ruolo) {
+    public RegisterResponse registraAccount(RegisterRequest request, Role ruolo) {
 
-        //Controllo unicità email
         if (accountRepository.existsByMailIgnoreCase(request.getMail())) {
-            throw new RuntimeException("Email già registrata");
-            // creare una exception personalizzata nelle exception/
+            throw new BusinessException("Email già registrata");
         }
 
-        // Creazione Account base
+        Account account = createAccount(request, ruolo);
+        Account savedAccount = accountRepository.save(account);
+
+        createLinkedEntity(savedAccount, request, ruolo);
+
+        return buildRegisterResponse(savedAccount, request);
+    }
+
+
+/*********LOGIN & LOGOUT*********************************************************************************************************/
+
+    @Override
+    public LoginResponse loginUtente(LoginRequest request) {
+
+        Account account = accountRepository.findByMailIgnoreCase(request.getMail())
+                .orElseThrow(() -> new BusinessException("Nessun account trovato con questa mail."));
+
+        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
+            throw new BusinessException("Password errata.");
+        }
+
+        String token = JwtUtil.generateToken(account.getMail(), account.getRuolo().name());
+
+        return buildLoginResponse(account,token);
+    }
+
+
+    @Override
+    public LogoutResponse logout(String token) {
+
+        LogoutResponse response = new LogoutResponse();
+
+        if (token == null || token.isEmpty()) {
+            response.setSuccess(false);
+            response.setMessage("Token non fornito.");
+            return response;
+        }
+
+
+        if (!JwtUtil.validateToken(token)) {
+            response.setSuccess(false);
+            response.setMessage("Token non valido o già scaduto.");
+            return response;
+        }
+
+        response.setSuccess(true);
+        response.setMessage("Logout effettuato con successo.");
+        return response;
+    }
+
+
+/**********ELIMINAZIONE ACOUNT********************************************************************************************************/
+
+    @Transactional
+    @Override
+    public void eliminaAccount(Long idAccount) {
+        Account account = accountRepository.findById(idAccount)
+                .orElseThrow(() -> new BusinessException("Account non trovato con ID: " + idAccount));
+
+        utenteRepository.findByAccount_Id(idAccount).ifPresent(utenteRepository::delete);
+        accountRepository.delete(account);
+    }
+
+
+/**********FUNZIONI AUSILIARE*******************************************************************************************************/
+
+    private Account createAccount(RegisterRequest request, Role ruolo) {
         Account account = new Account();
         account.setNome(request.getNome());
         account.setCognome(request.getCognome());
@@ -54,15 +121,16 @@ public class AccountServiceImpl implements AccountService {
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setNumero(request.getNumero());
         account.setRuolo(ruolo);
+        return account;
+    }
 
-        Account savedAccount = accountRepository.save(account);
+    private void createLinkedEntity(Account savedAccount, RegisterRequest request, Role ruolo) {
 
-        //specifiche in base al ruolo
         switch (ruolo) {
             case UTENTE -> {
                 Utente utente = new Utente();
                 utente.setAccount(savedAccount);
-                utente.setIndirizzo(request.getApprofondimento()); // 👈 indirizzo
+                utente.setIndirizzo(request.getApprofondimento());
                 utente.setDataIscrizione(LocalDateTime.now());
                 utenteRepository.save(utente);
             }
@@ -70,91 +138,38 @@ public class AccountServiceImpl implements AccountService {
             case AGENTE -> {
                 Agente agente = new Agente();
                 agente.setAccount(savedAccount);
-                agente.setAgenzia(request.getApprofondimento()); // 👈 agenzia
+                agente.setAgenzia(request.getApprofondimento());
                 agenteRepository.save(agente);
             }
 
             case ADMIN -> {
-                //Admin non ha tabella
             }
 
-            default -> throw new IllegalArgumentException("Ruolo non supportato: " + ruolo);
+            default -> throw new BusinessException("Ruolo non supportato: " + ruolo);
         }
+    }
 
+    private RegisterResponse buildRegisterResponse(Account account, RegisterRequest request) {
         RegisterResponse response = new RegisterResponse();
-        response.setIdAccount(savedAccount.getId());
-        response.setNome(savedAccount.getNome());
-        response.setCognome(savedAccount.getCognome());
-        response.setMail(savedAccount.getMail());
-        response.setNumero(savedAccount.getNumero());
-        response.setRuolo(savedAccount.getRuolo());
+        response.setIdAccount(account.getId());
+        response.setNome(account.getNome());
+        response.setCognome(account.getCognome());
+        response.setMail(account.getMail());
+        response.setNumero(account.getNumero());
+        response.setRuolo(account.getRuolo());
         response.setMessaggio(request.getMessaggio() != null ? request.getMessaggio() : "Registrazione completata");
+        response.setSuccess(true);
 
         return response;
     }
 
-
-    @Override
-    public LoginResponse loginUtente(LoginRequest request) {
-
-        // Trova l’account tramite la mail
-        Account account = accountRepository.findByMailIgnoreCase(request.getMail())
-                .orElse(null);
-
-        if (account == null) {
-            return new LoginResponse("Nessun account trovato con questa mail.", null, null);
-        }
-
-        // Verifica la password criptata
-        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
-            return new LoginResponse("Password errata.", null, null);
-        }
-
-        // Genera token JWT
-        String token = JwtUtil.generateToken(account.getMail(), account.getRuolo().name());
-
-        // Crea e restituisce la risposta
-        return new LoginResponse(
-                "Login effettuato con successo.",
-                account.getRuolo().name(),
-                token
-        );
+    private LoginResponse buildLoginResponse(Account account, String token) {
+        LoginResponse response = new LoginResponse();
+        response.setMessaggio("Login effettuato con successo.");
+        response.setRuolo(account.getRuolo());
+        response.setToken(token);
+        response.setSuccess(true);
+        return response;
     }
-
-    @Override
-    public String logout(String token) {
-        if (token == null || token.isEmpty()) {
-            return "Token non fornito.";
-        }
-
-        // Se inizia con 'Bearer ', lo puliamo
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        // Verifica se il token è valido (così non “logout” token già scaduti)
-        boolean valido = JwtUtil.validateToken(token);
-        if (!valido) {
-            return "Token non valido o già scaduto.";
-        }
-
-        // Logout simbolico: il frontend eliminerà il token
-        return "Logout effettuato con successo. Token non più utilizzabile.";
-    }
-
-    @Transactional
-    @Override
-    public void eliminaAccount(Long idAccount) {
-        // Verifica che l’account esista
-        Account account = accountRepository.findById(idAccount)
-                .orElseThrow(() -> new RuntimeException("Account non trovato con ID: " + idAccount));
-
-        // Elimina prima l’utente collegato (se esiste)
-        utenteRepository.findByAccount_Id(idAccount).ifPresent(utenteRepository::delete);
-
-        // Poi elimina l’account
-        accountRepository.delete(account);
-    }
-
 
 }

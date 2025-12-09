@@ -2,10 +2,13 @@ package ProgettoINSW.backend.controller;
 
 import ProgettoINSW.backend.dto.registrazione.RegisterRequest;
 import ProgettoINSW.backend.dto.registrazione.RegisterResponse;
+import ProgettoINSW.backend.dto.logout.LogoutResponse;
 import ProgettoINSW.backend.dto.login.LoginRequest;
 import ProgettoINSW.backend.dto.login.LoginResponse;
+import ProgettoINSW.backend.dto.response.SimpleResponse;
 import ProgettoINSW.backend.model.enums.Role;
 import ProgettoINSW.backend.service.AccountService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,63 +24,73 @@ public class AccountController {
     }
 
 
-//Registrazioni
-/******************************************************************************************************************/
-
+/******REGISTRAZIONI************************************************************************************************************/
 
     @PostMapping("/registerUtente")
-    public ResponseEntity<RegisterResponse> registraUtente(@RequestBody RegisterRequest request) {
-        RegisterResponse response = accountService.registraAccount(request,Role.UTENTE);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<RegisterResponse> registraUtente(@Valid @RequestBody RegisterRequest request) {
+        return registra(request, Role.UTENTE);
     }
 
     @PostMapping("/registerAgente")
-    public ResponseEntity<RegisterResponse> registraAgente(@RequestBody RegisterRequest request) {
-        RegisterResponse response = accountService.registraAccount(request,Role.AGENTE);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<RegisterResponse> registraAgente(@Valid @RequestBody RegisterRequest request) {
+        return registra(request, Role.AGENTE);
     }
 
     @PostMapping("/registerAdmin")
-    public ResponseEntity<RegisterResponse> registraAdmin(@RequestBody RegisterRequest request) {
-        RegisterResponse response = accountService.registraAccount(request,Role.ADMIN);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<RegisterResponse> registraAdmin(@Valid @RequestBody RegisterRequest request) {
+        return registra(request, Role.ADMIN);
     }
 
 
-//Login e Logout
-/******************************************************************************************************************/
+
+/*********LOGIN & LOGOUT*********************************************************************************************************/
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         LoginResponse response = accountService.loginUtente(request);
 
-        if ("Nessun account trovato con questa mail.".equals(response.getMessaggio()) ||
-                "Password errata.".equals(response.getMessaggio())) {
+        if (response.getToken() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        String message = accountService.logout(token);
-        return ResponseEntity.ok(message);
+    public ResponseEntity<LogoutResponse> logout(@RequestHeader("Authorization") String authorizationHeader) {
+
+        String token = authorizationHeader;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7);
+        }
+
+        LogoutResponse response = accountService.logout(token);
+
+        if (!response.isSuccess()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
 
-//Eliminazione account
-/******************************************************************************************************************/
+
+/**********ELIMINAZIONE ACOUNT********************************************************************************************************/
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
-        try {
-            accountService.eliminaAccount(id);
-            return ResponseEntity.ok("Account eliminato con successo!");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+    public ResponseEntity<SimpleResponse> deleteAccount(@PathVariable Long id) {
+        accountService.eliminaAccount(id);
+        return ResponseEntity.ok(new SimpleResponse(true, "Account eliminato con successo"));
     }
 
+
+
+
+/**********FUNZIONI AUSILIARIE*************************************************************************************************************/
+
+    private ResponseEntity<RegisterResponse> registra(RegisterRequest request, Role role) {
+        RegisterResponse response = accountService.registraAccount(request, role);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
 
 }

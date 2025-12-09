@@ -1,10 +1,8 @@
 package ProgettoINSW.backend.security;
 
 import ProgettoINSW.backend.model.Account;
-import ProgettoINSW.backend.model.Utente;
 import ProgettoINSW.backend.model.enums.Role;
 import ProgettoINSW.backend.repository.AccountRepository;
-import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +26,6 @@ import org.springframework.web.client.RestTemplate;
 
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.*;
 
 @Configuration
@@ -36,12 +33,9 @@ import java.util.*;
 public class SecurityConfig {
 
     private final AccountRepository accountRepository;
-    private final UtenteRepository utenteRepository;
 
-    public SecurityConfig(AccountRepository accountRepository,
-                          UtenteRepository utenteRepository) {
+    public SecurityConfig(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
-        this.utenteRepository = utenteRepository;
     }
 
     @Bean
@@ -73,6 +67,7 @@ public class SecurityConfig {
     }
 
     // ======== DETERMINA PROVIDER =========
+
     private String getProviderFromRequest(HttpServletRequest request) {
         String uri = request.getRequestURI();
         if (uri.contains("google")) return "google";
@@ -96,6 +91,7 @@ public class SecurityConfig {
     }
 
     // ========= GOOGLE ==========
+
     private void handleGoogleSuccess(HttpServletResponse response,
                                      Authentication authentication) throws IOException {
 
@@ -110,6 +106,7 @@ public class SecurityConfig {
     }
 
     // ========= GITHUB ==========
+
     private void handleGitHubSuccess(HttpServletResponse response,
                                      Authentication authentication) throws IOException {
 
@@ -121,7 +118,6 @@ public class SecurityConfig {
 
         String email = (String) a.get("email");
 
-        // Se GitHub NON fornisce email → la recuperiamo tramite API
         if (email == null) {
             try {
                 RestTemplate rest = new RestTemplate();
@@ -172,6 +168,7 @@ public class SecurityConfig {
     }
 
     // ========= FACEBOOK ==========
+
     private void handleFacebookSuccess(HttpServletResponse response,
                                        Authentication authentication) throws IOException {
 
@@ -188,6 +185,7 @@ public class SecurityConfig {
     }
 
     // ========= CREA ACCOUNT + UTENTE ==========
+
     private void processOAuthUser(String email,
                                   String nome,
                                   String cognome,
@@ -201,13 +199,12 @@ public class SecurityConfig {
                     nuovo.setCognome(cognome);
                     nuovo.setPassword(passwordEncoder().encode(UUID.randomUUID().toString()));
                     nuovo.setRuolo(Role.UTENTE);
-                    return accountRepository.save(nuovo);   // <-- viene fatto solo per NUOVO utente
+                    return accountRepository.save(nuovo);
                 });
-
-        // ❗ Nessun save() se già esiste -> EVITI entity detached!
 
         String token = JwtUtil.generateToken(account.getMail(), account.getRuolo().name());
 
-        response.sendRedirect("http://localhost:4200/oauth-callback?token=" + token);
+        response.sendRedirect("http://localhost:4200/#/oauth-callback?token=" + token);
+
     }
 }
