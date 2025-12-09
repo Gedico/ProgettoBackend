@@ -201,6 +201,27 @@ public class PropostaServiceImpl implements PropostaService {
         return mapToResponseList(offerte);
     }
 
+    @Override
+    public List<PropostaResponse> getProposteAgenteRegistro(String token) {
+
+        String mail = JwtUtil.extractMail(token);
+
+        Account account = accountRepository.findByMail(mail)
+                .orElseThrow(() -> new EntityNotFoundException("Account non trovato"));
+
+        Agente agente = agenteRepository.findByAccount(account)
+                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato"));
+
+        List<Proposta> proposte =
+                propostaRepository.findByAgente(agente).stream()
+                        .filter(p -> p.getStato() == StatoProposta.ACCETTATA ||
+                                p.getStato() == StatoProposta.RIFIUTATA)
+                        .toList();
+
+        return mapToResponseList(proposte);
+    }
+
+
     private List<PropostaResponse> mapToResponseList(List<Proposta> offerte) {
         return offerte.stream()
                 .map(o -> {

@@ -68,6 +68,21 @@ public class PropostaController {
         );
     }
 
+    @GetMapping("/registro")
+    @PreAuthorize("hasRole('AGENTE')")
+    public ResponseEntity<List<PropostaResponse>> registroProposte(
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = cleanToken(authHeader);
+
+        List<PropostaResponse> registro =
+                propostaService.getProposteAgenteRegistro(token);
+
+        return registro.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(registro);
+    }
+
     // 🔹 4) Dettagli proposta
     @GetMapping("/{id}")
     public ResponseEntity<PropostaResponse> dettagliProposta(
