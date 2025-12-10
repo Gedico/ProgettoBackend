@@ -45,4 +45,7 @@ public interface InserzioneRepository
        """)
     List<Inserzione> findUltime4ConFoto(Pageable pageable);
 
+    List<Inserzione> findByAgente_IdAgente(Long idAgente);
+
+
 }

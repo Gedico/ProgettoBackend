@@ -4,6 +4,7 @@ import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneResponse;
 import ProgettoINSW.backend.dto.foto.FotoRequest;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.foto.FotoResponse;
+import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.dto.posizione.PosizioneRequest;
 import ProgettoINSW.backend.dto.posizione.PosizioneResponse;
@@ -64,7 +65,7 @@ public class InserzioneMap {
         InserzioneResponse response = new InserzioneResponse();
         response.setId(inserzione.getIdInserzione());
 
-        // --- dati ---
+
         DatiInserzioneResponse dati = new DatiInserzioneResponse();
         dati.setTitolo(inserzione.getTitolo());
         dati.setDescrizione(inserzione.getDescrizione());
@@ -103,5 +104,28 @@ public class InserzioneMap {
 
 
     }
+
+    public InserzioneCardResponse toCardResponse(Inserzione inserzione) {
+
+        InserzioneCardResponse card = new InserzioneCardResponse();
+
+        card.setIdInserzione(inserzione.getIdInserzione());
+        card.setTitolo(inserzione.getTitolo());
+        card.setPrezzo(inserzione.getPrezzo());
+        card.setDimensioni(inserzione.getDimensioni());
+        card.setNumero_stanze(inserzione.getNumeroStanze());
+
+        // Foto principale = prima foto nella lista
+        if (inserzione.getFoto() != null && !inserzione.getFoto().isEmpty()) {
+            card.setFotoPrincipale(inserzione.getFoto().get(0).getUrlFoto());
+        } else {
+            card.setFotoPrincipale(null);
+        }
+
+        return card;
+    }
+
+
+
 
 }

@@ -255,8 +255,36 @@ public class InserzioneServiceImpl implements InserzioneService {
                 .toList();
     }
 
+    @Override
+    public List<InserzioneCardResponse> getInserzioniPerAgente(String token) {
 
-/*****ELIMINA INSERZIONI**********************************************************************************************************************/
+        // 1. Estrazione email dal JWT
+        String mail = JwtUtil.extractMail(token);
+
+        // 2. Recupero account
+        Account account = accountRepository.findByMailIgnoreCase(mail)
+                .orElseThrow(() -> new RuntimeException("Account non trovato per " + mail));
+
+        // 3. Recupero agente collegato
+        Agente agente = agenteRepository.findByAccount(account)
+                .orElseThrow(() -> new RuntimeException("Agente non trovato per l'account " + mail));
+
+        Long idAgente = agente.getIdAgente();
+
+        // 4. Recupero inserzioni dell’agente
+        List<Inserzione> lista = inserzioneRepository.findByAgente_IdAgente(idAgente);
+
+        // 5. Mappatura a card DTO
+        return lista.stream()
+                .map(map::toCardResponse)
+                .toList();
+    }
+
+
+
+
+
+    /*****ELIMINA INSERZIONI**********************************************************************************************************************/
 
 
     @Override

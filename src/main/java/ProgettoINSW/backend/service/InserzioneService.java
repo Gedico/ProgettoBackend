@@ -29,4 +29,6 @@ public interface InserzioneService {
     void cambiaStato(Long id, String bearer, String nuovoStato);
 
     List<InserzioneCardResponse> getInserzioniRecenti();
+
+    List<InserzioneCardResponse> getInserzioniPerAgente(String token);
 }
