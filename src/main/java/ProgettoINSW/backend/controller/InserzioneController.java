@@ -62,6 +62,17 @@ public class InserzioneController {
         return ResponseEntity.ok(response);
     }
 
+  // Dashboard di agente
+    @GetMapping("/mie")
+    public ResponseEntity<List<InserzioneCardResponse>> getInserzioniAgente(
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = extractToken(authHeader);
+        List<InserzioneCardResponse> mie = inserzioneService.getInserzioniPerAgente(token);
+
+        return ResponseEntity.ok(mie);
+    }
+
 
 
     //Gestione inserzioni
