@@ -7,6 +7,7 @@ import ProgettoINSW.backend.dto.geopify.GeoapifyResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
+import ProgettoINSW.backend.exception.BusinessException;
 import ProgettoINSW.backend.mapper.InserzioneMap;
 import ProgettoINSW.backend.model.*;
 import ProgettoINSW.backend.model.enums.Categoria;
@@ -259,23 +260,23 @@ public class InserzioneServiceImpl implements InserzioneService {
     public List<InserzioneCardResponse> getInserzioniPerAgente(String token) {
 
         // 1. Estrazione email dal JWT
-        String mail = JwtUtil.extractMail(token);
+        final String mail = JwtUtil.extractMail(token);
 
         // 2. Recupero account
-        Account account = accountRepository.findByMailIgnoreCase(mail)
-                .orElseThrow(() -> new RuntimeException("Account non trovato per " + mail));
+        final Account account = accountRepository.findByMailIgnoreCase(mail)
+                .orElseThrow(() -> new BusinessException("Account non trovato per " + mail));
 
         // 3. Recupero agente collegato
-        Agente agente = agenteRepository.findByAccount(account)
-                .orElseThrow(() -> new RuntimeException("Agente non trovato per l'account " + mail));
+        final Agente agente = agenteRepository.findByAccount(account)
+                .orElseThrow(() -> new BusinessException("Agente non trovato per l'account " + mail));
 
-        Long idAgente = agente.getIdAgente();
+        final Long idAgente = agente.getIdAgente();
 
         // 4. Recupero inserzioni dell’agente
-        List<Inserzione> lista = inserzioneRepository.findByAgente_IdAgente(idAgente);
+        final List<Inserzione> inserzioni = inserzioneRepository.findByAgente_IdAgente(idAgente);
 
         // 5. Mappatura a card DTO
-        return lista.stream()
+        return inserzioni.stream()
                 .map(map::toCardResponse)
                 .toList();
     }
@@ -288,20 +289,21 @@ public class InserzioneServiceImpl implements InserzioneService {
 
 
     @Override
-    public void eliminaInserzione(Long id, String token) {
-        String mailAgente = JwtUtil.extractMail(token);
+    public void eliminaInserzione(final Long id, final String token) {
 
-        Inserzione inserzione = inserzioneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Inserzione non trovato"));
+        final String mailAgente = JwtUtil.extractMail(token);
 
-        Account accountRichiedente = accountRepository.findByMailIgnoreCase(mailAgente)
-                .orElseThrow(() -> new RuntimeException("Account non trovato"));
+        final Inserzione inserzione = inserzioneRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Inserzione non trovato"));
 
-        boolean isAdmin = accountRichiedente.getRuolo().equals(Role.ADMIN);
-        boolean isProprietario = inserzione.getAgente().getAccount().getMail().equalsIgnoreCase(mailAgente);
+        final Account accountRichiedente = accountRepository.findByMailIgnoreCase(mailAgente)
+                .orElseThrow(() -> new BusinessException("Account non trovato"));
+
+        final boolean isAdmin = accountRichiedente.getRuolo().equals(Role.ADMIN);
+        final boolean isProprietario = inserzione.getAgente().getAccount().getMail().equalsIgnoreCase(mailAgente);
 
         if (!isAdmin && !isProprietario) {
-            throw new RuntimeException("Non puoi eliminare un'inserzione che non hai pubblicato");
+            throw new BusinessException("Non puoi eliminare un'inserzione che non hai pubblicato");
         }
 
         inserzioneRepository.delete(inserzione);
