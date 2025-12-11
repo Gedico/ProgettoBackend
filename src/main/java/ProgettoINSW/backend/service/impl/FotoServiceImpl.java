@@ -1,83 +1,101 @@
 package ProgettoINSW.backend.service.impl;
 
-import ProgettoINSW.backend.dto.foto.FotoRequest;
 import ProgettoINSW.backend.model.Foto;
 import ProgettoINSW.backend.model.Inserzione;
 import ProgettoINSW.backend.repository.FotoRepository;
-import ProgettoINSW.backend.repository.InserzioneRepository;
 import ProgettoINSW.backend.service.FotoService;
-import ProgettoINSW.backend.util.ValidazioneUtil;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class FotoServiceImpl implements FotoService {
 
-    private final InserzioneRepository inserzioneRepository;
+    private final CloudStorageServiceImpl cloudStorageService;
     private final FotoRepository fotoRepository;
-    private final ValidazioneUtil validazioneUtil;
 
-    @Transactional
+    private static final int MAX_IMAGE_COUNT = 10;
+    private static final long MAX_IMAGE_SIZE_BYTES = 5_000_000;
+
     @Override
-    public void caricaFoto(Long id, String token, List<FotoRequest> nuoveFoto) {
+    public List<Foto> processImages(MultipartFile[] files, Inserzione inserzione) throws IOException {
 
-        if (validazioneUtil.verificaAgenteInserzione(id, token)) {
-            throw new RuntimeException("Non puoi caricare foto per un'iserzione che non hai pubblicato");
+        if (files == null) {
+            files = new MultipartFile[0];
         }
 
-        if (nuoveFoto == null || nuoveFoto.isEmpty()) {
-            throw new RuntimeException("Nessuna foto fornita");
+        if (files == null || files.length == 0) {
+            return List.of(); // nessuna foto → nessun problema
         }
 
-        Inserzione inserzione = inserzioneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Inserzione non trovata"));
+        if (files.length > MAX_IMAGE_COUNT) {
+            throw new IllegalArgumentException(
+                    "Puoi caricare massimo " + MAX_IMAGE_COUNT + " immagini."
+            );
+        }
 
-        List<Foto> fotoDaSalvare = nuoveFoto.stream()
-                .map(f -> {
-                    Foto foto = new Foto();
-                    foto.setUrlFoto(f.getUrl());
-                    foto.setInserzione(inserzione);
-                    return foto;
-                })
-                .collect(Collectors.toList());
+        List<String> uploadedUrls = new ArrayList<>();
+        List<Foto> fotoList = new ArrayList<>();
 
-        fotoRepository.saveAll(fotoDaSalvare);
+        try {
+            for (MultipartFile file : files) {
 
+                validateImage(file);
+
+                String url = cloudStorageService.uploadFile(file);
+                uploadedUrls.add(url);
+
+                Foto f = new Foto();
+                f.setUrlFoto(url);
+                f.setInserzione(inserzione);
+                fotoList.add(f);
+            }
+
+            fotoRepository.saveAll(fotoList);
+            return fotoList;
+
+        } catch (Exception e) {
+
+            // rollback cloud → elimina ciò che è stato caricato prima dell'errore
+            for (String url : uploadedUrls) {
+                try {
+                    cloudStorageService.deleteFile(url);
+                } catch (Exception ignored) {}
+            }
+
+            throw e;
+        }
     }
 
-    @Transactional
     @Override
-    public void eliminaFoto(Long id, String token, List<FotoRequest> daEliminare) {
+    public void validateImage(MultipartFile file) {
 
-        if (validazioneUtil.verificaAgenteInserzione(id, token)) {
-            throw new RuntimeException("Non puoi eliminare foto per un'inserzione che non hai pubblicato");
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Caricata un'immagine vuota.");
         }
 
-        if (daEliminare == null || daEliminare.isEmpty()) {
-            throw new RuntimeException("Nessuna foto fornita");
+        if (file.getSize() > MAX_IMAGE_SIZE_BYTES) {
+            throw new IllegalArgumentException("Un'immagine supera il limite massimo di 5MB.");
         }
 
-        Inserzione inserzione = inserzioneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Inserzione non trovata"));
-
-        List<String> urlDaEliminare = daEliminare.stream()
-                .map(FotoRequest::getUrl)
-                .collect(Collectors.toList());
-
-        List<Foto> fotoPresenti = fotoRepository.findByInserzioneAndUrlFotoIn(inserzione, urlDaEliminare);
-
-        if (fotoPresenti.isEmpty()) {
-            throw new RuntimeException("Nessuna foto trovata da eliminare");
+        String contentType = file.getContentType();
+        if (contentType == null) {
+            throw new IllegalArgumentException("Formato immagine non riconosciuto.");
         }
 
-        fotoRepository.deleteAll(fotoPresenti);
+        contentType = contentType.toLowerCase();
+
+        if (!contentType.equals("image/jpeg")
+                && !contentType.equals("image/png")
+                && !contentType.equals("image/webp")) {
+
+            throw new IllegalArgumentException("Formato non supportato. Ammessi: JPG, PNG, WEBP.");
+        }
     }
-
-
-
 }
+

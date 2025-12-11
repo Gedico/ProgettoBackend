@@ -89,7 +89,7 @@ public class InserzioneController {
             @RequestBody @Valid List<FotoRequest> daEliminare) {
 
         String token = extractToken(authHeader);
-        fotoService.eliminaFoto(id, token, daEliminare);
+        //fotoService.eliminaFoto(id, token, daEliminare);
 
         return ResponseEntity.ok(new SimpleResponse(true, "Foto eliminate con successo"));
     }
@@ -138,7 +138,7 @@ public class InserzioneController {
             @RequestBody @Valid List<FotoRequest> nuoveFoto) {
 
         String token = extractToken(authHeader);
-        fotoService.caricaFoto(id, token, nuoveFoto);
+        //fotoService.caricaFoto(id, token, nuoveFoto);
 
         return ResponseEntity.ok(new SimpleResponse(true, "Foto caricate con successo"));
     }

@@ -1,6 +1,7 @@
 package ProgettoINSW.backend.service.impl;
 
 import ProgettoINSW.backend.service.CloudStorageService;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,12 +11,21 @@ import java.io.IOException;
 @Service
 public class CloudStorageServiceImpl implements CloudStorageService {
 
-    private final String bucketName = "dietiestate25"; // <-- usa il tuo bucket
+    private final String bucketName = "database-dietiestate25"; // <-- usa il tuo bucket
 
     private final Storage storage;
 
-    public CloudStorageServiceImpl() {
-        this.storage = StorageOptions.getDefaultInstance().getService();
+    public CloudStorageServiceImpl() throws IOException {
+        this.storage = StorageOptions.newBuilder()
+                .setCredentials(
+                        GoogleCredentials.fromStream(
+                                getClass().getClassLoader().getResourceAsStream(
+                                        "gcp/dietiestate25-storage.json"
+                                )
+                        )
+                )
+                .build()
+                .getService();
     }
 
     @Override

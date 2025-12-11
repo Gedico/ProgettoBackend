@@ -1,12 +1,16 @@
 package ProgettoINSW.backend.service;
 
-import ProgettoINSW.backend.dto.foto.FotoRequest;
+import ProgettoINSW.backend.model.Foto;
+import ProgettoINSW.backend.model.Inserzione;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface FotoService {
 
-    void caricaFoto(Long id, String token, List<FotoRequest> nuoveFoto);
+    List<Foto> processImages(MultipartFile[] files, Inserzione inserzione) throws IOException;
 
-    void eliminaFoto(Long id, String token, List<FotoRequest> daEliminare);
+    void validateImage(MultipartFile file);
 }
+
