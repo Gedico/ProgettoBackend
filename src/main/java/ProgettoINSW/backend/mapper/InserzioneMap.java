@@ -3,8 +3,11 @@ package ProgettoINSW.backend.mapper;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneResponse;
 import ProgettoINSW.backend.dto.foto.FotoResponse;
+import ProgettoINSW.backend.dto.foto.FotoRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
+import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
+import ProgettoINSW.backend.dto.posizione.PosizioneRequest;
 import ProgettoINSW.backend.dto.posizione.PosizioneResponse;
 import ProgettoINSW.backend.model.Agente;
 import ProgettoINSW.backend.model.Foto;
@@ -12,23 +15,33 @@ import ProgettoINSW.backend.model.Inserzione;
 import ProgettoINSW.backend.model.Posizione;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class InserzioneMap {
 
-    // ============================
-    // 1️⃣ CREA ENTITY COMPLETA
-    // ============================
-    public Inserzione toEntity(InserzioneRequest request, Posizione posizione, Agente agente) {
-        if (request == null) return null;
+    // -------------------------------------------------------------
+    // POSIZIONE: DTO → ENTITY
+    // -------------------------------------------------------------
+    public Posizione toPosizione(PosizioneRequest dto) {
+        if (dto == null) return null;
 
-        DatiInserzioneRequest dto = request.getDatiInserzioneRequest();
+        Posizione posizione = new Posizione();
+        posizione.setLatitudine(dto.getLatitudine());
+        posizione.setLongitudine(dto.getLongitudine());
+        posizione.setDescrizione(dto.getDescrizione_posizione());
+        return posizione;
+    }
+
+    // -------------------------------------------------------------
+    // DATI INSERZIONE: DTO → ENTITY
+    // -------------------------------------------------------------
+    public Inserzione toDatiInserzione(DatiInserzioneRequest dto) {
         if (dto == null) return null;
 
         Inserzione inserzione = new Inserzione();
-
-        // --- Dati inserzione ---
         inserzione.setTitolo(dto.getTitolo());
         inserzione.setDescrizione(dto.getDescrizione());
         inserzione.setPrezzo(dto.getPrezzo());
@@ -37,25 +50,69 @@ public class InserzioneMap {
         inserzione.setPiano(dto.getPiano());
         inserzione.setAscensore(dto.getAscensore());
         inserzione.setClasseEnergetica(dto.getClasse_energetica());
-        inserzione.setCategoria(dto.getCategoria());
 
-        // --- Relazioni ---
+        if (dto.getCategoria() != null) {
+            inserzione.setCategoria(dto.getCategoria());
+        }
+
+        return inserzione;
+    }
+
+    // -------------------------------------------------------------
+    // CREA ENTITY COMPLETA (REQUEST → ENTITY)
+    // -------------------------------------------------------------
+    public Inserzione toEntity(InserzioneRequest request, Posizione posizione, Agente agente) {
+        if (request == null) return null;
+
+        DatiInserzioneRequest dto = request.getDatiInserzioneRequest();
+        if (dto == null) return null;
+
+        Inserzione inserzione = toDatiInserzione(dto);
         inserzione.setPosizione(posizione);
         inserzione.setAgente(agente);
 
         return inserzione;
     }
 
+    // -------------------------------------------------------------
+    // FOTO LIST: DTO → ENTITY LIST
+    // -------------------------------------------------------------
+    public List<Foto> toFotoList(List<FotoRequest> lista, Inserzione inserzione) {
 
-    // ============================
-    // 2️⃣ RESPONSE COMPLETA
-    // ============================
+        if (lista == null || lista.isEmpty() || inserzione == null) {
+            return Collections.emptyList();
+        }
+
+        return lista.stream()
+                .filter(Objects::nonNull)
+                .map(dto -> {
+                    Foto foto = new Foto();
+                    foto.setUrlFoto(dto.getUrl());
+                    foto.setInserzione(inserzione);
+                    return foto;
+                })
+                .toList();
+    }
+
+    // -------------------------------------------------------------
+    // ENTITY → RESPONSE COMPLETA
+    // -------------------------------------------------------------
     public InserzioneResponse toInserzioneResponse(Inserzione inserzione) {
+        if (inserzione == null) return null;
 
         InserzioneResponse response = new InserzioneResponse();
         response.setId(inserzione.getIdInserzione());
+        response.setDati(mapDati(inserzione));
+        response.setPosizione(mapPosizione(inserzione));
+        response.setFoto(mapFoto(inserzione));
+        response.setMessaggio("Inserzione caricata con successo");
 
-        // --- DATI ---
+        return response;
+    }
+
+    private DatiInserzioneResponse mapDati(Inserzione inserzione) {
+        if (inserzione == null) return null;
+
         DatiInserzioneResponse dati = new DatiInserzioneResponse();
         dati.setTitolo(inserzione.getTitolo());
         dati.setDescrizione(inserzione.getDescrizione());
@@ -65,35 +122,59 @@ public class InserzioneMap {
         dati.setPiano(inserzione.getPiano());
         dati.setAscensore(inserzione.getAscensore());
         dati.setClasseEnergetica(inserzione.getClasseEnergetica());
-        dati.setCategoria(inserzione.getCategoria().name());
 
-        response.setDati(dati);
-
-        // --- POSIZIONE ---
-        if (inserzione.getPosizione() != null) {
-            PosizioneResponse pos = new PosizioneResponse();
-            pos.setLatitudine(inserzione.getPosizione().getLatitudine());
-            pos.setLongitudine(inserzione.getPosizione().getLongitudine());
-            pos.setDescrizionePosizione(inserzione.getPosizione().getDescrizione());
-            response.setPosizione(pos);
+        if (inserzione.getCategoria() != null) {
+            dati.setCategoria(inserzione.getCategoria().name());
         }
 
-        // --- FOTO ---
-        if (inserzione.getFoto() != null) {
-            List<FotoResponse> fotoList = inserzione.getFoto()
-                    .stream()
-                    .map(f -> {
-                        FotoResponse fr = new FotoResponse();
-                        fr.setUrl(f.getUrlFoto());
-                        return fr;
-                    })
-                    .toList();
+        return dati;
+    }
 
-            response.setFoto(fotoList);
-        }
+    private PosizioneResponse mapPosizione(Inserzione inserzione) {
+        if (inserzione == null || inserzione.getPosizione() == null) return null;
 
-        response.setMessaggio("Inserzione caricata con successo");
-        return response;
+        PosizioneResponse pos = new PosizioneResponse();
+        pos.setLatitudine(inserzione.getPosizione().getLatitudine());
+        pos.setLongitudine(inserzione.getPosizione().getLongitudine());
+        pos.setDescrizionePosizione(inserzione.getPosizione().getDescrizione());
+
+        return pos;
+    }
+
+    private List<FotoResponse> mapFoto(Inserzione inserzione) {
+        if (inserzione == null || inserzione.getFoto() == null) return Collections.emptyList();
+
+        return inserzione.getFoto().stream()
+                .map(f -> {
+                    FotoResponse fr = new FotoResponse();
+                    fr.setUrl(f.getUrlFoto());
+                    return fr;
+                })
+                .toList();
+    }
+
+    // -------------------------------------------------------------
+    // CARD RESPONSE (LISTA)
+    // -------------------------------------------------------------
+    public InserzioneCardResponse toCardResponse(Inserzione inserzione) {
+        if (inserzione == null) return null;
+
+        InserzioneCardResponse card = new InserzioneCardResponse();
+        card.setIdInserzione(inserzione.getIdInserzione());
+        card.setTitolo(inserzione.getTitolo());
+        card.setPrezzo(inserzione.getPrezzo());
+        card.setDimensioni(inserzione.getDimensioni());
+        card.setNumero_stanze(inserzione.getNumeroStanze());
+
+        String fotoPrincipale =
+                (inserzione.getFoto() != null && !inserzione.getFoto().isEmpty())
+                        ? inserzione.getFoto().get(0).getUrlFoto()
+                        : null;
+
+        card.setFotoPrincipale(fotoPrincipale);
+
+        return card;
     }
 }
+
 

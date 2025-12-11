@@ -33,5 +33,11 @@ build/
 .vscode/
 
 
-src/main/resources/gcp/*.json
+# Google Cloud service account credentials
+src/main/resources/*.json
+src/main/resources/**/*.json
+*.json
 
+# Specifico per sicurezza:
+src/main/resources/gcp/
+src/main/resources/gcp/*.json

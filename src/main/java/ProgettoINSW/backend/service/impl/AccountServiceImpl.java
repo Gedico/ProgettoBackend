@@ -172,4 +172,13 @@ public class AccountServiceImpl implements AccountService {
         return response;
     }
 
+
+    @Override
+    public Account getAccountByMail(String mail) {
+        return accountRepository.findByMailIgnoreCase(mail)
+                .orElseThrow(() -> new BusinessException("Account non trovato"));
+    }
+
+
+
 }

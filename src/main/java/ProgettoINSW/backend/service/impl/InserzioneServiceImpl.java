@@ -5,6 +5,7 @@ import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
+import ProgettoINSW.backend.exception.BusinessException;
 import ProgettoINSW.backend.mapper.InserzioneMap;
 import ProgettoINSW.backend.model.*;
 import ProgettoINSW.backend.model.enums.Categoria;
@@ -38,6 +39,7 @@ public class InserzioneServiceImpl implements InserzioneService {
     private final FotoService fotoService;
     private final AgenteService agenteService;
     private final PosizioneService posizioneService;
+    private final AccountService accountService;
 
 
     /*********CREA INSERZIONE*************************************************************************************************************/
@@ -157,32 +159,56 @@ public class InserzioneServiceImpl implements InserzioneService {
                 .toList();
     }
 
+    @Override
+    public List<InserzioneCardResponse> getInserzioniPerAgente(String token) {
 
-/*****ELIMINA INSERZIONI**********************************************************************************************************************/
+
+        final Long idAgente = agenteService.getAgenteFromToken(token).getIdAgente();
+
+        final List<Inserzione> inserzioni = inserzioneRepository.findByAgente_IdAgente(idAgente);
+
+        return inserzioni.stream()
+                .map(map::toCardResponse)
+                .toList();
+    }
+
+
+
+
+
+    /*****ELIMINA INSERZIONI**********************************************************************************************************************/
 
 
     @Override
-    public void eliminaInserzione(Long id, String token) {
-        String mailAgente = JwtUtil.extractMail(token);
+    public void eliminaInserzione(final Long id, final String token) {
 
-        Inserzione inserzione = inserzioneRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Inserzione non trovato"));
+        // 1. Estrai email dal token
+        final String mailAgente = JwtUtil.extractMail(token);
 
-        Account accountRichiedente = agenteService.getAccountFromToken(token);
+        // 2. Recupera account tramite service
+        final Account accountRichiedente = accountService.getAccountByMail(mailAgente);
 
-        boolean isAdmin = accountRichiedente.getRuolo().equals(Role.ADMIN);
-        boolean isProprietario = inserzione.getAgente().getAccount().getMail().equalsIgnoreCase(mailAgente);
+        // 3. Recupera inserzione
+        final Inserzione inserzione = inserzioneRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Inserzione non trovata"));
+
+        // 4. Controllo permessi
+        final boolean isAdmin = accountRichiedente.getRuolo().equals(Role.ADMIN);
+        final boolean isProprietario =
+                inserzione.getAgente().getAccount().getMail().equalsIgnoreCase(mailAgente);
 
         if (!isAdmin && !isProprietario) {
-            throw new RuntimeException("Non puoi eliminare un'inserzione che non hai pubblicato");
+            throw new BusinessException("Non puoi eliminare un'inserzione che non hai pubblicato");
         }
 
+        // 5. Elimina
         inserzioneRepository.delete(inserzione);
     }
 
 
 
-/*******FUNZIONI AUSILIARi*****************************************************************************************************************/
+
+    /*******FUNZIONI AUSILIARi*****************************************************************************************************************/
 
     @Override
     public void cambiaStato(Long id, String token, String nuovoStato) {
