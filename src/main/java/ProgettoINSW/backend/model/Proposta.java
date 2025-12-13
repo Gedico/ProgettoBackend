@@ -1,5 +1,6 @@
 package ProgettoINSW.backend.model;
 import ProgettoINSW.backend.model.enums.StatoProposta;
+import ProgettoINSW.backend.model.enums.TipoProponente;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -31,6 +32,14 @@ public class Proposta {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_agente", nullable = false)
     private Agente agente;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "proponente", nullable = false)
+    private TipoProponente proponente; // UTENTE o AGENTE
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_proposta_precedente")
+    private Proposta propostaPrecedente;
 
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)

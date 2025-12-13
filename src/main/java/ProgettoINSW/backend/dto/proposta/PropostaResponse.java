@@ -1,6 +1,7 @@
 package ProgettoINSW.backend.dto.proposta;
 
 import ProgettoINSW.backend.model.enums.StatoProposta;
+import ProgettoINSW.backend.model.enums.TipoProponente;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,10 +13,24 @@ import java.time.OffsetDateTime;
 @Setter
 public class PropostaResponse {
     private Long idProposta;
+
+    // Inserzione
+    private Long idInserzione;
     private String titoloInserzione;
-    private BigDecimal importo;
     private BigDecimal prezzoInserzione;
+
+    // Importo e stato
+    private BigDecimal importo;
     private StatoProposta stato;
     private OffsetDateTime dataCreazione;
-    private String messaggio; //nel caso feedback
+
+    // Proponente
+    private TipoProponente proponente;
+    private Long idUtente;
+    private Long idAgente;
+
+    // Controproposta
+    private Long idPropostaPrecedente;  // null se è la prima
+    private String messaggio;           // eventuale commento / feedback
+
 }

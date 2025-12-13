@@ -5,6 +5,7 @@ import ProgettoINSW.backend.mapper.PropostaMap;
 import ProgettoINSW.backend.model.*;
 import ProgettoINSW.backend.model.enums.StatoInserzione;
 import ProgettoINSW.backend.model.enums.StatoProposta;
+import ProgettoINSW.backend.model.enums.TipoProponente;
 import ProgettoINSW.backend.repository.*;
 import ProgettoINSW.backend.service.PropostaService;
 import ProgettoINSW.backend.util.JwtUtil;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.math.RoundingMode;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -71,11 +74,17 @@ public class PropostaServiceImpl implements PropostaService {
             ContropropostaRequest request,
             String token) {
 
+
         Agente agente = getAgenteFromToken(token);
         Proposta propostaOriginale = getPropostaOrThrow(idProposta);
 
         verificaAgenteAutorizzato(propostaOriginale, agente);
         verificaPropostaModificabile(propostaOriginale);
+
+        validaPrezzoProposta(
+                request.getNuovoPrezzo(),
+                propostaOriginale.getInserzione()
+        );
 
         propostaOriginale.setStato(StatoProposta.RIFIUTATA);
         propostaRepository.save(propostaOriginale);
@@ -95,6 +104,8 @@ public class PropostaServiceImpl implements PropostaService {
         Utente utente = getUtenteFromToken(token);
         Inserzione inserzione = getInserzioneDisponibile(request.getIdInserzione());
 
+        validaPrezzoProposta(request.getPrezzoProposta(), inserzione);
+
         if (propostaRepository.existsByClienteAndInserzione(utente, inserzione)) {
             throw new IllegalStateException("Hai già inviato una proposta per questa inserzione");
         }
@@ -106,6 +117,8 @@ public class PropostaServiceImpl implements PropostaService {
         proposta.setPrezzoProposta(request.getPrezzoProposta());
         proposta.setNote(request.getNote());
         proposta.setStato(StatoProposta.IN_ATTESA);
+        proposta.setProponente(TipoProponente.UTENTE);
+        proposta.setPropostaPrecedente(null);
         proposta.setDataProposta(OffsetDateTime.now());
 
         propostaRepository.save(proposta);
@@ -165,7 +178,7 @@ public class PropostaServiceImpl implements PropostaService {
     }
 
     /* =========================
-       METODI PRIVATI (SONAR)
+       METODI PRIVATI
        ========================= */
 
     private Agente getAgenteFromToken(String token) {
@@ -229,7 +242,7 @@ public class PropostaServiceImpl implements PropostaService {
     }
 
     private void verificaPropostaModificabile(Proposta proposta) {
-        if (proposta.getStato() != StatoProposta.IN_ATTESA) {
+        if (proposta.getStato() == StatoProposta.ACCETTATA || proposta.getStato() == StatoProposta.RIFIUTATA) {
             throw new IllegalStateException("La proposta non è modificabile");
         }
     }
@@ -260,8 +273,38 @@ public class PropostaServiceImpl implements PropostaService {
         p.setAgente(agente);
         p.setPrezzoProposta(request.getNuovoPrezzo());
         p.setNote(request.getNote());
+
         p.setStato(StatoProposta.CONTROPROPOSTA);
+        p.setProponente(TipoProponente.AGENTE);
+        p.setPropostaPrecedente(originale);
+
         p.setDataProposta(OffsetDateTime.now());
         return p;
     }
+
+    private void validaPrezzoProposta(BigDecimal prezzoProposto, Inserzione inserzione) {
+
+        if (prezzoProposto == null) {
+            throw new IllegalArgumentException("Il prezzo non può essere nullo");
+        }
+
+        if (prezzoProposto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Il prezzo deve essere maggiore di zero");
+        }
+
+        BigDecimal prezzoInserzione = inserzione.getPrezzo();
+
+        // minimo accettato = prezzo - 15%
+        BigDecimal minimoAccettato = prezzoInserzione
+                .multiply(new BigDecimal("0.85"))
+                .setScale(2, RoundingMode.HALF_UP);
+
+        if (prezzoProposto.compareTo(minimoAccettato) < 0) {
+            throw new IllegalArgumentException(
+                    "L'importo offerto è inferiore al minimo accettato (" +
+                            minimoAccettato + " €)"
+            );
+        }
+    }
+
 }

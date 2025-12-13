@@ -28,10 +28,12 @@ public interface PropostaService {
     PropostaResponse creaControproposta(Long idProposta, ContropropostaRequest request, String token);
     PropostaResponse aggiornaStatoProposta(Long id, AggiornaStatoPropostaRequest request, String token);
 
+
     /* =========================
        ELIMINAZIONE
        ========================= */
 
     void eliminaProposta(Long idProposta, String token);
+
 }
 
