@@ -1,9 +1,6 @@
 package ProgettoINSW.backend.service.impl;
-import ProgettoINSW.backend.dto.proposta.AggiornaStatoPropostaRequest;
-import ProgettoINSW.backend.dto.proposta.PropostaResponse;
-import ProgettoINSW.backend.dto.proposta.PropostaRequest;
-import ProgettoINSW.backend.repository.UtenteRepository;
-import java.time.OffsetDateTime;
+
+import ProgettoINSW.backend.dto.proposta.*;
 import ProgettoINSW.backend.mapper.PropostaMap;
 import ProgettoINSW.backend.model.*;
 import ProgettoINSW.backend.model.enums.StatoInserzione;
@@ -13,18 +10,26 @@ import ProgettoINSW.backend.service.PropostaService;
 import ProgettoINSW.backend.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
- @RequiredArgsConstructor
+@RequiredArgsConstructor
 public class PropostaServiceImpl implements PropostaService {
+
     private final PropostaRepository propostaRepository;
     private final AccountRepository accountRepository;
     private final AgenteRepository agenteRepository;
-    private final PropostaMap propostaMap;
-    private final InserzioneRepository inserzioneRepository;
     private final UtenteRepository utenteRepository;
+    private final InserzioneRepository inserzioneRepository;
+    private final PropostaMap propostaMap;
+
+    /* =========================
+       METODI PUBBLICI
+       ========================= */
 
     @Override
     public List<PropostaResponse> getProposteAgente(String token) {
@@ -37,99 +42,63 @@ public class PropostaServiceImpl implements PropostaService {
     }
 
     @Override
-    public PropostaResponse aggiornaStatoProposta(Long id, AggiornaStatoPropostaRequest request, String token) {
+    public PropostaResponse aggiornaStatoProposta(
+            Long id,
+            AggiornaStatoPropostaRequest request,
+            String token) {
 
-        String mail = JwtUtil.extractMail(token);
+        Agente agente = getAgenteFromToken(token);
+        Proposta proposta = getPropostaOrThrow(id);
 
-        Account account = accountRepository.findByMail(mail)
-                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
+        verificaAgenteAutorizzato(proposta, agente);
 
-        Agente agente = agenteRepository.findByAccount(account)
-                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mail));
-
-        Proposta proposta = propostaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Proposta non trovata con ID: " + id));
-
-        if (!proposta.getInserzione().getAgente().getIdAgente().equals(agente.getIdAgente())) {
-            throw new SecurityException("Non sei autorizzato a modificare questa Proposta.");
-        }
-
-        StatoProposta nuovoStato = request.getNuovoStato();
-        proposta.setStato(nuovoStato);
+        proposta.setStato(request.getNuovoStato());
         propostaRepository.save(proposta);
 
-        if (nuovoStato == StatoProposta.ACCETTATA) {
-            Inserzione inserzione = proposta.getInserzione();
-
-            inserzione.setStato(StatoInserzione.VENDUTO);
-            inserzioneRepository.save(inserzione);
-
-            List<Proposta> altreProposte = propostaRepository.findAltreProposteByInserzione(inserzione, proposta.getIdProposta());
-            for (Proposta altra : altreProposte) {
-                if (altra.getStato() == StatoProposta.IN_ATTESA) {
-                    altra.setStato(StatoProposta.RIFIUTATA);
-                    propostaRepository.save(altra);
-                }
-            }
+        if (request.getNuovoStato() == StatoProposta.ACCETTATA) {
+            gestisciAccettazioneProposta(proposta);
         }
 
-        // Se la proposta è RIFIUTATA → non si cambia lo stato dell'inserzione (rimane DISPONIBILE)
-        // Non serve fare nulla in questo caso
-
-        return propostaMap.toPropostaResponse(proposta, "Stato proposta aggiornato con successo");
-
+        return propostaMap.toPropostaResponse(
+                proposta,
+                "Stato proposta aggiornato con successo"
+        );
     }
 
     @Override
-    public PropostaResponse mostraDettagliProposta(Long idProposta, String token) {
+    public PropostaResponse creaControproposta(
+            Long idProposta,
+            ContropropostaRequest request,
+            String token) {
 
-        Proposta proposta = propostaRepository.findById(idProposta).
-                orElseThrow(() -> new EntityNotFoundException("Inserzione con ID " + idProposta + " non trovato."));
+        Agente agente = getAgenteFromToken(token);
+        Proposta propostaOriginale = getPropostaOrThrow(idProposta);
 
-        String mailAgente = JwtUtil.extractMail(token);
+        verificaAgenteAutorizzato(propostaOriginale, agente);
+        verificaPropostaModificabile(propostaOriginale);
 
-        Account account = accountRepository.findByMail(mailAgente)
-                .orElseThrow(() -> new EntityNotFoundException("account con mail:." + mailAgente+" non esiste. "));
+        propostaOriginale.setStato(StatoProposta.RIFIUTATA);
+        propostaRepository.save(propostaOriginale);
 
-        Agente agente = agenteRepository.findByAccount(account)
-                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mailAgente));
+        Proposta controproposta = creaNuovaControproposta(propostaOriginale, agente, request);
+        propostaRepository.save(controproposta);
 
-        if(!proposta.getAgente().getIdAgente().equals(agente.getIdAgente())){
-            throw  new RuntimeException("Non puoi visualizzare una proposta che non appartiene alle tue ");
-        }
-
-
-        return propostaMap.toPropostaResponse(proposta,null);
+        return propostaMap.toPropostaResponse(
+                controproposta,
+                "Controproposta inviata con successo"
+        );
     }
 
     @Override
     public PropostaResponse inviaProposta(PropostaRequest request, String token) {
 
-        // Recupero mail utente autenticato
-        String mail = JwtUtil.extractMail(token);
+        Utente utente = getUtenteFromToken(token);
+        Inserzione inserzione = getInserzioneDisponibile(request.getIdInserzione());
 
-        Account account = accountRepository.findByMail(mail)
-                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
-
-        Utente utente = utenteRepository.findByAccount_Id(account.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato per l'account: " + mail));
-
-        // Recupero inserzione
-        Inserzione inserzione = inserzioneRepository.findById(request.getIdInserzione())
-                .orElseThrow(() -> new EntityNotFoundException("Inserzione non trovata con ID: " + request.getIdInserzione()));
-
-        // Controllo disponibilità
-        if (inserzione.getStato() != StatoInserzione.DISPONIBILE) {
-            throw new RuntimeException("Non è possibile fare proposte su un'inserzione non disponibile.");
+        if (propostaRepository.existsByClienteAndInserzione(utente, inserzione)) {
+            throw new IllegalStateException("Hai già inviato una proposta per questa inserzione");
         }
 
-        // (Facoltativo) controllo se l'utente ha già inviato una proposta per la stessa inserzione
-        boolean esisteGia = propostaRepository.existsByClienteAndInserzione(utente, inserzione);
-        if (esisteGia) {
-            throw new RuntimeException("Hai già inviato una proposta per questa inserzione.");
-        }
-
-        // Creazione proposta
         Proposta proposta = new Proposta();
         proposta.setInserzione(inserzione);
         proposta.setCliente(utente);
@@ -139,57 +108,95 @@ public class PropostaServiceImpl implements PropostaService {
         proposta.setStato(StatoProposta.IN_ATTESA);
         proposta.setDataProposta(OffsetDateTime.now());
 
-        // Salvataggio nel DB
         propostaRepository.save(proposta);
 
-        // Uso del tuo mapper per creare la risposta
-        return propostaMap.toPropostaResponse(proposta, "Proposta inviata con successo.");
+        return propostaMap.toPropostaResponse(
+                proposta,
+                "Proposta inviata con successo"
+        );
     }
-
 
     @Override
     public void eliminaProposta(Long idProposta, String token) {
 
-        // 1️⃣ Recupera la mail dal token
-        String mail = JwtUtil.extractMail(token);
+        Utente utente = getUtenteFromToken(token);
+        Proposta proposta = getPropostaOrThrow(idProposta);
 
-        // 2️⃣ Trova account e utente associato
-        Account account = accountRepository.findByMail(mail)
-                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
-
-        Utente utente = utenteRepository.findByAccount_Id(account.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato per l'account: " + mail));
-
-        // 3️⃣ Recupera la proposta da eliminare
-        Proposta proposta = propostaRepository.findById(idProposta)
-                .orElseThrow(() -> new EntityNotFoundException("Proposta non trovata con ID: " + idProposta));
-
-        // 4️⃣ Verifica che la proposta appartenga all’utente autenticato
         if (!proposta.getCliente().getIdUtente().equals(utente.getIdUtente())) {
-            throw new SecurityException("Non sei autorizzato a eliminare questa proposta.");
+            throw new AccessDeniedException("Non sei autorizzato a eliminare questa proposta");
         }
 
-        // 5️⃣ Può eliminarla solo se è ancora in attesa
-        if (proposta.getStato() != StatoProposta.IN_ATTESA) {
-            throw new IllegalStateException("Non è possibile eliminare una proposta già accettata o rifiutata.");
-        }
-
-        // 6️⃣ Eliminazione dal database
+        verificaPropostaModificabile(proposta);
         propostaRepository.delete(proposta);
     }
 
+    @Override
+    public PropostaResponse mostraDettagliProposta(Long idProposta, String token) {
 
-    //Metodi Utili
-/******************************************************************************************************************/
+        Agente agente = getAgenteFromToken(token);
+        Proposta proposta = getPropostaOrThrow(idProposta);
+
+        verificaAgenteAutorizzato(proposta, agente);
+
+        return propostaMap.toPropostaResponse(proposta, null);
+    }
+
+    @Override
+    public List<PropostaResponse> getProposteAgenteRegistro(String token) {
+
+        Agente agente = getAgenteFromToken(token);
+
+        return propostaRepository.findByAgente(agente).stream()
+                .filter(p -> p.getStato() == StatoProposta.ACCETTATA
+                        || p.getStato() == StatoProposta.RIFIUTATA)
+                .map(p -> propostaMap.toPropostaResponse(p, null))
+                .toList();
+    }
+
+    @Override
+    public List<PropostaResponse> getProposteUtente(String token) {
+
+        Utente utente = getUtenteFromToken(token);
+
+        return propostaRepository.findByCliente_IdUtente(utente.getIdUtente())
+                .stream()
+                .map(p -> propostaMap.toPropostaResponse(p, null))
+                .toList();
+    }
+
+    /* =========================
+       METODI PRIVATI (SONAR)
+       ========================= */
+
+    private Agente getAgenteFromToken(String token) {
+        Account account = getAccountFromToken(token);
+        return agenteRepository.findByAccount(account)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Agente non trovato per account"));
+    }
+
+    private Utente getUtenteFromToken(String token) {
+        Account account = getAccountFromToken(token);
+        return utenteRepository.findByAccount_Id(account.getId())
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Utente non trovato per account"));
+    }
+
+    private Account getAccountFromToken(String token) {
+        String mail = JwtUtil.extractMail(token);
+        return accountRepository.findByMail(mail)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Account non trovato per mail: " + mail));
+    }
+
+    private Proposta getPropostaOrThrow(Long id) {
+        return propostaRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Proposta non trovata con ID: " + id));
+    }
 
     private List<PropostaResponse> getProposteAgenteByStato(String token, StatoProposta stato) {
-        String mail = JwtUtil.extractMail(token);
-
-        Account account = accountRepository.findByMail(mail)
-                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per l'email: " + mail));
-
-        Agente agente = agenteRepository.findByAccount(account)
-                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato per l'account: " + mail));
+        Agente agente = getAgenteFromToken(token);
 
         List<Proposta> offerte;
         if (stato == null) {
@@ -198,66 +205,63 @@ public class PropostaServiceImpl implements PropostaService {
             offerte = propostaRepository.findByAgenteAndStato(agente.getIdAgente(), stato);
         }
 
-        return mapToResponseList(offerte);
-    }
-
-    @Override
-    public List<PropostaResponse> getProposteAgenteRegistro(String token) {
-
-        String mail = JwtUtil.extractMail(token);
-
-        Account account = accountRepository.findByMail(mail)
-                .orElseThrow(() -> new EntityNotFoundException("Account non trovato"));
-
-        Agente agente = agenteRepository.findByAccount(account)
-                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato"));
-
-        List<Proposta> proposte =
-                propostaRepository.findByAgente(agente).stream()
-                        .filter(p -> p.getStato() == StatoProposta.ACCETTATA ||
-                                p.getStato() == StatoProposta.RIFIUTATA)
-                        .toList();
-
-        return mapToResponseList(proposte);
-    }
-
-
-    private List<PropostaResponse> mapToResponseList(List<Proposta> offerte) {
         return offerte.stream()
-                .map(o -> {
-                    PropostaResponse dto = new PropostaResponse();
-                    dto.setIdProposta(o.getIdProposta());
-                    dto.setTitoloInserzione(o.getInserzione().getTitolo());
-                    dto.setImporto(o.getPrezzoProposta());
-                    dto.setStato(o.getStato());
-                    dto.setDataCreazione(o.getDataProposta());
-                    return dto;
-                })
-                .toList();
-    }
-
-    @Override
-    public List<PropostaResponse> getProposteUtente(String token) {
-
-        // 1) recupera mail dal JWT
-        String mail = JwtUtil.extractMail(token);
-
-        // 2) recupera account dalla mail
-        Account account = accountRepository.findByMail(mail)
-                .orElseThrow(() -> new EntityNotFoundException("Account non trovato per mail: " + mail));
-
-        // 3) recupera utente legato all'account
-        Utente utente = utenteRepository.findByAccount_Id(account.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato per account: " + account.getId()));
-
-        // 4) recupera tutte le proposte fatte da quell’utente
-        List<Proposta> proposte = propostaRepository.findByCliente_IdUtente(utente.getIdUtente());
-
-        // 5) mappa in response
-        return proposte.stream()
                 .map(p -> propostaMap.toPropostaResponse(p, null))
                 .toList();
     }
 
 
+    private Inserzione getInserzioneDisponibile(Long idInserzione) {
+        Inserzione inserzione = inserzioneRepository.findById(idInserzione)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Inserzione non trovata"));
+
+        if (inserzione.getStato() != StatoInserzione.DISPONIBILE) {
+            throw new IllegalStateException("Inserzione non disponibile");
+        }
+        return inserzione;
+    }
+
+    private void verificaAgenteAutorizzato(Proposta proposta, Agente agente) {
+        if (!proposta.getAgente().getIdAgente().equals(agente.getIdAgente())) {
+            throw new AccessDeniedException("Operazione non autorizzata");
+        }
+    }
+
+    private void verificaPropostaModificabile(Proposta proposta) {
+        if (proposta.getStato() != StatoProposta.IN_ATTESA) {
+            throw new IllegalStateException("La proposta non è modificabile");
+        }
+    }
+
+    private void gestisciAccettazioneProposta(Proposta proposta) {
+        Inserzione inserzione = proposta.getInserzione();
+        inserzione.setStato(StatoInserzione.VENDUTO);
+        inserzioneRepository.save(inserzione);
+
+        propostaRepository
+                .findAltreProposteByInserzione(inserzione, proposta.getIdProposta())
+                .forEach(p -> {
+                    if (p.getStato() == StatoProposta.IN_ATTESA) {
+                        p.setStato(StatoProposta.RIFIUTATA);
+                        propostaRepository.save(p);
+                    }
+                });
+    }
+
+    private Proposta creaNuovaControproposta(
+            Proposta originale,
+            Agente agente,
+            ContropropostaRequest request) {
+
+        Proposta p = new Proposta();
+        p.setInserzione(originale.getInserzione());
+        p.setCliente(originale.getCliente());
+        p.setAgente(agente);
+        p.setPrezzoProposta(request.getNuovoPrezzo());
+        p.setNote(request.getNote());
+        p.setStato(StatoProposta.CONTROPROPOSTA);
+        p.setDataProposta(OffsetDateTime.now());
+        return p;
+    }
 }

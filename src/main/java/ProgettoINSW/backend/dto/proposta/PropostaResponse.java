@@ -14,6 +14,7 @@ public class PropostaResponse {
     private Long idProposta;
     private String titoloInserzione;
     private BigDecimal importo;
+    private BigDecimal prezzoInserzione;
     private StatoProposta stato;
     private OffsetDateTime dataCreazione;
     private String messaggio; //nel caso feedback

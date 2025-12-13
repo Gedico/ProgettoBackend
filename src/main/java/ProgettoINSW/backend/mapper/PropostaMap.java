@@ -10,6 +10,7 @@ public class PropostaMap {
         PropostaResponse dto = new PropostaResponse();
         dto.setIdProposta(entity.getIdProposta());
         dto.setImporto(entity.getPrezzoProposta());
+        dto.setPrezzoInserzione(entity.getInserzione().getPrezzo());
         dto.setStato(entity.getStato());
         dto.setTitoloInserzione(entity.getInserzione().getTitolo());
         dto.setDataCreazione(entity.getDataProposta());
