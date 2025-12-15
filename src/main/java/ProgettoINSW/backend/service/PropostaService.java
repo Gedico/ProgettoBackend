@@ -1,9 +1,6 @@
 package ProgettoINSW.backend.service;
 
-import ProgettoINSW.backend.dto.proposta.AggiornaStatoPropostaRequest;
-import ProgettoINSW.backend.dto.proposta.ContropropostaRequest;
-import ProgettoINSW.backend.dto.proposta.PropostaRequest;
-import ProgettoINSW.backend.dto.proposta.PropostaResponse;
+import ProgettoINSW.backend.dto.proposta.*;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 
 import java.util.List;
@@ -28,6 +25,7 @@ public interface PropostaService {
     PropostaResponse creaControproposta(Long idProposta, ContropropostaRequest request, String token);
     PropostaResponse aggiornaStatoProposta(Long id, AggiornaStatoPropostaRequest request, String token);
 
+    PropostaResponse creaPropostaManuale(Long idInserzione, PropostaManualeRequest request, String token);
 
     /* =========================
        ELIMINAZIONE

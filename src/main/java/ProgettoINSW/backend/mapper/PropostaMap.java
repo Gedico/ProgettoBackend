@@ -2,6 +2,7 @@ package ProgettoINSW.backend.mapper;
 
 import ProgettoINSW.backend.dto.proposta.PropostaResponse;
 import ProgettoINSW.backend.model.Proposta;
+import ProgettoINSW.backend.model.enums.TipoProposta;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,8 +27,18 @@ public class PropostaMap {
 
         // Proponente
         dto.setProponente(entity.getProponente());
-        dto.setIdUtente(entity.getCliente().getIdUtente());
         dto.setIdAgente(entity.getAgente().getIdAgente());
+
+        // SOLO SE ONLINE
+        if (entity.getCliente() != null) {
+            dto.setIdUtente(entity.getCliente().getIdUtente());
+        }
+
+        // SOLO SE MANUALE
+        if (entity.getTipo() == TipoProposta.MANUALE) {
+            dto.setNomeCliente(entity.getNomeCliente());
+            dto.setContattoCliente(entity.getContattoCliente());
+        }
 
         // Controproposta
         if (entity.getPropostaPrecedente() != null) {
@@ -36,10 +47,9 @@ public class PropostaMap {
             );
         }
 
-        // Messaggio opzionale
+        dto.setTipo(entity.getTipo());
         dto.setMessaggio(messaggio);
 
         return dto;
     }
 }
-

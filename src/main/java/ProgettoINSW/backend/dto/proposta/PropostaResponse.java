@@ -2,6 +2,7 @@ package ProgettoINSW.backend.dto.proposta;
 
 import ProgettoINSW.backend.model.enums.StatoProposta;
 import ProgettoINSW.backend.model.enums.TipoProponente;
+import ProgettoINSW.backend.model.enums.TipoProposta;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,7 +28,10 @@ public class PropostaResponse {
     // Proponente
     private TipoProponente proponente;
     private Long idUtente;
+    private String nomeCliente;  //solo manuale
+    private String contattoCliente;
     private Long idAgente;
+    private TipoProposta tipo;
 
     // Controproposta
     private Long idPropostaPrecedente;  // null se è la prima

@@ -1,9 +1,6 @@
 package ProgettoINSW.backend.controller;
 
-import ProgettoINSW.backend.dto.proposta.AggiornaStatoPropostaRequest;
-import ProgettoINSW.backend.dto.proposta.ContropropostaRequest;
-import ProgettoINSW.backend.dto.proposta.PropostaRequest;
-import ProgettoINSW.backend.dto.proposta.PropostaResponse;
+import ProgettoINSW.backend.dto.proposta.*;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 import ProgettoINSW.backend.service.PropostaService;
 import jakarta.validation.Valid;
@@ -30,7 +27,7 @@ public class PropostaController {
     }
 
     /* =========================
-       PROPOSTE AGENTE
+       PROPOSTE AGENTE (manuale e online)
        ========================= */
 
     @GetMapping
@@ -96,6 +93,23 @@ public class PropostaController {
                 propostaService.creaControproposta(id, request, extractToken(authHeader))
         );
     }
+
+    @PostMapping("/inserzioni/{idInserzione}/manuale")
+    @PreAuthorize("hasRole('AGENTE')")
+    public ResponseEntity<PropostaResponse> creaPropostaManuale(
+            @PathVariable Long idInserzione,
+            @RequestBody @Valid PropostaManualeRequest request,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        return ResponseEntity.ok(
+                propostaService.creaPropostaManuale(
+                        idInserzione,
+                        request,
+                        extractToken(authHeader)
+                )
+        );
+    }
+
 
     /* =========================
        PROPOSTE UTENTE

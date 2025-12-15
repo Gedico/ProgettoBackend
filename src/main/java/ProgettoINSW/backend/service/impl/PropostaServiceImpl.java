@@ -6,6 +6,7 @@ import ProgettoINSW.backend.model.*;
 import ProgettoINSW.backend.model.enums.StatoInserzione;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 import ProgettoINSW.backend.model.enums.TipoProponente;
+import ProgettoINSW.backend.model.enums.TipoProposta;
 import ProgettoINSW.backend.repository.*;
 import ProgettoINSW.backend.service.PropostaService;
 import ProgettoINSW.backend.util.JwtUtil;
@@ -306,5 +307,46 @@ public class PropostaServiceImpl implements PropostaService {
             );
         }
     }
+
+    @Override
+    public PropostaResponse creaPropostaManuale(
+            Long idInserzione,
+            PropostaManualeRequest request,
+            String token
+    ) {
+
+        Agente agente = getAgenteFromToken(token);
+        Inserzione inserzione = getInserzioneDisponibile(idInserzione);
+
+        // riuso la validazione prezzo già esistente
+        validaPrezzoProposta(request.getPrezzoProposta(), inserzione);
+
+        Proposta proposta = new Proposta();
+        proposta.setInserzione(inserzione);
+        proposta.setAgente(agente);
+        proposta.setCliente(null); // OFFLINE
+        proposta.setPrezzoProposta(request.getPrezzoProposta());
+        proposta.setNote(request.getNote());
+
+        // campi specifici OFFLINE
+        proposta.setNomeCliente(request.getNomeCliente());
+        proposta.setContattoCliente(request.getContattoCliente());
+
+        proposta.setStato(StatoProposta.IN_ATTESA);
+        proposta.setProponente(TipoProponente.AGENTE);
+        proposta.setTipo(TipoProposta.MANUALE);
+        proposta.setPropostaPrecedente(null);
+        proposta.setDataProposta(OffsetDateTime.now());
+
+        propostaRepository.save(proposta);
+
+        return propostaMap.toPropostaResponse(
+                proposta,
+                "Proposta manuale inserita con successo"
+        );
+    }
+
+
+
 
 }

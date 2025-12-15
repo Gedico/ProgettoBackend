@@ -1,6 +1,7 @@
 package ProgettoINSW.backend.model;
 import ProgettoINSW.backend.model.enums.StatoProposta;
 import ProgettoINSW.backend.model.enums.TipoProponente;
+import ProgettoINSW.backend.model.enums.TipoProposta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -25,9 +26,15 @@ public class Proposta {
     @JoinColumn(name = "id_inserzione", nullable = false)
     private Inserzione inserzione;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id_cliente", nullable = false)
-    private Utente cliente;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cliente")
+    private Utente cliente; //null se manuale
+
+    @Column(name = "nome_cliente")
+    private String nomeCliente; // solo MANUALE
+
+    @Column(name = "contatto_cliente")
+    private String contattoCliente; // solo MANUALE
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_agente", nullable = false)
@@ -36,6 +43,10 @@ public class Proposta {
     @Enumerated(EnumType.STRING)
     @Column(name = "proponente", nullable = false)
     private TipoProponente proponente; // UTENTE o AGENTE
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
+    private TipoProposta tipo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_proposta_precedente")
@@ -82,4 +93,17 @@ public class Proposta {
                 ", dataProposta=" + dataProposta +
                 '}';
     }
+
+
+    @AssertTrue(message = "Coerenza dati proposta non valida")
+    public boolean isPropostaValida() {
+        if (tipo == TipoProposta.MANUALE) {
+            return cliente == null && nomeCliente != null && contattoCliente != null;
+        }
+        if (tipo == TipoProposta.ONLINE) {
+            return cliente != null;
+        }
+        return true;
+    }
+
 }
