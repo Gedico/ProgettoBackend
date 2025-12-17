@@ -29,9 +29,7 @@ public class CloudStorageServiceImpl implements CloudStorageService {
     }
 
     @Override
-    public String uploadFile(MultipartFile file) throws IOException {
-
-        String objectName = "dietiestate25/Inserzioni/" + file.getOriginalFilename();
+    public String uploadFile(MultipartFile file, String objectName) throws IOException {
 
         BlobId blobId = BlobId.of(bucketName, objectName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
@@ -42,6 +40,7 @@ public class CloudStorageServiceImpl implements CloudStorageService {
 
         return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
     }
+
 
     @Override
     public String getPublicUrl(String filename) {

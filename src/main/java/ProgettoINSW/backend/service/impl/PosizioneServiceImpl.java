@@ -18,6 +18,8 @@ public class PosizioneServiceImpl implements PosizioneService {
         Posizione pos = new Posizione();
         pos.setLatitudine(dto.getLatitudine());
         pos.setLongitudine(dto.getLongitudine());
+        pos.setComune(dto.getComune());
+        pos.setIndirizzo(dto.getIndirizzo());
 
         return posizioneRepository.save(pos);
     }

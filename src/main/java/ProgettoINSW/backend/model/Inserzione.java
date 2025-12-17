@@ -33,6 +33,9 @@ public class Inserzione {
     @JoinColumn(name = "id_posizione", nullable = false)
     private Posizione posizione;
 
+    @OneToOne
+    @JoinColumn(name = "id_indicatore", unique = true)
+    private IndicatoreProssimita indicatore;
 
     @OneToMany(mappedBy = "inserzione", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Foto> foto = new ArrayList<>();

@@ -15,10 +15,6 @@ public class IndicatoreProssimita {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idIndicatore;
 
-    @OneToOne
-    @JoinColumn(name = "id_inserzione", nullable = false, unique = true)
-    private Inserzione inserzione;
-
     @Column(nullable = false)
     private boolean vicinoScuola;
 

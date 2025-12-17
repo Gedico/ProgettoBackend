@@ -10,5 +10,6 @@ import java.math.BigDecimal;
 public class PosizioneResponse {
     private BigDecimal latitudine;
     private BigDecimal longitudine;
-    private String descrizionePosizione;
+    private String comune;
+    private String indirizzo;
 }

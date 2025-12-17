@@ -24,20 +24,21 @@ public class Posizione {
     @Column(name = "longitudine" ,nullable = false)
     private BigDecimal longitudine;
 
-    @Column(name = "descrizione" )
-    private String descrizione;
+    @Column(nullable = false, length = 100)
+    private String comune;
 
-    //Costruttori
+    @Column(nullable = false, length = 255)
+    private String indirizzo;
 
     public Posizione() {
     }
 
-
-    public Posizione(Long idPosizione, BigDecimal latitudine, BigDecimal longitudine, String descrizione) {
-        this.idPosizione = idPosizione;
+    public Posizione(BigDecimal latitudine, BigDecimal longitudine, String comune, String indirizzo) {
         this.latitudine = latitudine;
         this.longitudine = longitudine;
-        this.descrizione = descrizione;
+        this.comune = comune;
+        this.indirizzo = indirizzo;
     }
+
 }
 

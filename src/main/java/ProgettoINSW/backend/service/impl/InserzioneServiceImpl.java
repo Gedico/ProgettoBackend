@@ -54,13 +54,13 @@ public class InserzioneServiceImpl implements InserzioneService {
         Agente agente = agenteService.getAgenteFromToken(token);
 
         Posizione posizione = posizioneService.creaPosizione(request.getPosizione());
+        IndicatoreProssimita indicatoreProssimita = indicatoreProssimitaService.generaIndicatoriPerInserzione(request);
 
-        Inserzione inserzione = map.toEntity(request, posizione, agente);
+        Inserzione inserzione = map.inserzioneToEntity(request, posizione, agente , indicatoreProssimita);
         inserzioneRepository.save(inserzione);
 
         fotoService.processImages(immagini, inserzione);
 
-        indicatoreProssimitaService.generaIndicatoriPerInserzione(inserzione);
 
         return map.toInserzioneResponse(inserzione);
     }

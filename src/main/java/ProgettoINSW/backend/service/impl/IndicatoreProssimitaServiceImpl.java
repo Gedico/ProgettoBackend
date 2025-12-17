@@ -1,8 +1,10 @@
 package ProgettoINSW.backend.service.impl;
 
 import ProgettoINSW.backend.dto.geopify.GeoapifyResponse;
+import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.model.IndicatoreProssimita;
 import ProgettoINSW.backend.model.Inserzione;
+import ProgettoINSW.backend.model.Posizione;
 import ProgettoINSW.backend.repository.IndicatoreProssimitaRepository;
 import ProgettoINSW.backend.service.GeoapifyClient;
 import ProgettoINSW.backend.service.IndicatoreProssimitaService;
@@ -17,7 +19,7 @@ public class IndicatoreProssimitaServiceImpl implements IndicatoreProssimitaServ
     private final GeoapifyClient geopify;
 
     @Override
-    public void generaIndicatoriPerInserzione(Inserzione inserzione) {
+    public IndicatoreProssimita generaIndicatoriPerInserzione(InserzioneRequest inserzione) {
 
         GeoapifyResponse response = geopify.cercaLuoghi(
                 inserzione.getPosizione().getLatitudine(),
@@ -48,12 +50,11 @@ public class IndicatoreProssimitaServiceImpl implements IndicatoreProssimitaServ
         }
 
         IndicatoreProssimita indicatore = new IndicatoreProssimita();
-        indicatore.setInserzione(inserzione);
         indicatore.setVicinoScuola(vicinoScuola);
         indicatore.setVicinoParco(vicinoParco);
         indicatore.setVicinoMezziPubblici(vicinoMezziPubblici);
 
-        indicatoreRepo.save(indicatore);
+        return indicatoreRepo.save(indicatore);
     }
 }
 

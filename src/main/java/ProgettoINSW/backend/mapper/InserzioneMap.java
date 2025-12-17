@@ -3,41 +3,43 @@ package ProgettoINSW.backend.mapper;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneResponse;
 import ProgettoINSW.backend.dto.foto.FotoResponse;
-import ProgettoINSW.backend.dto.foto.FotoRequest;
+import ProgettoINSW.backend.dto.indicatori.IndicatoreResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
-import ProgettoINSW.backend.dto.posizione.PosizioneRequest;
 import ProgettoINSW.backend.dto.posizione.PosizioneResponse;
-import ProgettoINSW.backend.model.Agente;
-import ProgettoINSW.backend.model.Foto;
-import ProgettoINSW.backend.model.Inserzione;
-import ProgettoINSW.backend.model.Posizione;
+import ProgettoINSW.backend.model.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+
 
 @Component
 public class InserzioneMap {
 
-    // -------------------------------------------------------------
-    // POSIZIONE: DTO → ENTITY
-    // -------------------------------------------------------------
-    public Posizione toPosizione(PosizioneRequest dto) {
+
+/*****************CREA ENTITY COMPLETA (REQUEST → ENTITY)****************************************************************/
+
+
+    public Inserzione inserzioneToEntity(InserzioneRequest request, Posizione posizione, Agente agente, IndicatoreProssimita indicatoreProssimita) {
+        if (request == null) return null;
+
+        DatiInserzioneRequest dto = request.getDatiInserzioneRequest();
         if (dto == null) return null;
 
-        Posizione posizione = new Posizione();
-        posizione.setLatitudine(dto.getLatitudine());
-        posizione.setLongitudine(dto.getLongitudine());
-        posizione.setDescrizione(dto.getDescrizione_posizione());
-        return posizione;
+        Inserzione inserzione = toDatiInserzione(dto);
+        inserzione.setPosizione(posizione);
+        inserzione.setAgente(agente);
+        inserzione.setIndicatore(indicatoreProssimita);
+
+        return inserzione;
     }
 
-    // -------------------------------------------------------------
-    // DATI INSERZIONE: DTO → ENTITY
-    // -------------------------------------------------------------
+
+
+/******************DATI INSERZIONE: DTO → ENTITY**********************************************************************/
+
     public Inserzione toDatiInserzione(DatiInserzioneRequest dto) {
         if (dto == null) return null;
 
@@ -58,104 +60,93 @@ public class InserzioneMap {
         return inserzione;
     }
 
-    // -------------------------------------------------------------
-    // CREA ENTITY COMPLETA (REQUEST → ENTITY)
-    // -------------------------------------------------------------
-    public Inserzione toEntity(InserzioneRequest request, Posizione posizione, Agente agente) {
-        if (request == null) return null;
 
-        DatiInserzioneRequest dto = request.getDatiInserzioneRequest();
-        if (dto == null) return null;
 
-        Inserzione inserzione = toDatiInserzione(dto);
-        inserzione.setPosizione(posizione);
-        inserzione.setAgente(agente);
 
-        return inserzione;
-    }
+/***********ENTITY → RESPONSE COMPLETA**********************************************************************************/
 
-    // -------------------------------------------------------------
-    // FOTO LIST: DTO → ENTITY LIST
-    // -------------------------------------------------------------
-    public List<Foto> toFotoList(List<FotoRequest> lista, Inserzione inserzione) {
 
-        if (lista == null || lista.isEmpty() || inserzione == null) {
-            return Collections.emptyList();
+        public InserzioneResponse toInserzioneResponse(Inserzione inserzione) {
+            if (inserzione == null) return null;
+
+            InserzioneResponse response = new InserzioneResponse();
+            response.setId(inserzione.getIdInserzione());
+            response.setDati(mapDati(inserzione));
+            response.setPosizione(mapPosizione(inserzione));
+            response.setIndicatore(mapIndicatore(inserzione.getIndicatore()));
+            response.setFoto(mapFoto(inserzione));
+            response.setMessaggio("Inserzione caricata con successo");
+
+            return response;
         }
 
-        return lista.stream()
-                .filter(Objects::nonNull)
-                .map(dto -> {
-                    Foto foto = new Foto();
-                    foto.setUrlFoto(dto.getUrl());
-                    foto.setInserzione(inserzione);
-                    return foto;
-                })
-                .toList();
-    }
 
-    // -------------------------------------------------------------
-    // ENTITY → RESPONSE COMPLETA
-    // -------------------------------------------------------------
-    public InserzioneResponse toInserzioneResponse(Inserzione inserzione) {
-        if (inserzione == null) return null;
+        private DatiInserzioneResponse mapDati(Inserzione inserzione) {
+            if (inserzione == null) return null;
 
-        InserzioneResponse response = new InserzioneResponse();
-        response.setId(inserzione.getIdInserzione());
-        response.setDati(mapDati(inserzione));
-        response.setPosizione(mapPosizione(inserzione));
-        response.setFoto(mapFoto(inserzione));
-        response.setMessaggio("Inserzione caricata con successo");
+            DatiInserzioneResponse dati = new DatiInserzioneResponse();
+            dati.setTitolo(inserzione.getTitolo());
+            dati.setDescrizione(inserzione.getDescrizione());
+            dati.setPrezzo(inserzione.getPrezzo());
+            dati.setDimensioni(inserzione.getDimensioni());
+            dati.setNumeroStanze(inserzione.getNumeroStanze());
+            dati.setPiano(inserzione.getPiano());
+            dati.setAscensore(inserzione.getAscensore());
+            dati.setClasseEnergetica(inserzione.getClasseEnergetica());
 
-        return response;
-    }
+            if (inserzione.getCategoria() != null) {
+                dati.setCategoria(inserzione.getCategoria().name());
+            }
 
-    private DatiInserzioneResponse mapDati(Inserzione inserzione) {
-        if (inserzione == null) return null;
-
-        DatiInserzioneResponse dati = new DatiInserzioneResponse();
-        dati.setTitolo(inserzione.getTitolo());
-        dati.setDescrizione(inserzione.getDescrizione());
-        dati.setPrezzo(inserzione.getPrezzo());
-        dati.setDimensioni(inserzione.getDimensioni());
-        dati.setNumeroStanze(inserzione.getNumeroStanze());
-        dati.setPiano(inserzione.getPiano());
-        dati.setAscensore(inserzione.getAscensore());
-        dati.setClasseEnergetica(inserzione.getClasseEnergetica());
-
-        if (inserzione.getCategoria() != null) {
-            dati.setCategoria(inserzione.getCategoria().name());
+            return dati;
         }
 
-        return dati;
-    }
 
-    private PosizioneResponse mapPosizione(Inserzione inserzione) {
-        if (inserzione == null || inserzione.getPosizione() == null) return null;
+        private PosizioneResponse mapPosizione(Inserzione inserzione) {
+            if (inserzione == null || inserzione.getPosizione() == null) return null;
 
-        PosizioneResponse pos = new PosizioneResponse();
-        pos.setLatitudine(inserzione.getPosizione().getLatitudine());
-        pos.setLongitudine(inserzione.getPosizione().getLongitudine());
-        pos.setDescrizionePosizione(inserzione.getPosizione().getDescrizione());
+            PosizioneResponse pos = new PosizioneResponse();
+            pos.setLatitudine(inserzione.getPosizione().getLatitudine());
+            pos.setLongitudine(inserzione.getPosizione().getLongitudine());
+            pos.setComune(inserzione.getPosizione().getComune());
+            pos.setIndirizzo(inserzione.getPosizione().getIndirizzo());
 
-        return pos;
-    }
+            return pos;
+        }
 
-    private List<FotoResponse> mapFoto(Inserzione inserzione) {
-        if (inserzione == null || inserzione.getFoto() == null) return Collections.emptyList();
 
-        return inserzione.getFoto().stream()
-                .map(f -> {
-                    FotoResponse fr = new FotoResponse();
-                    fr.setUrl(f.getUrlFoto());
-                    return fr;
-                })
-                .toList();
-    }
+        private List<FotoResponse> mapFoto(Inserzione inserzione) {
+            if (inserzione == null || inserzione.getFoto() == null) return Collections.emptyList();
 
-    // -------------------------------------------------------------
-    // CARD RESPONSE (LISTA)
-    // -------------------------------------------------------------
+            return inserzione.getFoto().stream()
+                    .map(f -> {
+                        FotoResponse fr = new FotoResponse();
+                        fr.setUrl(f.getUrlFoto());
+                        return fr;
+                    })
+                    .toList();
+        }
+
+
+        private IndicatoreResponse mapIndicatore(IndicatoreProssimita indicatore) {
+
+            if (indicatore == null) {
+                return null;
+            }
+
+            IndicatoreResponse dto = new IndicatoreResponse();
+            dto.setScuoleVicine(indicatore.isVicinoScuola());
+            dto.setSupermercatiVicini(indicatore.isVicinoParco());
+            dto.setMezziPubbliciVicini(indicatore.isVicinoMezziPubblici());
+            return dto;
+        }
+
+
+
+/*******CARD RESPONSE (LISTA)********************************************************************************************/
+
+
+
     public InserzioneCardResponse toCardResponse(Inserzione inserzione) {
         if (inserzione == null) return null;
 

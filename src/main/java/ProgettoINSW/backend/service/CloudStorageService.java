@@ -7,7 +7,7 @@ import java.io.IOException;
 public interface CloudStorageService {
 
 
-    String uploadFile(MultipartFile file) throws IOException;
+    String uploadFile(MultipartFile file, String object) throws IOException;
 
     String getPublicUrl(String filename);
 }

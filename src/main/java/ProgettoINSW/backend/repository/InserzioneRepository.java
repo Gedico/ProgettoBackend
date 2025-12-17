@@ -17,7 +17,7 @@ public interface InserzioneRepository
 
     @Query("""
         SELECT i FROM Inserzione i
-        WHERE (:citta IS NULL OR LOWER(i.posizione.descrizione) LIKE LOWER(CONCAT('%', :citta, '%')))
+        WHERE (:citta IS NULL OR LOWER(i.posizione.comune) LIKE LOWER(CONCAT('%', :citta, '%')))
           AND (:categoria IS NULL OR i.categoria = :categoria)
           AND (:prezzoMin IS NULL OR i.prezzo >= :prezzoMin)
           AND (:prezzoMax IS NULL OR i.prezzo <= :prezzoMax)

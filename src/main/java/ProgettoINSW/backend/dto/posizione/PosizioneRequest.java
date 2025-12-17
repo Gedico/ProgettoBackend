@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 
         private BigDecimal latitudine;
         private BigDecimal longitudine;
-        private String descrizione_posizione;
+        private String comune;
+        private String indirizzo;
 
     }

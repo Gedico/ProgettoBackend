@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +48,12 @@ public class FotoServiceImpl implements FotoService {
 
                 validateImage(file);
 
-                String url = cloudStorageService.uploadFile(file);
+                String uniqueName =
+                        inserzione.getIdInserzione() + "/" +
+                                UUID.randomUUID() + "_" +
+                                file.getOriginalFilename();
+
+                String url = cloudStorageService.uploadFile(file, uniqueName);
                 uploadedUrls.add(url);
 
                 Foto f = new Foto();
@@ -55,6 +61,7 @@ public class FotoServiceImpl implements FotoService {
                 f.setInserzione(inserzione);
                 fotoList.add(f);
             }
+
 
             fotoRepository.saveAll(fotoList);
             return fotoList;
