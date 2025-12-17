@@ -1,5 +1,7 @@
 package ProgettoINSW.backend.model;
 import ProgettoINSW.backend.model.enums.StatoProposta;
+import ProgettoINSW.backend.model.enums.TipoProponente;
+import ProgettoINSW.backend.model.enums.TipoProposta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -9,62 +11,99 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-
-@Getter
-@Setter
 @Entity
 @Table(name = "proposta")
+@Getter
+@Setter
 public class Proposta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_proposta")
     private Long idProposta;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_inserzione", nullable = false)
     private Inserzione inserzione;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cliente")
-    private Utente cliente;
+    private Utente cliente; //null se manuale
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_agente")
+    @Column(name = "nome_cliente")
+    private String nomeCliente; // solo MANUALE
+
+    @Column(name = "contatto_cliente")
+    private String contattoCliente; // solo MANUALE
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_agente", nullable = false)
     private Agente agente;
 
-    @Column(name = "prezzo_proposta",  nullable = false)
-    @DecimalMin("0.0")
-    private BigDecimal prezzoProposta;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "proponente", nullable = false)
+    private TipoProponente proponente; // UTENTE o AGENTE
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "tipo", nullable = false)
+    private TipoProposta tipo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_proposta_precedente")
+    private Proposta propostaPrecedente;
+
+    @NotNull
+    @DecimalMin(value = "0.0", inclusive = false)
+    @Column(name = "prezzo_proposta", nullable = false)
+    private BigDecimal prezzoProposta;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "stato_proposta", length = 20, nullable = false)
-    private StatoProposta stato= StatoProposta.IN_ATTESA;
+    private StatoProposta stato;
 
-
+    @NotNull
     @Column(name = "data_proposta", nullable = false)
-    private OffsetDateTime dataProposta = OffsetDateTime.now();
+    private OffsetDateTime dataProposta;
 
-    @Column(name = "note" , columnDefinition = "TEXT")
+    @Column(name = "note", columnDefinition = "TEXT")
     private String note;
 
 
-    //Costruttori
-
     public Proposta() {
     }
-    
+
+
+    @PrePersist
+    private void prePersist() {
+        if (stato == null) {
+            stato = StatoProposta.IN_ATTESA;
+        }
+        if (dataProposta == null) {
+            dataProposta = OffsetDateTime.now();
+        }
+    }
 
     @Override
     public String toString() {
         return "Proposta{" +
                 "idProposta=" + idProposta +
-                ", Idinserzione=" + (inserzione != null ? inserzione.getIdInserzione() : null) +
-                ", clienteId=" + (cliente != null ? cliente.getIdUtente() : null) +
-                ", agenteId=" + (agente != null ? agente.getIdAgente() : null) +
-                ", prezzoproposta=" + prezzoProposta +
-                ", statoproposta='" + stato + '\'' +
-                ", dataproposta=" + dataProposta +
-                ", note='" + note + '\'' +
+                ", prezzoProposta=" + prezzoProposta +
+                ", stato=" + stato +
+                ", dataProposta=" + dataProposta +
                 '}';
     }
+
+
+    @AssertTrue(message = "Coerenza dati proposta non valida")
+    public boolean isPropostaValida() {
+        if (tipo == TipoProposta.MANUALE) {
+            return cliente == null && nomeCliente != null && contattoCliente != null;
+        }
+        if (tipo == TipoProposta.ONLINE) {
+            return cliente != null;
+        }
+        return true;
+    }
+
 }

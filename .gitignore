@@ -41,3 +41,6 @@ src/main/resources/**/*.json
 # Specifico per sicurezza:
 src/main/resources/gcp/
 src/main/resources/gcp/*.json
+
+
+src/main/resources/gcp/dietiestate25-storage.json
