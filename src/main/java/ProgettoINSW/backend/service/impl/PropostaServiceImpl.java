@@ -10,13 +10,14 @@ import ProgettoINSW.backend.model.enums.TipoProposta;
 import ProgettoINSW.backend.repository.*;
 import ProgettoINSW.backend.service.PropostaService;
 import ProgettoINSW.backend.util.JwtUtil;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.math.RoundingMode;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -46,6 +47,107 @@ public class PropostaServiceImpl implements PropostaService {
     }
 
     @Override
+    public PropostaResponse inviaProposta(PropostaRequest request, String token) {
+
+        Utente utente = getUtenteFromToken(token);
+        Inserzione inserzione = getInserzioneDisponibile(request.getIdInserzione());
+
+        validaPrezzoProposta(request.getPrezzoProposta(), inserzione);
+
+        if (propostaRepository.existsByClienteAndInserzione(utente, inserzione)) {
+            throw new IllegalStateException("Hai già inviato una proposta per questa inserzione");
+        }
+
+        Proposta proposta = new Proposta();
+        proposta.setInserzione(inserzione);
+        proposta.setCliente(utente);
+        proposta.setAgente(inserzione.getAgente());
+        proposta.setPrezzoProposta(request.getPrezzoProposta());
+        proposta.setNote(request.getNote());
+
+        proposta.setProponente(TipoProponente.UTENTE);
+        proposta.setTipo(TipoProposta.ONLINE); // 🔥 FIX CRITICO
+        proposta.setStato(StatoProposta.IN_ATTESA);
+
+        proposta.setPropostaPrecedente(null);
+        proposta.setDataProposta(OffsetDateTime.now());
+
+        propostaRepository.save(proposta);
+
+        return propostaMap.toPropostaResponse(
+                proposta,
+                "Proposta inviata con successo"
+        );
+    }
+
+    @Override
+    public PropostaResponse creaControproposta(
+            Long idProposta,
+            ContropropostaRequest request,
+            String token) {
+
+        Agente agente = getAgenteFromToken(token);
+        Proposta propostaOriginale = getPropostaOrThrow(idProposta);
+
+        verificaAgenteAutorizzato(propostaOriginale, agente);
+        verificaPropostaModificabile(propostaOriginale);
+
+        validaPrezzoProposta(
+                request.getNuovoPrezzo(),
+                propostaOriginale.getInserzione()
+        );
+
+        propostaOriginale.setStato(StatoProposta.RIFIUTATA);
+        propostaRepository.save(propostaOriginale);
+
+        Proposta controproposta =
+                creaNuovaControproposta(propostaOriginale, agente, request);
+
+        propostaRepository.save(controproposta);
+
+        return propostaMap.toPropostaResponse(
+                controproposta,
+                "Controproposta inviata con successo"
+        );
+    }
+
+    @Override
+    public PropostaResponse creaPropostaManuale(
+            Long idInserzione,
+            PropostaManualeRequest request,
+            String token) {
+
+        Agente agente = getAgenteFromToken(token);
+        Inserzione inserzione = getInserzioneDisponibile(idInserzione);
+
+        validaPrezzoProposta(request.getPrezzoProposta(), inserzione);
+
+        Proposta proposta = new Proposta();
+        proposta.setInserzione(inserzione);
+        proposta.setAgente(agente);
+        proposta.setCliente(null);
+
+        proposta.setNomeCliente(request.getNomeCliente());
+        proposta.setContattoCliente(request.getContattoCliente());
+        proposta.setPrezzoProposta(request.getPrezzoProposta());
+        proposta.setNote(request.getNote());
+
+        proposta.setProponente(TipoProponente.AGENTE);
+        proposta.setTipo(TipoProposta.MANUALE);
+        proposta.setStato(StatoProposta.IN_ATTESA);
+
+        proposta.setPropostaPrecedente(null);
+        proposta.setDataProposta(OffsetDateTime.now());
+
+        propostaRepository.save(proposta);
+
+        return propostaMap.toPropostaResponse(
+                proposta,
+                "Proposta manuale inserita con successo"
+        );
+    }
+
+    @Override
     public PropostaResponse aggiornaStatoProposta(
             Long id,
             AggiornaStatoPropostaRequest request,
@@ -66,67 +168,6 @@ public class PropostaServiceImpl implements PropostaService {
         return propostaMap.toPropostaResponse(
                 proposta,
                 "Stato proposta aggiornato con successo"
-        );
-    }
-
-    @Override
-    public PropostaResponse creaControproposta(
-            Long idProposta,
-            ContropropostaRequest request,
-            String token) {
-
-
-        Agente agente = getAgenteFromToken(token);
-        Proposta propostaOriginale = getPropostaOrThrow(idProposta);
-
-        verificaAgenteAutorizzato(propostaOriginale, agente);
-        verificaPropostaModificabile(propostaOriginale);
-
-        validaPrezzoProposta(
-                request.getNuovoPrezzo(),
-                propostaOriginale.getInserzione()
-        );
-
-        propostaOriginale.setStato(StatoProposta.RIFIUTATA);
-        propostaRepository.save(propostaOriginale);
-
-        Proposta controproposta = creaNuovaControproposta(propostaOriginale, agente, request);
-        propostaRepository.save(controproposta);
-
-        return propostaMap.toPropostaResponse(
-                controproposta,
-                "Controproposta inviata con successo"
-        );
-    }
-
-    @Override
-    public PropostaResponse inviaProposta(PropostaRequest request, String token) {
-
-        Utente utente = getUtenteFromToken(token);
-        Inserzione inserzione = getInserzioneDisponibile(request.getIdInserzione());
-
-        validaPrezzoProposta(request.getPrezzoProposta(), inserzione);
-
-        if (propostaRepository.existsByClienteAndInserzione(utente, inserzione)) {
-            throw new IllegalStateException("Hai già inviato una proposta per questa inserzione");
-        }
-
-        Proposta proposta = new Proposta();
-        proposta.setInserzione(inserzione);
-        proposta.setCliente(utente);
-        proposta.setAgente(inserzione.getAgente());
-        proposta.setPrezzoProposta(request.getPrezzoProposta());
-        proposta.setNote(request.getNote());
-        proposta.setStato(StatoProposta.IN_ATTESA);
-        proposta.setProponente(TipoProponente.UTENTE);
-        proposta.setPropostaPrecedente(null);
-        proposta.setDataProposta(OffsetDateTime.now());
-
-        propostaRepository.save(proposta);
-
-        return propostaMap.toPropostaResponse(
-                proposta,
-                "Proposta inviata con successo"
         );
     }
 
@@ -161,8 +202,9 @@ public class PropostaServiceImpl implements PropostaService {
         Agente agente = getAgenteFromToken(token);
 
         return propostaRepository.findByAgente(agente).stream()
-                .filter(p -> p.getStato() == StatoProposta.ACCETTATA
-                        || p.getStato() == StatoProposta.RIFIUTATA)
+                .filter(p ->
+                        p.getStato() == StatoProposta.ACCETTATA ||
+                                p.getStato() == StatoProposta.RIFIUTATA)
                 .map(p -> propostaMap.toPropostaResponse(p, null))
                 .toList();
     }
@@ -182,87 +224,6 @@ public class PropostaServiceImpl implements PropostaService {
        METODI PRIVATI
        ========================= */
 
-    private Agente getAgenteFromToken(String token) {
-        Account account = getAccountFromToken(token);
-        return agenteRepository.findByAccount(account)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Agente non trovato per account"));
-    }
-
-    private Utente getUtenteFromToken(String token) {
-        Account account = getAccountFromToken(token);
-        return utenteRepository.findByAccount_Id(account.getId())
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Utente non trovato per account"));
-    }
-
-    private Account getAccountFromToken(String token) {
-        String mail = JwtUtil.extractMail(token);
-        return accountRepository.findByMail(mail)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Account non trovato per mail: " + mail));
-    }
-
-    private Proposta getPropostaOrThrow(Long id) {
-        return propostaRepository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Proposta non trovata con ID: " + id));
-    }
-
-    private List<PropostaResponse> getProposteAgenteByStato(String token, StatoProposta stato) {
-        Agente agente = getAgenteFromToken(token);
-
-        List<Proposta> offerte;
-        if (stato == null) {
-            offerte = propostaRepository.findByAgente(agente);
-        } else {
-            offerte = propostaRepository.findByAgenteAndStato(agente.getIdAgente(), stato);
-        }
-
-        return offerte.stream()
-                .map(p -> propostaMap.toPropostaResponse(p, null))
-                .toList();
-    }
-
-
-    private Inserzione getInserzioneDisponibile(Long idInserzione) {
-        Inserzione inserzione = inserzioneRepository.findById(idInserzione)
-                .orElseThrow(() ->
-                        new EntityNotFoundException("Inserzione non trovata"));
-
-        if (inserzione.getStato() != StatoInserzione.DISPONIBILE) {
-            throw new IllegalStateException("Inserzione non disponibile");
-        }
-        return inserzione;
-    }
-
-    private void verificaAgenteAutorizzato(Proposta proposta, Agente agente) {
-        if (!proposta.getAgente().getIdAgente().equals(agente.getIdAgente())) {
-            throw new AccessDeniedException("Operazione non autorizzata");
-        }
-    }
-
-    private void verificaPropostaModificabile(Proposta proposta) {
-        if (proposta.getStato() == StatoProposta.ACCETTATA || proposta.getStato() == StatoProposta.RIFIUTATA) {
-            throw new IllegalStateException("La proposta non è modificabile");
-        }
-    }
-
-    private void gestisciAccettazioneProposta(Proposta proposta) {
-        Inserzione inserzione = proposta.getInserzione();
-        inserzione.setStato(StatoInserzione.VENDUTO);
-        inserzioneRepository.save(inserzione);
-
-        propostaRepository
-                .findAltreProposteByInserzione(inserzione, proposta.getIdProposta())
-                .forEach(p -> {
-                    if (p.getStato() == StatoProposta.IN_ATTESA) {
-                        p.setStato(StatoProposta.RIFIUTATA);
-                        propostaRepository.save(p);
-                    }
-                });
-    }
-
     private Proposta creaNuovaControproposta(
             Proposta originale,
             Agente agente,
@@ -272,81 +233,104 @@ public class PropostaServiceImpl implements PropostaService {
         p.setInserzione(originale.getInserzione());
         p.setCliente(originale.getCliente());
         p.setAgente(agente);
+
         p.setPrezzoProposta(request.getNuovoPrezzo());
         p.setNote(request.getNote());
 
-        p.setStato(StatoProposta.CONTROPROPOSTA);
         p.setProponente(TipoProponente.AGENTE);
-        p.setPropostaPrecedente(originale);
+        p.setTipo(TipoProposta.ONLINE); // 🔥 FIX
+        p.setStato(StatoProposta.CONTROPROPOSTA);
 
+        p.setPropostaPrecedente(originale);
         p.setDataProposta(OffsetDateTime.now());
+
         return p;
     }
 
     private void validaPrezzoProposta(BigDecimal prezzoProposto, Inserzione inserzione) {
 
-        if (prezzoProposto == null) {
-            throw new IllegalArgumentException("Il prezzo non può essere nullo");
+        if (prezzoProposto == null || prezzoProposto.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Prezzo non valido");
         }
 
-        if (prezzoProposto.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Il prezzo deve essere maggiore di zero");
-        }
-
-        BigDecimal prezzoInserzione = inserzione.getPrezzo();
-
-        // minimo accettato = prezzo - 15%
-        BigDecimal minimoAccettato = prezzoInserzione
+        BigDecimal minimoAccettato = inserzione.getPrezzo()
                 .multiply(new BigDecimal("0.85"))
                 .setScale(2, RoundingMode.HALF_UP);
 
         if (prezzoProposto.compareTo(minimoAccettato) < 0) {
             throw new IllegalArgumentException(
-                    "L'importo offerto è inferiore al minimo accettato (" +
-                            minimoAccettato + " €)"
+                    "Importo inferiore al minimo accettato (" + minimoAccettato + " €)"
             );
         }
     }
 
-    @Override
-    public PropostaResponse creaPropostaManuale(
-            Long idInserzione,
-            PropostaManualeRequest request,
-            String token
-    ) {
+    private Inserzione getInserzioneDisponibile(Long idInserzione) {
+        Inserzione inserzione = inserzioneRepository.findById(idInserzione)
+                .orElseThrow(() -> new EntityNotFoundException("Inserzione non trovata"));
 
-        Agente agente = getAgenteFromToken(token);
-        Inserzione inserzione = getInserzioneDisponibile(idInserzione);
-
-        // riuso la validazione prezzo già esistente
-        validaPrezzoProposta(request.getPrezzoProposta(), inserzione);
-
-        Proposta proposta = new Proposta();
-        proposta.setInserzione(inserzione);
-        proposta.setAgente(agente);
-        proposta.setCliente(null); // OFFLINE
-        proposta.setPrezzoProposta(request.getPrezzoProposta());
-        proposta.setNote(request.getNote());
-
-        // campi specifici OFFLINE
-        proposta.setNomeCliente(request.getNomeCliente());
-        proposta.setContattoCliente(request.getContattoCliente());
-
-        proposta.setStato(StatoProposta.IN_ATTESA);
-        proposta.setProponente(TipoProponente.AGENTE);
-        proposta.setTipo(TipoProposta.MANUALE);
-        proposta.setPropostaPrecedente(null);
-        proposta.setDataProposta(OffsetDateTime.now());
-
-        propostaRepository.save(proposta);
-
-        return propostaMap.toPropostaResponse(
-                proposta,
-                "Proposta manuale inserita con successo"
-        );
+        if (inserzione.getStato() != StatoInserzione.DISPONIBILE) {
+            throw new IllegalStateException("Inserzione non disponibile");
+        }
+        return inserzione;
     }
 
+    private Proposta getPropostaOrThrow(Long id) {
+        return propostaRepository.findById(id)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("Proposta non trovata con ID: " + id));
+    }
 
+    private Agente getAgenteFromToken(String token) {
+        Account account = getAccountFromToken(token);
+        return agenteRepository.findByAccount(account)
+                .orElseThrow(() -> new EntityNotFoundException("Agente non trovato"));
+    }
 
+    private Utente getUtenteFromToken(String token) {
+        Account account = getAccountFromToken(token);
+        return utenteRepository.findByAccount_Id(account.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato"));
+    }
 
+    private Account getAccountFromToken(String token) {
+        String mail = JwtUtil.extractMail(token);
+        return accountRepository.findByMail(mail)
+                .orElseThrow(() -> new EntityNotFoundException("Account non trovato"));
+    }
+
+    private List<PropostaResponse> getProposteAgenteByStato(
+            String token,
+            StatoProposta stato) {
+
+        Agente agente = getAgenteFromToken(token);
+
+        List<Proposta> proposte =
+                stato == null
+                        ? propostaRepository.findByAgente(agente)
+                        : propostaRepository.findByAgenteAndStato(
+                        agente.getIdAgente(), stato);
+
+        return proposte.stream()
+                .map(p -> propostaMap.toPropostaResponse(p, null))
+                .toList();
+    }
+
+    private void verificaAgenteAutorizzato(Proposta proposta, Agente agente) {
+        if (!proposta.getAgente().getIdAgente().equals(agente.getIdAgente())) {
+            throw new AccessDeniedException("Operazione non autorizzata");
+        }
+    }
+
+    private void verificaPropostaModificabile(Proposta proposta) {
+        if (proposta.getStato() == StatoProposta.ACCETTATA ||
+                proposta.getStato() == StatoProposta.RIFIUTATA) {
+            throw new IllegalStateException("La proposta non è modificabile");
+        }
+    }
+
+    private void gestisciAccettazioneProposta(Proposta proposta) {
+        Inserzione inserzione = proposta.getInserzione();
+        inserzione.setStato(StatoInserzione.VENDUTO);
+        inserzioneRepository.save(inserzione);
+    }
 }

@@ -106,4 +106,5 @@ public class Proposta {
         return true;
     }
 
+
 }
