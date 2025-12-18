@@ -5,6 +5,9 @@ import ProgettoINSW.backend.service.ProfiloService;
 import ProgettoINSW.backend.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ProgettoINSW.backend.dto.profilo.ChangePasswordRequest;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/profilo")
@@ -36,4 +39,21 @@ public class ProfiloController {
 
         return ResponseEntity.ok(profiloService.aggiornaProfilo(request, mail));
     }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestBody ChangePasswordRequest request,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.substring(7);
+        String mail = JwtUtil.extractMail(token);
+
+        profiloService.changePassword(mail, request);
+
+        return ResponseEntity.ok(
+                Map.of("message", "Password aggiornata con successo")
+        );
+    }
+
+
 }

@@ -6,7 +6,7 @@ import ProgettoINSW.backend.model.Utente;
 import ProgettoINSW.backend.repository.AccountRepository;
 import ProgettoINSW.backend.repository.UtenteRepository;
 import ProgettoINSW.backend.service.ProfiloService;
-import ProgettoINSW.backend.service.UtenteService;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +64,6 @@ public class ProfiloServiceImpl implements ProfiloService {
 
         accountRepository.save(account);
 
-        // --- FIX: crea utente se non esiste ---
         Utente utente = utenteRepository.findByAccount_Id(account.getId()).orElse(null);
 
         if (utente == null) {
@@ -78,9 +77,22 @@ public class ProfiloServiceImpl implements ProfiloService {
         }
 
         utenteRepository.save(utente);
-        // --- FINE FIX ---
 
         return new UpdateProfiloResponse("Profilo aggiornato con successo", true);
+    }
+
+    @Override
+    public void changePassword(String mail, ChangePasswordRequest request) {
+
+        Account account = accountRepository.findByMail(mail)
+                .orElseThrow(() -> new RuntimeException("Account non trovato"));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), account.getPassword())) {
+            throw new RuntimeException("Password attuale non corretta");
+        }
+
+        account.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        accountRepository.save(account);
     }
 
 
