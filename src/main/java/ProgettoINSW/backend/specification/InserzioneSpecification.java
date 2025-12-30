@@ -1,72 +1,87 @@
 package ProgettoINSW.backend.specification;
 
-import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneFiltriRequest;
 import ProgettoINSW.backend.model.Inserzione;
+import ProgettoINSW.backend.dto.datiInserzione.InserzioneSearchRequest;
 import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InserzioneSpecification {
 
-    public static Specification<Inserzione> filtra(DatiInserzioneFiltriRequest filtri) {
+    public static Specification<Inserzione> filtra(InserzioneSearchRequest filtri) {
+
         return (root, query, cb) -> {
 
-            var predicates = cb.conjunction();
+            List<Predicate> predicates = new ArrayList<>();
 
-            // --- QUERY TESTO LIBERO ---
-            if (filtri.getQuery() != null && !filtri.getQuery().trim().isEmpty()) {
-                String pattern = "%" + filtri.getQuery().toLowerCase() + "%";
+            // === COMUNE (OBBLIGATORIO) ===
+            predicates.add(
+                    cb.equal(
+                            cb.lower(root.get("posizione").get("comune")),
+                            filtri.getComune().toLowerCase()
+                    )
+            );
 
-                predicates.getExpressions().add(
-                        cb.or(
-                                cb.like(cb.lower(root.get("titolo")), pattern),
-                                cb.like(cb.lower(root.get("descrizione")), pattern),
-                                cb.like(cb.lower(root.get("categoria").as(String.class)), pattern)
-                        )
-                );
-            }
-
-            // --- CITTA ---
-            if (filtri.getCitta() != null && !filtri.getCitta().isEmpty()) {
-                String pattern = "%" + filtri.getCitta().toLowerCase() + "%";
-
-                predicates.getExpressions().add(
-                        cb.like(cb.lower(root.get("posizione").get("descrizione")), pattern)
-                );
-            }
-
-            // --- CATEGORIA ---
+            // === CATEGORIA ===
             if (filtri.getCategoria() != null) {
-                predicates.getExpressions().add(
+                predicates.add(
                         cb.equal(root.get("categoria"), filtri.getCategoria())
                 );
             }
 
-            // --- PREZZI ---
+            // === PREZZO ===
             if (filtri.getPrezzoMin() != null) {
-                predicates.getExpressions().add(
+                predicates.add(
                         cb.greaterThanOrEqualTo(root.get("prezzo"), filtri.getPrezzoMin())
                 );
             }
 
             if (filtri.getPrezzoMax() != null) {
-                predicates.getExpressions().add(
+                predicates.add(
                         cb.lessThanOrEqualTo(root.get("prezzo"), filtri.getPrezzoMax())
                 );
             }
 
-            // --- DIMENSIONI ---
+            // === DIMENSIONI ===
             if (filtri.getDimensioniMin() != null) {
-                predicates.getExpressions().add(
+                predicates.add(
                         cb.greaterThanOrEqualTo(root.get("dimensioni"), filtri.getDimensioniMin())
                 );
             }
 
             if (filtri.getDimensioniMax() != null) {
-                predicates.getExpressions().add(
+                predicates.add(
                         cb.lessThanOrEqualTo(root.get("dimensioni"), filtri.getDimensioniMax())
                 );
             }
 
-            return predicates;
+            // === NUMERO STANZE ===
+            if (filtri.getNumeroStanze() != null) {
+                predicates.add(
+                        cb.greaterThanOrEqualTo(root.get("numeroStanze"), filtri.getNumeroStanze())
+                );
+            }
+
+            // === ASCENSORE ===
+            if (filtri.getAscensore() != null) {
+                predicates.add(
+                        cb.equal(root.get("ascensore"), filtri.getAscensore())
+                );
+            }
+
+            // === STATO INSERZIONE ===
+            if (filtri.getStato() != null) {
+                predicates.add(
+                        cb.equal(root.get("stato"), filtri.getStato())
+                );
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
 }
+
+
+
