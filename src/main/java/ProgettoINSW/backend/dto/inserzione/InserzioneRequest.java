@@ -1,6 +1,5 @@
 package ProgettoINSW.backend.dto.inserzione;
 
-import ProgettoINSW.backend.dto.foto.FotoRequest;
 import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.posizione.PosizioneRequest;
 import lombok.Getter;

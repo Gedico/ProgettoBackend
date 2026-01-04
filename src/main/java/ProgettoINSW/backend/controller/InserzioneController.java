@@ -1,15 +1,12 @@
 package ProgettoINSW.backend.controller;
 
-import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
-import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneFiltriRequest;
-import ProgettoINSW.backend.dto.foto.FotoRequest;
+import ProgettoINSW.backend.dto.datiInserzione.InserzioneSearchRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneCardResponse;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
-import ProgettoINSW.backend.dto.response.SimpleResponse;
-import ProgettoINSW.backend.dto.stato.StatoRequest;
+import ProgettoINSW.backend.dto.inserzionesearch.*;
 import ProgettoINSW.backend.exception.BusinessException;
-import ProgettoINSW.backend.service.FotoService;
+import ProgettoINSW.backend.service.InserzioneSearchService;
 import ProgettoINSW.backend.service.InserzioneService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +21,12 @@ import java.util.List;
 public class InserzioneController {
 
     private final InserzioneService inserzioneService;
-    private final FotoService fotoService;
+    private final InserzioneSearchService inserzioneSearchService;
 
     public InserzioneController(final InserzioneService inserzioneService,
-                                final FotoService fotoService) {
+                                final InserzioneSearchService inserzioneSearchService) {
         this.inserzioneService = inserzioneService;
-        this.fotoService = fotoService;
+        this.inserzioneSearchService = inserzioneSearchService ;
     }
 
     // -----------------------------------------------------------
@@ -46,11 +43,16 @@ public class InserzioneController {
         return ResponseEntity.ok(inserzioneService.getInserzioniRecenti());
     }
 
-    @GetMapping("/ricerca")
-    public ResponseEntity<List<InserzioneResponse>> ricercaInserzioni(
-            @ModelAttribute final DatiInserzioneFiltriRequest filtri) {
-        return ResponseEntity.ok(inserzioneService.ricercaInserzioni(filtri));
+    @PostMapping("/search")
+    public ResponseEntity<List<InserzioneSearchResponse>> ricercaInserzioni(
+            @Valid @RequestBody InserzioneSearchRequest request) {
+
+        List<InserzioneSearchResponse> risultati =
+                inserzioneSearchService.ricercaInserzioni(request);
+
+        return ResponseEntity.ok(risultati);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<InserzioneResponse> getInserzioneById(
@@ -84,61 +86,6 @@ public class InserzioneController {
         return ResponseEntity.ok(inserzioneService.creaInserzione(request, immagini, token));
     }
 
-    @DeleteMapping("/eliminaFoto/{id}")
-    public ResponseEntity<SimpleResponse> eliminaFoto(
-            @PathVariable final Long id,
-            @RequestHeader("Authorization") final String authHeader,
-            @RequestBody @Valid final List<FotoRequest> daEliminare) {
-        
-        String token = extractToken(authHeader);
-        //fotoService.eliminaFoto(id, token, daEliminare);
-        
-        return ResponseEntity.ok(new SimpleResponse(true, "Foto eliminate con successo"));
-    }
-
-    @PutMapping("/modifica/{id}")
-    public ResponseEntity<DatiInserzioneRequest> modificaInserzione(
-            @PathVariable final Long id,
-            @Valid @RequestBody final DatiInserzioneRequest request,
-            @RequestHeader("Authorization") final String authHeader) {
-
-        final String token = extractToken(authHeader);
-        return ResponseEntity.ok(inserzioneService.modificaInserzione(id, request, token));
-    }
-
-    @DeleteMapping("/elimina/{id}")
-    public ResponseEntity<SimpleResponse> eliminaInserzione(
-            @PathVariable final Long id,
-            @RequestHeader("Authorization") final String authHeader) {
-
-        final String token = extractToken(authHeader);
-        inserzioneService.eliminaInserzione(id, token);
-        return ResponseEntity.ok(new SimpleResponse(true, "Inserzione eliminata con successo"));
-    }
-
-    @PutMapping("/modificaStato/{id}")
-    public ResponseEntity<SimpleResponse> cambiaStatoInserzione(
-            @PathVariable final Long id,
-            @RequestHeader("Authorization") final String authHeader,
-            @RequestBody @Valid final StatoRequest body) {
-
-        final String token = extractToken(authHeader);
-        inserzioneService.cambiaStato(id, token, body.getStato());
-        return ResponseEntity.ok(new SimpleResponse(true,
-                "Stato aggiornato correttamente a: " + body.getStato()));
-    }
-
-    @PostMapping("/caricaFoto/{id}")
-    public ResponseEntity<SimpleResponse> caricaFoto(
-            @PathVariable final Long id,
-            @RequestHeader("Authorization") final String authHeader,
-            @RequestBody @Valid final List<FotoRequest> nuoveFoto) {
-        
-        String token = extractToken(authHeader);
-        //fotoService.caricaFoto(id, token, nuoveFoto);
-
-        return ResponseEntity.ok(new SimpleResponse(true, "Foto caricate con successo"));
-    }
 
     // -----------------------------------------------------------
     // TOKEN UTIL
