@@ -16,11 +16,14 @@ public class PasswordResetToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String token;
 
-    @OneToOne
+    @OneToOne(optional = false)
+    @JoinColumn(name = "account_id_account", nullable = false, unique = true)
     private Account account;
 
+    @Column(nullable = false)
     private LocalDateTime expiryDate;
 
     public PasswordResetToken(String token, Account account) {

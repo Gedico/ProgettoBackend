@@ -55,17 +55,24 @@ public class PasswordResetController {
 
         Account account = accountOpt.get();
 
-        // 2. Genera token
+        // 2. Genera nuovo token
         String token = UUID.randomUUID().toString();
 
-        PasswordResetToken resetToken = new PasswordResetToken(token, account);
+        // 3. Se esiste già un token per quell'account, lo aggiorno (refresh); altrimenti lo creo
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByAccount(account)
+                .orElseGet(PasswordResetToken::new);
+
+        resetToken.setAccount(account);
+        resetToken.setToken(token);
+        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+
         passwordResetTokenRepository.save(resetToken);
 
-        // 3. Salva e invia email
+        // 4. Invia email
         String link = "http://localhost:4200/reset-password?token=" + token;
         emailService.sendPasswordResetEmail(account.getMail(), link);
 
-        // 4. Risposta uniforme e sempre 200 OK
+        // 5. Risposta uniforme e sempre 200 OK
         return ResponseEntity.ok(
                 Map.of("message", "Se l'email è corretta, riceverai un link per il reset.")
         );
@@ -111,6 +118,26 @@ public class PasswordResetController {
         );
     }
 
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verify(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+        if (token == null || token.isBlank()) {
+            return ResponseEntity.ok(Map.of("status", "invalid_token", "message", "Token mancante."));
+        }
+
+        Optional<PasswordResetToken> tokenOpt = passwordResetTokenRepository.findByToken(token);
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.ok(Map.of("status", "invalid_token", "message", "Token non valido."));
+        }
+
+        PasswordResetToken resetToken = tokenOpt.get();
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.ok(Map.of("status", "expired", "message", "Token scaduto."));
+        }
+
+        return ResponseEntity.ok(Map.of("status", "success", "message", "Token valido."));
+    }
 
 
 
