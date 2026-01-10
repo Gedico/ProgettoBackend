@@ -206,5 +206,6 @@ public class SecurityConfig {
 
         response.sendRedirect("http://localhost:4200/#/oauth-callback?token=" + token);
 
+
     }
 }

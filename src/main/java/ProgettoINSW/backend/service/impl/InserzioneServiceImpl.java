@@ -73,7 +73,7 @@ public class InserzioneServiceImpl implements InserzioneService {
     @Override
     public List<InserzioneCardResponse> getInserzioniRecenti() {
 
-        Pageable limit = PageRequest.of(0, 4);
+        Pageable limit = PageRequest.of(0, 6);
 
         List<Inserzione> lista = inserzioneRepository.findUltime4ConFoto(limit);
 
