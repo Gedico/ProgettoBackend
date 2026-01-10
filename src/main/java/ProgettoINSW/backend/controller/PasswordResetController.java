@@ -69,7 +69,7 @@ public class PasswordResetController {
         passwordResetTokenRepository.save(resetToken);
 
         // 4. Invia email
-        String link = "http://localhost:4200/reset-password?token=" + token;
+        String link = "http://localhost:4200/#/reset-password?token=" + token;
         emailService.sendPasswordResetEmail(account.getMail(), link);
 
         // 5. Risposta uniforme e sempre 200 OK
