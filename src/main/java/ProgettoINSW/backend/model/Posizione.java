@@ -18,10 +18,10 @@ public class Posizione {
     @Column(name = "id_posizione")
     private Long idPosizione;
 
-    @Column(name = "latitudine" ,nullable = false)
+    @Column(name = "latitudine", nullable = false, precision = 9, scale = 6)
     private BigDecimal latitudine;
 
-    @Column(name = "longitudine" ,nullable = false)
+    @Column(name = "longitudine", nullable = false, precision = 9, scale = 6)
     private BigDecimal longitudine;
 
     @Column(nullable = false, length = 100)

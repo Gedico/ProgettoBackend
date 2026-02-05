@@ -42,6 +42,12 @@ public class InserzioneServiceImpl implements InserzioneService {
                                              MultipartFile[] immagini,
                                              String token) throws IOException {
 
+        if (request == null) {
+            throw new IllegalArgumentException("InserzioneRequest non può essere null");
+        }
+        if (request.getPosizione() == null) {
+            throw new IllegalArgumentException("La posizione è obbligatoria");
+        }
 
         Agente agente = agenteService.getAgenteFromToken(token);
 
