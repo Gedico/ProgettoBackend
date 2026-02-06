@@ -13,14 +13,26 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 🔐 Chiave segreta fissa — cambiala con una tua personale, lunga almeno 32 caratteri
-    private static final String SECRET_KEY = "ProgettoINSW2025SecretKeyForJWT_is_MoltoLungaEForte!";
+    // 🔐 Chiave letta da variabile d'ambiente (NON hardcoded)
+    private static final String SECRET_KEY = System.getenv("JWT_SECRET_KEY");
+
     private static final long EXPIRATION_TIME = 86400000; // 24h
 
-    private static final Key key = new SecretKeySpec(
-            SECRET_KEY.getBytes(StandardCharsets.UTF_8),
-            SignatureAlgorithm.HS256.getJcaName()
-    );
+    // 🔐 Inizializzazione sicura della chiave
+    private static final Key key = initKey();
+
+    private static Key initKey() {
+        if (SECRET_KEY == null || SECRET_KEY.length() < 32) {
+            throw new IllegalStateException(
+                    "JWT_SECRET_KEY non configurata o troppo corta (minimo 32 caratteri)"
+            );
+        }
+
+        return new SecretKeySpec(
+                SECRET_KEY.getBytes(StandardCharsets.UTF_8),
+                SignatureAlgorithm.HS256.getJcaName()
+        );
+    }
 
     // 🔸 Genera token
     public static String generateToken(String email, String ruolo) {
@@ -63,3 +75,4 @@ public class JwtUtil {
         }
     }
 }
+
