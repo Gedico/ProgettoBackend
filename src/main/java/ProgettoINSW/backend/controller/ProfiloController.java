@@ -13,6 +13,9 @@ import java.util.Map;
 @RequestMapping("/api/profilo")
 public class ProfiloController {
 
+    private static final String MESSAGE_KEY = "message";
+    private static final String BEARER_PREFIX = "Bearer ";
+
     private final ProfiloService profiloService;
 
     public ProfiloController(ProfiloService profiloService) {
@@ -41,19 +44,24 @@ public class ProfiloController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(
+    public ResponseEntity<Map<String, String>> changePassword(
             @RequestBody ChangePasswordRequest request,
             @RequestHeader("Authorization") String authHeader) {
 
-        String token = authHeader.substring(7);
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+            throw new IllegalArgumentException("Header Authorization non valido");
+        }
+
+        String token = authHeader.substring(BEARER_PREFIX.length());
         String mail = JwtUtil.extractMail(token);
 
         profiloService.changePassword(mail, request);
 
         return ResponseEntity.ok(
-                Map.of("message", "Password aggiornata con successo")
+                Map.of(MESSAGE_KEY, "Password aggiornata con successo")
         );
     }
+
 
 
 }

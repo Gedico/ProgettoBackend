@@ -18,7 +18,7 @@ public class ErrorResponse {
     private int status;
 
     //  Costruttore vuoto (necessario per buildError)
-    public ErrorResponse() {
+    public ErrorResponse() { // Costruttore vuoto richiesto da Jackson per la deserializzazione JSON
     }
 
 
