@@ -49,40 +49,32 @@ class InserzioneServiceImplTest {
     private InserzioneServiceImpl inserzioneService;
 
     // ---------- TEST HAPPY PATH ----------
-    /*@Test
+    @Test
     void creaInserzione_quandoOk_salvaInserzioneEImmagini() throws Exception {
         // GIVEN
         String token = "valid-token";
 
-        // 1. Mock della richiesta principale
-        InserzioneRequest request = mock(InserzioneRequest.class);
-        // 2. Mock dell'oggetto annidato (DatiInserzioneRequest) per evitare il NullPointerException
-        DatiInserzioneRequest datiRequest = mock(DatiInserzioneRequest.class);
+        InserzioneRequest request = new InserzioneRequest();
 
-        // Configuriamo la catena: request.getDatiInserzioneRequest() -> datiRequest -> getTitolo()
-        when(request.getDatiInserzioneRequest()).thenReturn(datiRequest);
-        when(datiRequest.getTitolo()).thenReturn("Appartamento Test");
+        PosizioneRequest posizioneRequest = new PosizioneRequest();
+        posizioneRequest.setIndirizzo("Via Roma 1");
+        posizioneRequest.setComune("Napoli");
+        request.setPosizione(posizioneRequest);
 
         MultipartFile[] immagini = new MultipartFile[]{mock(MultipartFile.class)};
 
+        // Mock delle entità di risposta
         Agente agente = new Agente();
-
-        // Prepariamo la posizione con dati per superare la validazione
         Posizione posizione = new Posizione();
         posizione.setIndirizzo("Via Roma 1");
-        posizione.setComune("Napoli");
-
         IndicatoreProssimita indicatore = new IndicatoreProssimita();
         Inserzione inserzione = new Inserzione();
-        inserzione.setPosizione(posizione);
         InserzioneResponse response = new InserzioneResponse();
 
-        // Configurazione dei Service
+        // Configurazione dei mock
         when(agenteService.getAgenteFromToken(token)).thenReturn(agente);
-        when(posizioneService.creaPosizione(any())).thenReturn(posizione);
+        when(posizioneService.creaPosizione(any(PosizioneRequest.class))).thenReturn(posizione);
         when(indicatoreProssimitaService.generaIndicatoriPerInserzione(any())).thenReturn(indicatore);
-
-        // Matchers flessibili per il Mapper
         when(map.inserzioneToEntity(any(), any(), any(), any())).thenReturn(inserzione);
         when(inserzioneRepository.save(any(Inserzione.class))).thenReturn(inserzione);
         when(map.toInserzioneResponse(any())).thenReturn(response);
@@ -95,15 +87,19 @@ class InserzioneServiceImplTest {
         verify(agenteService).getAgenteFromToken(token);
         verify(posizioneService).creaPosizione(any());
         verify(inserzioneRepository).save(any(Inserzione.class));
+        verify(fotoService).processImages(immagini, inserzione);
+        verify(map).toInserzioneResponse(inserzione);
     }
-
 
     @Test
     void creaInserzione_quandoTokenNonValido_lanciaEntityNotFound() throws Exception {
-
         // GIVEN
         String token = "invalid-token";
-        InserzioneRequest request = mock(InserzioneRequest.class);
+
+        InserzioneRequest request = new InserzioneRequest();
+        PosizioneRequest posizioneRequest = new PosizioneRequest();
+        request.setPosizione(posizioneRequest);
+
         MultipartFile[] immagini = new MultipartFile[]{mock(MultipartFile.class)};
 
         when(agenteService.getAgenteFromToken(token))
@@ -114,7 +110,7 @@ class InserzioneServiceImplTest {
                 inserzioneService.creaInserzione(request, immagini, token)
         );
 
-        // Verifica assenza di side effects
+        // Verifica che solo agenteService sia stato chiamato
         verify(agenteService).getAgenteFromToken(token);
         verifyNoInteractions(
                 posizioneService,
@@ -123,7 +119,7 @@ class InserzioneServiceImplTest {
                 fotoService,
                 map
         );
-    }*/
+    }
 
     @Test
     void creaInserzione_quandoRequestNull_lanciaIllegalArgumentException() throws Exception {

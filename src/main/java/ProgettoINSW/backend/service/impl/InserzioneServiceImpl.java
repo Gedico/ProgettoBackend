@@ -49,6 +49,17 @@ public class InserzioneServiceImpl implements InserzioneService {
             throw new IllegalArgumentException("La posizione è obbligatoria");
         }
 
+        if (request == null) {
+            throw new IllegalArgumentException("La request non può essere null");
+        }
+
+        if (request.getPosizione() == null) {
+            throw new IllegalArgumentException("La posizione non può essere null");
+        }
+
+        if (token == null || token.trim().isEmpty()) {
+            throw new IllegalArgumentException("Il token non può essere null o vuoto");
+        }
         Agente agente = agenteService.getAgenteFromToken(token);
 
         Posizione posizione = posizioneService.creaPosizione(request.getPosizione());
