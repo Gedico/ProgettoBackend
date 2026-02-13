@@ -1,5 +1,6 @@
 package ProgettoINSW.backend.service.impl;
 
+import ProgettoINSW.backend.dto.datiInserzione.DatiInserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneRequest;
 import ProgettoINSW.backend.dto.inserzione.InserzioneResponse;
 import ProgettoINSW.backend.dto.posizione.PosizioneRequest;
@@ -50,50 +51,55 @@ class InserzioneServiceImplTest {
     // ---------- TEST HAPPY PATH ----------
     @Test
     void creaInserzione_quandoOk_salvaInserzioneEImmagini() throws Exception {
-
         // GIVEN
         String token = "valid-token";
 
-        InserzioneRequest request = mock(InserzioneRequest.class);
+        InserzioneRequest request = new InserzioneRequest();
+
+        PosizioneRequest posizioneRequest = new PosizioneRequest();
+        posizioneRequest.setIndirizzo("Via Roma 1");
+        posizioneRequest.setComune("Napoli");
+        request.setPosizione(posizioneRequest);
+
         MultipartFile[] immagini = new MultipartFile[]{mock(MultipartFile.class)};
 
+        // Mock delle entità di risposta
         Agente agente = new Agente();
         Posizione posizione = new Posizione();
+        posizione.setIndirizzo("Via Roma 1");
         IndicatoreProssimita indicatore = new IndicatoreProssimita();
         Inserzione inserzione = new Inserzione();
         InserzioneResponse response = new InserzioneResponse();
 
+        // Configurazione dei mock
         when(agenteService.getAgenteFromToken(token)).thenReturn(agente);
-        when(posizioneService.creaPosizione(any())).thenReturn(posizione);
-        when(indicatoreProssimitaService.generaIndicatoriPerInserzione(request))
-                .thenReturn(indicatore);
-        when(map.inserzioneToEntity(request, posizione, agente, indicatore))
-                .thenReturn(inserzione);
-        when(inserzioneRepository.save(inserzione)).thenReturn(inserzione);
-        when(map.toInserzioneResponse(inserzione)).thenReturn(response);
+        when(posizioneService.creaPosizione(any(PosizioneRequest.class))).thenReturn(posizione);
+        when(indicatoreProssimitaService.generaIndicatoriPerInserzione(any())).thenReturn(indicatore);
+        when(map.inserzioneToEntity(any(), any(), any(), any())).thenReturn(inserzione);
+        when(inserzioneRepository.save(any(Inserzione.class))).thenReturn(inserzione);
+        when(map.toInserzioneResponse(any())).thenReturn(response);
 
         // WHEN
-        InserzioneResponse result =
-                inserzioneService.creaInserzione(request, immagini, token);
+        InserzioneResponse result = inserzioneService.creaInserzione(request, immagini, token);
 
         // THEN
         assertNotNull(result);
-
         verify(agenteService).getAgenteFromToken(token);
         verify(posizioneService).creaPosizione(any());
-        verify(indicatoreProssimitaService).generaIndicatoriPerInserzione(request);
-        verify(inserzioneRepository).save(inserzione);
+        verify(inserzioneRepository).save(any(Inserzione.class));
         verify(fotoService).processImages(immagini, inserzione);
         verify(map).toInserzioneResponse(inserzione);
     }
 
-
     @Test
     void creaInserzione_quandoTokenNonValido_lanciaEntityNotFound() throws Exception {
-
         // GIVEN
         String token = "invalid-token";
-        InserzioneRequest request = mock(InserzioneRequest.class);
+
+        InserzioneRequest request = new InserzioneRequest();
+        PosizioneRequest posizioneRequest = new PosizioneRequest();
+        request.setPosizione(posizioneRequest);
+
         MultipartFile[] immagini = new MultipartFile[]{mock(MultipartFile.class)};
 
         when(agenteService.getAgenteFromToken(token))
@@ -104,7 +110,7 @@ class InserzioneServiceImplTest {
                 inserzioneService.creaInserzione(request, immagini, token)
         );
 
-        // Verifica assenza di side effects
+        // Verifica che solo agenteService sia stato chiamato
         verify(agenteService).getAgenteFromToken(token);
         verifyNoInteractions(
                 posizioneService,

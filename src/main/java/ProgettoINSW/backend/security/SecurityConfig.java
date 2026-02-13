@@ -85,7 +85,6 @@ public class SecurityConfig {
         switch (provider) {
             case "google" -> handleGoogleSuccess(response, authentication);
             case "github" -> handleGitHubSuccess(response, authentication);
-            case "facebook" -> handleFacebookSuccess(response, authentication);
             default -> response.sendError(400, "Provider OAuth non supportato");
         }
     }
@@ -167,22 +166,6 @@ public class SecurityConfig {
         processOAuthUser(email, nome, cognome, response);
     }
 
-    // ========= FACEBOOK ==========
-
-    private void handleFacebookSuccess(HttpServletResponse response,
-                                       Authentication authentication) throws IOException {
-
-        OAuth2User user = (OAuth2User) authentication.getPrincipal();
-        Map<String, Object> a = user.getAttributes();
-
-        String email = (String) a.get("email");
-        if (email == null) email = UUID.randomUUID() + "@facebook.fake";
-
-        String nome = (String) a.getOrDefault("first_name", "FacebookUser");
-        String cognome = (String) a.getOrDefault("last_name", "");
-
-        processOAuthUser(email, nome, cognome, response);
-    }
 
     // ========= CREA ACCOUNT + UTENTE ==========
 

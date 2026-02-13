@@ -44,3 +44,5 @@ src/main/resources/gcp/*.json
 
 
 src/main/resources/gcp/dietiestate25-storage.json
+
+.env
